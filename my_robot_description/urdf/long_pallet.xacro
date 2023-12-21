@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot name="long_pallet" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name="long_pallet">
+    <inertial>
+      <origin
+        xyz="0.291080013901068 0.20335853380665 0.313229331004487"
+        rpy="0 0 0" />
+      <mass
+        value="5.89400000000001" />
+      <inertia
+        ixx="0.122033819833333"
+        ixy="-1.88845020711894E-20"
+        ixz="-1.53871349224279E-17"
+        iyy="0.157871233333333"
+        iyz="-4.14514250944756E-20"
+        izz="0.0361096948333333" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/long_pallet.stl"> 
+          
+        </mesh>
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/long_pallet.stl"> 
+        </mesh>
+      </geometry>
+    </collision>
+  </link>
+  
+  <link name="base_footprint">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </link>
+
+  <joint name="base_joint" type="fixed">
+      <parent link="base_footprint"/>
+      <child link="long_pallet"/>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+  </joint>
+
+  <!-- <gazebo>
+      <plugin name="gazebo_ros_joint_state_publisher_pallet"
+          filename="libgazebo_ros_joint_state_publisher.so">
+          <joint_name>base_joint</joint_name>
+      </plugin>
+  </gazebo> -->
+
+</robot>

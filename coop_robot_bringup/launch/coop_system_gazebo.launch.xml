@@ -1,0 +1,7 @@
+<launch>
+
+    <include file="$(find-pkg-share gazebo_ros)/launch/gazebo.launch.py">
+     <arg name="world" value="$(find-pkg-share my_robot_bringup)/worlds/coop_test3.world" />
+    </include>
+
+</launch>
