@@ -9,11 +9,12 @@ microcontroller:
 
 
 ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
-  publisher:  [     [1,"encode", "geometry_msgs/Vector3Stamped.msg"] ,
-                    [2,"speedreq", "geometry_msgs/Vector3Stamped.msg"],
-                    [3,"PWM", "geometry_msgs/Vector3Stamped.msg"],
-                    [4,"speedcmd", "geometry_msgs/Vector3Stamped.msg"],
-                    [5,"odom", "geometry_msgs/Pose.msg"]
+  publisher:  [     [1,"encoder_tick", "geometry_msgs/Vector3Stamped.msg"] ,
+                    [2,"speed_req", "geometry_msgs/Vector3Stamped.msg"],
+                    [3,"PWM_cmd", "geometry_msgs/Vector3Stamped.msg"],
+                    [4,"speed_cmd", "geometry_msgs/Vector3Stamped.msg"],
+                    [5,"IMU", "geometry_msgs/Vector3Stamped.msg"],
+                    [6,"encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
                        ]
   subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
   srv_client: [                           ]
