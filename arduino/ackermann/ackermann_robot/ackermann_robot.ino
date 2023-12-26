@@ -1,9 +1,12 @@
-#include <Servo.h>
-#include <ros.h>
-#include <geometry_msgs/Twist.h>
-#include <std_msgs/String.h>
 #include <PID_v1.h>
+#include <Xicro_coop_teleop_ID_1.h>
+#include <Wire.h>
+#include <Servo.h>
+#include <MPU6050_light.h>
 
+MPU6050 mpu(Wire);
+Servo servo;
+Xicro xicro;
 //initializing all the variables
 #define LOOPTIME                      100     //Looptime in millisecond
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
@@ -44,6 +47,7 @@ const int PIN_ENCOD_B_SERVO = 23;              //B channel for encoder of right 
 //Define Value
 const double radius = 0.06;                   //Wheel radius, in m
 const double wheelbase = 0.58;               //Wheelbase, in m
+const double wheellength = 0.58;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 const double speed_to_pwm_ratio = 0.00235;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
@@ -90,10 +94,11 @@ volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
 volatile float pos_servo = 0;      //Servo motor encoder position
 
+PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
+PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
+
 //const unsigned long print_interval = 1000; // 1 second
 //unsigned long previous_print_time = 0;
-
-Servo servo;
 
 class motor{
     public:
@@ -125,72 +130,23 @@ class motor{
             digitalWrite(pinB, HIGH);
        }
     }
-    servo.write(servo_pos);
+//    steer_servo.write(servo_pos);
 };
 
 void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
-  
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
-
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
-  
-  speed_req_left = speed_req - angular_speed_req*(wheelbase/2);     //Calculate the required speed for the left motor to comply with commanded linear and angular speeds
-  speed_req_right = speed_req + angular_speed_req*(wheelbase/2);    //Calculate the required speed for the right motor to comply with commanded linear and angular speeds
 
-//ros::NodeHandle nh;
-//std_msgs::String combined_msg;
-//ros::Publisher combined_pub("combined", &combined_msg);
+  speed_req_right = speed_req;
+  speed_req_left = speed_req;
+  ang_req_servo = atan(angular_speed_req*wheellength)/speed_req;
 
-//void cmd_vel_callback(const geometry_msgs::Twist& twist_msg) {
-  //int motor_state = twist_msg.linear.x;
-  //int motor_spd = twist_msg.linear.y;
-  //int servo_pos = twist_msg.angular.z;
-  //unsigned long current_time = millis();
-
-  //if (current_time - previous_print_time >= print_interval) {
-    //previous_print_time = current_time;
-
-    // Create the combined message
-    //char combined_buffer[50];
-    //snprintf(combined_buffer, sizeof(combined_buffer), "motor spd: %d servo_pos: %d", motor_spd, servo_pos);
-    //combined_msg.data = combined_buffer;
-
-    // Publish the combined message
-    //combined_pub.publish(&combined_msg);
-  }
-  // Set the motor directions and speeds
-  if (motor_state == 1) {
-    analogWrite(pwm1, motor_spd);
-    digitalWrite(motor1_pin1, HIGH);
-    digitalWrite(motor1_pin2, LOW);
-    analogWrite(pwm2, motor_spd+6);
-    digitalWrite(motor2_pin1, HIGH);
-    digitalWrite(motor2_pin2, LOW);
-    key_pressed = true;
-  } else if (motor_state == -1) {
-    analogWrite(pwm1, motor_spd);
-    digitalWrite(motor1_pin1, LOW);
-    digitalWrite(motor1_pin2, HIGH);
-    analogWrite(pwm2, motor_spd+6);
-    digitalWrite(motor2_pin1, LOW);
-    digitalWrite(motor2_pin2, HIGH);
-    key_pressed = true;
-  } else if (motor_state == 0) {
-    analogWrite(pwm1, 0);
-    digitalWrite(motor1_pin1, HIGH);
-    digitalWrite(motor1_pin2, HIGH);
-    analogWrite(pwm2, 0);
-    digitalWrite(motor2_pin1, HIGH);
-    digitalWrite(motor2_pin2, HIGH);
-    key_pressed = false;
-  }
-
-  servo.write(servo_pos);
+ 
+//  servo.write(servo_pos);
 }
 
-ros::Subscriber<geometry_msgs::Twist> cmd_vel_sub("cmd_vel", &cmd_vel_callback);
-
+motor leftMotor, rightMotor;
 
 void setup() {
   // Set the motor control pins as outputs
@@ -206,7 +162,7 @@ void setup() {
   pinMode(motor2PWM, OUTPUT);
   servo.attach(servoIN);
 
-  erial.begin(115200);
+  Serial.begin(115200);
   xicro.begin(&Serial);
 
   
@@ -220,7 +176,7 @@ void setup() {
   rightMotor.pinA = 6;
   rightMotor.pinB = 7;
   rightMotor.pinPWM = 5;
-  servo.pin = 13
+
   
   leftMotor.setSpeed(0);
   leftMotor.run("BRAKE");
@@ -250,15 +206,13 @@ void setup() {
   attachInterrupt(1, encoderRightMotor, RISING);
 
   //Define the rotary encoder for servo motor
-  pinMode(PIN_ENCOD_A_SERVO, INPUT);
-  pinMode(PIN_ENCOD_B_SERVO, INPUT);
-  digitalWrite(PIN_ENCOD_A_SERVO, HIGH);                // turn on pullup resistor
-  digitalWrite(PIN_ENCOD_B_SERVO, HIGH);
-  attachInterrupt(1, encoderServoMotor, RISING);
+//  pinMode(PIN_ENCOD_A_SERVO, INPUT);
+//  pinMode(PIN_ENCOD_B_SERVO, INPUT);
+//  digitalWrite(PIN_ENCOD_A_SERVO, HIGH);                // turn on pullup resistor
+//  digitalWrite(PIN_ENCOD_B_SERVO, HIGH);
+//  attachInterrupt(1, encoderServoMotor, RISING);
 
-  //nh.initNode();
-  //nh.subscribe(cmd_vel_sub);
-  //nh.advertise(combined_pub);
+
 }
 
 void loop() {
@@ -267,9 +221,7 @@ void loop() {
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loop
     lastMilli = millis();
-    
     byte status = mpu.begin();
-    
     xicro.Publisher_IMU.message.vector.x = mpu.getAngleX();
     xicro.Publisher_IMU.message.vector.y = mpu.getAngleY();
     xicro.Publisher_IMU.message.vector.z = mpu.getAngleZ();
@@ -354,20 +306,17 @@ void loop() {
     if (noCommLoops == 65535){
       noCommLoops = noCommLoopMax;
     }
-
    publishSpeed(LOOPTIME);
-
  }
 }
 void publishSpeed(double time) {
-//  xicro.Publisher_encode.message.header.stamp = nh.now;
+  xicro.Spin_node();
   xicro.Publisher_encoder_vel.message.vector.x = speed_act_right;
   xicro.Publisher_encoder_vel.message.vector.y = speed_act_left;
-  xicro.Publisher_encoder_vel.message.vector.z = time/1000;
+  xicro.Publisher_encoder_vel.message.vector.z = ang_act_servo;
   xicro.publish_encoder_vel();
   xicro.publish_encoder_tick();
   xicro.publish_IMU();
-  xicro.Spin_node();
   xicro.Publisher_speed_req.message.vector.x = speed_req_left;
   xicro.Publisher_speed_req.message.vector.y = speed_req_right;
         
