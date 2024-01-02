@@ -157,11 +157,8 @@ void setup() {
   Serial.begin(115200);
   xicro.begin(&Serial);
 
-  
   Serial.println("Setup complete");
   
-  float linearX = xicro.Subscription_cmd_vel.message.linear.x;
-
   leftMotor.pinA = 12;
   leftMotor.pinB = 11;
   leftMotor.pinPWM = 10;
@@ -206,9 +203,9 @@ void loop() {
     
     byte status = mpu.begin();
     
-    xicro.Publisher_IMU.message.vector.x = mpu.getAngleX();
-    xicro.Publisher_IMU.message.vector.y = mpu.getAngleY();
-    xicro.Publisher_IMU.message.vector.z = mpu.getAngleZ();
+    xicro.Publisher_diff_imu.message.vector.x = mpu.getAngleX();
+    xicro.Publisher_diff_imu.message.vector.y = mpu.getAngleY();
+    xicro.Publisher_diff_imu.message.vector.z = mpu.getAngleZ();
 //    xicro.Publisher_IMU.message.vector.y = int(mpu.getAngleZ())%360;
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -225,8 +222,8 @@ void loop() {
     speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
     }
     
-    xicro.Publisher_encoder_tick.message.vector.x = pos_right;
-    xicro.Publisher_encoder_tick.message.vector.y = pos_left;
+    xicro.Publisher_diff_encoder_tick.message.vector.x = pos_right;
+    xicro.Publisher_diff_encoder_tick.message.vector.y = pos_left;
     pos_left = 0;
     pos_right = 0;
     
@@ -297,27 +294,27 @@ void loop() {
 }
 void publishSpeed(double time) {
 //  xicro.Publisher_encode.message.header.stamp = nh.now;
-  xicro.Publisher_encoder_vel.message.vector.x = speed_act_right;
-  xicro.Publisher_encoder_vel.message.vector.y = speed_act_left;
-  xicro.Publisher_encoder_vel.message.vector.z = time/1000;
-  xicro.publish_encoder_vel();
-  xicro.publish_encoder_tick();
-  xicro.publish_IMU();
+  xicro.Publisher_diff_encoder_vel.message.vector.x = speed_act_right;
+  xicro.Publisher_diff_encoder_vel.message.vector.y = speed_act_left;
+  xicro.Publisher_diff_encoder_vel.message.vector.z = time/1000;
+  xicro.publish_diff_encoder_vel();
+  xicro.publish_diff_encoder_tick();
+  xicro.publish_diff_imu();
   xicro.Spin_node();
-  xicro.Publisher_speed_req.message.vector.x = speed_req_left;
-  xicro.Publisher_speed_req.message.vector.y = speed_req_right;
+  xicro.Publisher_diff_speed_req.message.vector.x = speed_req_left;
+  xicro.Publisher_diff_speed_req.message.vector.y = speed_req_right;
         
-  xicro.publish_speed_req();
+  xicro.publish_diff_speed_req();
 
-    xicro.Publisher_speed_cmd.message.vector.x = speed_cmd_left;
-    xicro.Publisher_speed_cmd.message.vector.y = speed_cmd_right;
+    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_left;
+    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_right;
           
-    xicro.publish_speed_cmd();
+    xicro.publish_diff_speed_cmd();
   
-    xicro.Publisher_PWM_cmd.message.vector.x = PWM_leftMotor;
-    xicro.Publisher_PWM_cmd.message.vector.y = PWM_rightMotor;
+    xicro.Publisher_diff_PWM_cmd.message.vector.x = PWM_leftMotor;
+    xicro.Publisher_diff_PWM_cmd.message.vector.y = PWM_rightMotor;
           
-    xicro.publish_PWM_cmd();
+    xicro.publish_diff_PWM_cmd();
 //  xicro.loginfo("Publishing odometry");
 }
 

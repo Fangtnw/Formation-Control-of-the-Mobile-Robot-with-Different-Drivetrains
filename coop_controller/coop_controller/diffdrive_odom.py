@@ -32,9 +32,9 @@ class OdometryNode(Node):
 
         self.odom_pub = self.create_publisher(Odometry, 'diff_odom', 100)
         # self.encoder_ticks_sub = self.create_subscription(
-        #     Vector3Stamped, 'encoder_ticks', self.encoder_ticks_callback, 100)
+        #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
-            Vector3Stamped, 'encoder_vel', self.encoder_vel_callback, 1)
+            Vector3Stamped, 'diff_encoder_vel', self.encoder_vel_callback, 1)
         self.imu_sub = self.create_subscription(
             Vector3Stamped, 'imu', self.imu_callback, 1)
 
@@ -57,11 +57,11 @@ class OdometryNode(Node):
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
-        odom_msg.header.frame_id = 'map'
+        odom_msg.header.frame_id = 'odom'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
-        odom_msg.child_frame_id = "diff_base_link"
+        odom_msg.child_frame_id = "base_link"
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
@@ -92,6 +92,17 @@ class OdometryNode(Node):
         # Publish odometry message
         self.odom_pub.publish(odom_msg)
 
+        map_to_odom_transform = TransformStamped()
+        map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
+        map_to_odom_transform.header.frame_id = 'map'
+        map_to_odom_transform.child_frame_id = 'odom'
+        map_to_odom_transform.transform.translation.x = self.Robot_X
+        map_to_odom_transform.transform.translation.y = self.Robot_Y
+        map_to_odom_transform.transform.translation.z = 0.0
+        map_to_odom_transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
+        map_to_odom_transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
+        self.tf_broadcaster.sendTransform(map_to_odom_transform)
+        
         # Publish TF transform
         transform = TransformStamped()
         transform.header = Header()
@@ -104,6 +115,18 @@ class OdometryNode(Node):
         transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
         transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
         self.tf_broadcaster.sendTransform(transform)
+
+        # Publish TF transform from 'base_link' to 'base_footprint'
+        transform_base_link_to_base_footprint = TransformStamped()
+        transform_base_link_to_base_footprint.header.stamp = self.get_clock().now().to_msg()
+        transform_base_link_to_base_footprint.header.frame_id = 'base_link'
+        transform_base_link_to_base_footprint.child_frame_id = 'base_footprint'
+        transform_base_link_to_base_footprint.transform.translation.x = 0.0  # Adjust as needed
+        transform_base_link_to_base_footprint.transform.translation.y = 0.0  # Adjust as needed
+        transform_base_link_to_base_footprint.transform.translation.z = 0.0  # Adjust as needed
+        transform_base_link_to_base_footprint.transform.rotation.z = 0.0  # Adjust as needed
+        transform_base_link_to_base_footprint.transform.rotation.w = 1.0  # Adjust as needed
+        self.tf_broadcaster.sendTransform(transform_base_link_to_base_footprint)
 
     def forward_kinematic(self):
         self.Robot_LinVel = (self.right_vel + self.left_vel) * 0.5

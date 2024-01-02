@@ -9,16 +9,41 @@ microcontroller:
 
 
 ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
-  publisher:  [     [1,"encoder_tick", "geometry_msgs/Vector3Stamped.msg"] ,
-                    [2,"speed_req", "geometry_msgs/Vector3Stamped.msg"],
-                    [3,"PWM_cmd", "geometry_msgs/Vector3Stamped.msg"],
-                    [4,"speed_cmd", "geometry_msgs/Vector3Stamped.msg"],
-                    [5,"IMU", "geometry_msgs/Vector3Stamped.msg"],
-                    [6,"encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
+  publisher:  [     [1,"diff_encoder_tick", "geometry_msgs/Vector3Stamped.msg"] ,
+                    [2,"diff_speed_req", "geometry_msgs/Vector3Stamped.msg"],
+                    [3,"diff_PWM_cmd", "geometry_msgs/Vector3Stamped.msg"],
+                    [4,"diff_speed_cmd", "geometry_msgs/Vector3Stamped.msg"],
+                    [5,"diff_imu", "geometry_msgs/Vector3Stamped.msg"],
+                    [6,"diff_encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
                        ]
   subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
   srv_client: [                           ]
   srv_server: [                           ]
   action_client: [                        ]
   action_server: [                        ]
+
+
+#   microcontroller:
+#   idmcu: 2 # id of mcu 
+#   namespace: "coop_teleop" # namespace
+#   generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
+#   connection:
+#     type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
+#     serial_port: "/dev/ttyACM0"  # for Serial UART example "/dev/ttyUSB0"
+#     baudrate: 115200  # for UART
+
+
+# ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
+#   publisher:  [     [1,"encoder_tick", "geometry_msgs/Vector3Stamped.msg"] ,
+#                     [2,"speed_req", "geometry_msgs/Vector3Stamped.msg"],
+#                     [3,"PWM_cmd", "geometry_msgs/Vector3Stamped.msg"],
+#                     [4,"speed_cmd", "geometry_msgs/Vector3Stamped.msg"],
+#                     [5,"IMU", "geometry_msgs/Vector3Stamped.msg"],
+#                     [6,"encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
+#                        ]
+#   subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
+#   srv_client: [                           ]
+#   srv_server: [                           ]
+#   action_client: [                        ]
+#   action_server: [                        ]
 
