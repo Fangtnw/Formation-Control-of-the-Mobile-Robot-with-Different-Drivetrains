@@ -89,7 +89,13 @@ void loop() {
     speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
     }
 
-    
+    if (abs(pos_servo) < 5){                                                  //Avoid taking in account small disturbances
+      ang_act_servo = 0;
+    }
+    else {
+    //speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
+    }
+    //pos_servo = 0;
     pos_left = 0;
     pos_right = 0;
 

@@ -12,8 +12,7 @@ Xicro xicro;
 #define LOOPTIME                      100     //Looptime in millisecond
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
 unsigned int noCommLoops = 0;                 //main loop without communication counter
-
-double speed_cmd_left2 = 0;   
+  
 unsigned long lastMilli = 0;
 
 // Motor 1
@@ -75,8 +74,11 @@ const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for r
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
 
-PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
-PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
+//PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
+//PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
+
+PID PID_leftMotor(&speed_cmd_left,&speed_act_left , &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
+PID PID_rightMotor(&speed_cmd_right,&speed_act_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
 
 class motor{
     public:
@@ -280,7 +282,7 @@ void loop() {
     }
 
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
-      Serial.println(" TOO LONG ");
+      Serial.println("Time out");
     }
 
     noCommLoops++;
@@ -301,18 +303,18 @@ void publishSpeed(double time) {
   xicro.publish_diff_encoder_tick();
   xicro.publish_diff_imu();
   xicro.Spin_node();
-  xicro.Publisher_diff_speed_req.message.vector.x = speed_req_left;
-  xicro.Publisher_diff_speed_req.message.vector.y = speed_req_right;
+  xicro.Publisher_diff_speed_req.message.vector.x = speed_req_right;
+  xicro.Publisher_diff_speed_req.message.vector.y = speed_req_left;
         
   xicro.publish_diff_speed_req();
 
-    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_left;
-    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_right;
+    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_right;
+    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_left;
           
     xicro.publish_diff_speed_cmd();
   
-    xicro.Publisher_diff_PWM_cmd.message.vector.x = PWM_leftMotor;
-    xicro.Publisher_diff_PWM_cmd.message.vector.y = PWM_rightMotor;
+    xicro.Publisher_diff_PWM_cmd.message.vector.x = PWM_rightMotor;
+    xicro.Publisher_diff_PWM_cmd.message.vector.y = PWM_leftMotor;
           
     xicro.publish_diff_PWM_cmd();
 //  xicro.loginfo("Publishing odometry");

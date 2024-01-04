@@ -30,13 +30,13 @@ class OdometryNode(Node):
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
 
-        self.odom_pub = self.create_publisher(Odometry, 'diff_odom', 100)
+        self.odom_pub = self.create_publisher(Odometry, 'odom', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
             Vector3Stamped, 'diff_encoder_vel', self.encoder_vel_callback, 1)
         self.imu_sub = self.create_subscription(
-            Vector3Stamped, 'imu', self.imu_callback, 1)
+            Vector3Stamped, 'diff_imu', self.imu_callback, 1)
 
         self.tf_broadcaster = TransformBroadcaster(self)
         self.timer = self.create_timer(0.05, self.publish_odometry)
