@@ -32,17 +32,17 @@ const int servoMAX = 180;
 const int servoMIN = 0;
 
 //Encoder
-const int PIN_ENCOD_A_MOTOR_LEFT = 2;               //A channel for encoder of left motor                    
-const int PIN_ENCOD_B_MOTOR_LEFT = 8;               //B channel for encoder of left motor
+const int PIN_ENCOD_A_MOTOR_LEFT = 8;               //A channel for encoder of left motor                    
+const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 3;         //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 9;         //B channel for encoder of right motor 
+const int PIN_ENCOD_A_MOTOR_RIGHT = 14;         //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 15;         //B channel for encoder of right motor 
 
-const int PIN_ENCOD_A_SERVO_LEFT = 18;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_SERVO_LEFT = 23;              //B channel for encoder of left servo motor 
+const int PIN_ENCOD_A_SERVO_LEFT = 16;              //A channel for encoder of left servo motor         
+const int PIN_ENCOD_B_SERVO_LEFT = 17;              //B channel for encoder of left servo motor 
 
 const int PIN_ENCOD_A_SERVO_RIGHT = 18;              //A channel for encoder of right servo motor         
-const int PIN_ENCOD_B_SERVO_RIGHT = 23;              //B channel for encoder of right servo motor 
+const int PIN_ENCOD_B_SERVO_RIGHT = 19;              //B channel for encoder of right servo motor 
 
 //Define Value
 const double radius = 0.06;                   //Wheel radius, in m
