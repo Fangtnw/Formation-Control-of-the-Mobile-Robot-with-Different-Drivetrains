@@ -1,28 +1,47 @@
+#include <Wire.h>
+#include <Servo.h>
+#include <MPU6050_light.h>
+
+MPU6050 mpu(Wire);
+Servo servo;
+
 // Motor 1
 const int motor1INA = 11;
 const int motor1INB = 12;
 const int motor1PWM = 10;
+int PWM = 30;
 
 // Motor 2
 const int motor2INA = 7;
 const int motor2INB = 6;
 const int motor2PWM = 5;
 
-
+const int servoIN = 13;
 
 const double radius = 0.06;                   //Wheel radius, in m
 const double wheelbase = 0.55;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 
 const int PIN_ENCOD_A_MOTOR_LEFT = 2;               //A channel for encoder of left motor                    
-const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
+const int PIN_ENCOD_B_MOTOR_LEFT = 8;               //B channel for encoder of left motor
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 5;              //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 9;              //B channel for encoder of right motor 
+const int PIN_ENCOD_A_MOTOR_RIGHT = 3;         //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 9;         //B channel for encoder of right motor 
+
+const int PIN_ENCOD_A_SERVO_LEFT = 18;              //A channel for encoder of left servo motor         
+const int PIN_ENCOD_B_SERVO_LEFT = 23;              //B channel for encoder of left servo motor 
+
+const int PIN_ENCOD_A_SERVO_RIGHT = 18;              //A channel for encoder of right servo motor         
+const int PIN_ENCOD_B_SERVO_RIGHT = 23;              //B channel for encoder of right servo motor 
 
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
+volatile float pos_servo = 0;      //Servo motor encoder position
+volatile float pos_servo_left = 0;      //Servo motor encoder position
+volatile float pos_servo_right = 0;      //Servo motor encoder position
+double ang_act_servo_left = 0;                     //Actual angle for servo motor
+double ang_act_servo_right = 0;                     //Actual angle for servo motor
 
 #define LOOPTIME                      100     //Looptime in millisecond
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
@@ -37,10 +56,14 @@ double speed_req_right = 0;                   //Desired speed for right wheel in
 double speed_act_right = 0;                   //Actual speed for right wheel in m/s
 double speed_cmd_right = 0;                   //Command speed for right wheel in m/s 
 
-
+double ang_req_servo = 0;                     //Desired angle for servo motor
+double ang_act_servo = 0;                     //Actual angle for servo motor
+double ang_cmd_servo = 0;                     //Command angle for servo motor
 
 void setup() {
   // Set the motor control pins as outputs
+  servo.attach(servoIN);
+  servo.write(0);
   pinMode(motor1INA, OUTPUT);
   pinMode(motor1INB, OUTPUT);
   pinMode(motor1PWM, OUTPUT);
@@ -66,7 +89,7 @@ void setup() {
 }
 
 void loop() {
-
+  
 // moveMotorsForward();
 
 
@@ -117,12 +140,12 @@ void moveMotorsForward() {
   // Motor 1
   digitalWrite(motor1INA, HIGH);
   digitalWrite(motor1INB, LOW);
-  analogWrite(motor1PWM, 30);  // 255 is the maximum PWM value for full speed
+  analogWrite(motor1PWM, PWM);  // 255 is the maximum PWM value for full speed
 
   // Motor 2
   digitalWrite(motor2INA, HIGH);
   digitalWrite(motor2INB, LOW);
-  analogWrite(motor2PWM, 30);
+  analogWrite(motor2PWM, PWM);
 }
 
 void moveMotorsBackward() {

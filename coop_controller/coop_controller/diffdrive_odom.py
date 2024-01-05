@@ -50,9 +50,8 @@ class OdometryNode(Node):
         self.right_vel = msg.vector.y
 
     def imu_callback(self, msg):
-        # self.Robot_Yaw = msg.vector.z
-        pass
-
+        self.Robot_Yaw = msg.vector.z
+        
     def publish_odometry(self):
         odom_msg = Odometry()
 
@@ -65,7 +64,7 @@ class OdometryNode(Node):
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.05  # replace with your actual time step
+        time_step = 0.05 
         self.forward_kinematic()
         self.odom_compute(time_step)
 
@@ -92,16 +91,16 @@ class OdometryNode(Node):
         # Publish odometry message
         self.odom_pub.publish(odom_msg)
 
-        map_to_odom_transform = TransformStamped()
-        map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
-        map_to_odom_transform.header.frame_id = 'map'
-        map_to_odom_transform.child_frame_id = 'odom'
-        map_to_odom_transform.transform.translation.x = self.Robot_X
-        map_to_odom_transform.transform.translation.y = self.Robot_Y
-        map_to_odom_transform.transform.translation.z = 0.0
-        map_to_odom_transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
-        map_to_odom_transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
-        self.tf_broadcaster.sendTransform(map_to_odom_transform)
+        # map_to_odom_transform = TransformStamped()
+        # map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
+        # map_to_odom_transform.header.frame_id = 'map'
+        # map_to_odom_transform.child_frame_id = 'odom'
+        # map_to_odom_transform.transform.translation.x = self.Robot_X
+        # map_to_odom_transform.transform.translation.y = self.Robot_Y
+        # map_to_odom_transform.transform.translation.z = 0.0
+        # map_to_odom_transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
+        # map_to_odom_transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
+        # self.tf_broadcaster.sendTransform(map_to_odom_transform)
         
         # Publish TF transform
         transform = TransformStamped()
