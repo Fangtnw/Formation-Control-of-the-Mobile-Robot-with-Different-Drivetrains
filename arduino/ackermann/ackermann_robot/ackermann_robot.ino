@@ -14,14 +14,14 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //DC MOTOR1
-const int motor1INA = 12;
-const int motor1INB = 11;
-const int motor1PWM = 10;
+const int motor1INA = 50;
+const int motor1INB = 52;
+const int motor1PWM = 11;
 
 //DC MOTOR2
-const int motor2INA = 6;
-const int motor2INB = 7;
-const int motor2PWM = 5;
+const int motor2INA = 51;
+const int motor2INB = 53;
+const int motor2PWM = 12;
 
 //SERVO
 const int servoIN = 13;
@@ -66,8 +66,8 @@ double ang_act_servo = 0;                     //Actual angle for servo motor
 double ang_cmd_servo = 0;                     //Command angle for servo motor
 
 const double max_speed = 0.4;                 //Max speed (m/s)
-const double max_angle = 60;                 //Max angle (degree)
-const double min_angle = 0;                 //Min angle (degree)
+const double max_angle = 120;                 //Max angle (degree)
+const double min_angle = 60;                 //Min angle (degree)
 
 double speedlinx = 0;
 double speedliny = 0;
@@ -149,7 +149,8 @@ void handle_cmd() {
 
   speed_req_right = speed_req;
   speed_req_left = speed_req;
-  ang_req_servo = atan(angular_speed_req*wheel_length)/speed_req;
+  //ang_req_servo = atan(angular_speed_req*wheel_length)/speed_req;
+  ang_req_servo = angular_speed_req;
 
   pos_servo = (pos_servo_left + pos_servo_right)/2;
  
@@ -164,12 +165,12 @@ void setup() {
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
 
-  leftMotor.pinA = 51;
-  leftMotor.pinB = 53;
-  leftMotor.pinPWM = 12;
-  rightMotor.pinA = 54;
-  rightMotor.pinB = 52;
-  rightMotor.pinPWM = 11;
+  leftMotor.pinA = 50;
+  leftMotor.pinB = 52;
+  leftMotor.pinPWM = 11;
+  rightMotor.pinA = 51;
+  rightMotor.pinB = 53;
+  rightMotor.pinPWM = 12;
   
   pinMode(motor1INA, OUTPUT);
   pinMode(motor1INB, OUTPUT);
@@ -188,7 +189,7 @@ void setup() {
   rightMotor.setSpeed(0);
   rightMotor.run("BRAKE");
 
-  servo.write(90);
+  //servo.write(90);
   
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
@@ -241,10 +242,10 @@ void loop() {
   {                                                                           // enter timed loop
     lastMilli = millis();
     byte status = mpu.begin();
-    ang_cmd_servo = 90;
-    ang_cmd_servo = constrain(ang_cmd_servo, min_angle, max_angle);
+    //ang_req_servo = constrain(ang_req_servo, min_angle, max_angle);
+    ang_req_servo = 60;
     //PID_servoMotor.Compute();                                               
-    servo.write(ang_cmd_servo);
+    servo.write(ang_req_servo);
 
     if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
       ang_act_servo = 0;
