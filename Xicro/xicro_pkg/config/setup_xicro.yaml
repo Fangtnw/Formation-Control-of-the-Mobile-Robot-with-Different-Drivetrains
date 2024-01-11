@@ -1,6 +1,6 @@
 microcontroller:
   idmcu: 1 # id of mcu 
-  namespace: "coop_teleop" # namespace
+  namespace: "diffdrive" # namespace
   generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
   connection:
     type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
@@ -14,7 +14,8 @@ ros: # setup ros is reference from microcontroller example publisher is mean mic
                     [3,"diff_PWM_cmd", "geometry_msgs/Vector3Stamped.msg"],
                     [4,"diff_speed_cmd", "geometry_msgs/Vector3Stamped.msg"],
                     [5,"diff_imu", "geometry_msgs/Vector3Stamped.msg"],
-                    [6,"diff_encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
+                    [6,"diff_imu_raw", "sensor_msgs/Imu.msg"],
+                    [7,"diff_encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
                        ]
   subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
   srv_client: [                           ]

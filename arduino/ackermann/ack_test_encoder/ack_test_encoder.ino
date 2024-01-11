@@ -6,15 +6,14 @@ MPU6050 mpu(Wire);
 Servo servo;
 
 // Motor 1
-const int motor1INA = 11;
-const int motor1INB = 12;
-const int motor1PWM = 10;
-int PWM = 30;
+const int motor1INA = 51;
+const int motor1INB = 53;
+const int motor1PWM = 12;
 
 // Motor 2
-const int motor2INA = 7;
-const int motor2INB = 6;
-const int motor2PWM = 5;
+const int motor2INA = 52;
+const int motor2INB = 50;
+const int motor2PWM = 11;
 
 const int servoIN = 13;
 
@@ -22,11 +21,11 @@ const double radius = 0.06;                   //Wheel radius, in m
 const double wheelbase = 0.55;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 
-const int PIN_ENCOD_A_MOTOR_LEFT = 2;               //A channel for encoder of left motor                    
-const int PIN_ENCOD_B_MOTOR_LEFT = 8;               //B channel for encoder of left motor
+const int PIN_ENCOD_A_MOTOR_LEFT = 47;               //A channel for encoder of left motor                    
+const int PIN_ENCOD_B_MOTOR_LEFT = 49;               //B channel for encoder of left motor
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 3;         //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 9;         //B channel for encoder of right motor 
+const int PIN_ENCOD_A_MOTOR_RIGHT = 48;         //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 46;         //B channel for encoder of right motor 
 
 const int PIN_ENCOD_A_SERVO_LEFT = 18;              //A channel for encoder of left servo motor         
 const int PIN_ENCOD_B_SERVO_LEFT = 23;              //B channel for encoder of left servo motor 
@@ -62,8 +61,8 @@ double ang_cmd_servo = 0;                     //Command angle for servo motor
 
 void setup() {
   // Set the motor control pins as outputs
-  servo.attach(servoIN);
-  servo.write(0);
+//  servo.attach(servoIN);
+//  servo.write(0);
   pinMode(motor1INA, OUTPUT);
   pinMode(motor1INB, OUTPUT);
   pinMode(motor1PWM, OUTPUT);
@@ -76,28 +75,31 @@ void setup() {
   pinMode(PIN_ENCOD_B_MOTOR_LEFT, INPUT); 
   digitalWrite(PIN_ENCOD_A_MOTOR_LEFT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_LEFT, HIGH);
-  attachInterrupt(0, encoderLeftMotor, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCOD_A_MOTOR_LEFT), encoderLeftMotor, RISING);
+//  attachInterrupt(0, encoderLeftMotor, RISING);
 
   // Define the rotary encoder for right motor
   pinMode(PIN_ENCOD_A_MOTOR_RIGHT, INPUT); 
   pinMode(PIN_ENCOD_B_MOTOR_RIGHT, INPUT); 
   digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
-  attachInterrupt(1, encoderRightMotor, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIN_ENCOD_A_MOTOR_RIGHT), encoderRightMotor, RISING);
+  //attachInterrupt(1, encoderRightMotor, RISING);
   
   Serial.begin(115200);
 }
 
 void loop() {
   
-// moveMotorsForward();
+moveMotorsForward();
 
 
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loop
     lastMilli = millis();
     Serial.println(pos_left);
-    Serial.println(speed_act_left);
+    Serial.println(pos_right);
+    Serial.println(speed_act_right);
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
       speed_act_left = 0;
     }
@@ -116,7 +118,7 @@ void loop() {
       ang_act_servo = 0;
     }
     else {
-    //speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
+    speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
     }
     //pos_servo = 0;
     pos_left = 0;
@@ -140,12 +142,12 @@ void moveMotorsForward() {
   // Motor 1
   digitalWrite(motor1INA, HIGH);
   digitalWrite(motor1INB, LOW);
-  analogWrite(motor1PWM, PWM);  // 255 is the maximum PWM value for full speed
+  analogWrite(motor1PWM, 50);  // 255 is the maximum PWM value for full speed
 
   // Motor 2
   digitalWrite(motor2INA, HIGH);
   digitalWrite(motor2INB, LOW);
-  analogWrite(motor2PWM, PWM);
+  analogWrite(motor2PWM, 50);
 }
 
 void moveMotorsBackward() {

@@ -11,8 +11,6 @@ Xicro xicro;
 #define LOOPTIME                      100     //Looptime in millisecond
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
 unsigned int noCommLoops = 0;                 //main loop without communication counter
-
-double speed_cmd_left2 = 0;   
 unsigned long lastMilli = 0;
 
 //DC MOTOR1
@@ -35,11 +33,11 @@ const int servoMIN = 0;
 const int PIN_ENCOD_A_MOTOR_LEFT = 8;               //A channel for encoder of left motor                    
 const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 14;         //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 15;         //B channel for encoder of right motor 
+const int PIN_ENCOD_A_MOTOR_RIGHT = 47;         //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 49;         //B channel for encoder of right motor 
 
-const int PIN_ENCOD_A_SERVO_LEFT = 16;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_SERVO_LEFT = 17;              //B channel for encoder of left servo motor 
+const int PIN_ENCOD_A_SERVO_LEFT = 48;              //A channel for encoder of left servo motor         
+const int PIN_ENCOD_B_SERVO_LEFT = 46;              //B channel for encoder of left servo motor 
 
 const int PIN_ENCOD_A_SERVO_RIGHT = 18;              //A channel for encoder of right servo motor         
 const int PIN_ENCOD_B_SERVO_RIGHT = 19;              //B channel for encoder of right servo motor 
@@ -84,6 +82,9 @@ float angular_velocity_covariance[9]={1,0,0,0,1,0,0,0,1};
 float linear_acceleration[3]={0};
 float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
 double theta = 0 ;
+
+int steer_cmd = 0;/* replace this with your input value */; 
+int servo_cmd = 90;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
@@ -162,6 +163,13 @@ void setup() {
   Wire.begin();
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
+
+  leftMotor.pinA = 51;
+  leftMotor.pinB = 53;
+  leftMotor.pinPWM = 12;
+  rightMotor.pinA = 54;
+  rightMotor.pinB = 52;
+  rightMotor.pinPWM = 11;
   
   pinMode(motor1INA, OUTPUT);
   pinMode(motor1INB, OUTPUT);
@@ -169,7 +177,7 @@ void setup() {
   pinMode(motor2INA, OUTPUT);
   pinMode(motor2INB, OUTPUT);
   pinMode(motor2PWM, OUTPUT);
-  servo.attach(servoIN);
+    
 
   Serial.begin(115200);
   xicro.begin(&Serial);
@@ -180,7 +188,7 @@ void setup() {
   rightMotor.setSpeed(0);
   rightMotor.run("BRAKE");
 
-  servo.write(0);
+  servo.write(90);
   
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
@@ -233,8 +241,9 @@ void loop() {
   {                                                                           // enter timed loop
     lastMilli = millis();
     byte status = mpu.begin();
+    ang_cmd_servo = 90;
     ang_cmd_servo = constrain(ang_cmd_servo, min_angle, max_angle);
-    PID_servoMotor.Compute();                                               
+    //PID_servoMotor.Compute();                                               
     servo.write(ang_cmd_servo);
 
     if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
@@ -362,6 +371,15 @@ void encoderLeftServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_RIGHT) == digitalRead(PIN_ENCOD_B_SERVO_RIGHT)) pos_servo_left++;
   else pos_servo_left--;
 }
+void Steertoservo(){
+  if (steer_cmd < 0) {
+  servo_cmd += steer_cmd;
+} else if (steer_cmd > 0) {
+  servo_cmd -= steer_cmd;
+}
+  
+  }
+
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));

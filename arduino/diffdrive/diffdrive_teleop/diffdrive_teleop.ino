@@ -1,5 +1,5 @@
 #include <PID_v1.h>
-#include <Xicro_coop_teleop_ID_1.h>
+#include <Xicro_diffdrive_ID_1.h>
 #include <Wire.h>
 #include <Servo.h>
 #include <MPU6050_light.h>
@@ -9,7 +9,7 @@ Servo myservo;
 Xicro xicro;
 
 //initializing all the variables
-#define LOOPTIME                      100     //Looptime in millisecond
+#define LOOPTIME                      100    //Looptime in millisecond
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
 unsigned int noCommLoops = 0;                 //main loop without communication counter
   
@@ -55,13 +55,6 @@ double speedliny = 0;
 double speedangz = 0;                 //Desired angular speed for the robot, in rad/s
 float ax, ay, az;  
 float gx, gy, gz;  
-
-float orientation[4]={0};
-float orientation_covariance[9]={1,0,0,0,1,0,0,0,1};
-float angular_velocity[3]={0};
-float angular_velocity_covariance[9]={1,0,0,0,1,0,0,0,1};
-float linear_acceleration[3]={0};
-float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
 double theta = 0 ;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
@@ -121,23 +114,6 @@ void handle_cmd() {
   
   speed_req_left = speed_req - angular_speed_req*(wheelbase/2);     //Calculate the required speed for the left motor to comply with commanded linear and angular speeds
   speed_req_right = speed_req + angular_speed_req*(wheelbase/2);    //Calculate the required speed for the right motor to comply with commanded linear and angular speeds
-
-//  xicro.Publisher_speedreq.message.vector.x = speed_req_left;
-//  xicro.Publisher_speedreq.message.vector.y = speed_req_right;
-//        
-//  xicro.publish_speedreq();
-
-//    xicro.Publisher_speedcmd.message.vector.x = speed_cmd_left;
-//    xicro.Publisher_speedcmd.message.vector.y = speed_cmd_right;
-//          
-//    xicro.publish_speedcmd();
-//  
-//    xicro.Publisher_PWM.message.vector.x = PWM_leftMotor;
-//    xicro.Publisher_PWM.message.vector.y = PWM_rightMotor;
-//          
-//    xicro.publish_PWM();
-//
-
       
 }
 
@@ -204,10 +180,9 @@ void loop() {
     lastMilli = millis();
     
     byte status = mpu.begin();
+
+    IMUbringup();
     
-    xicro.Publisher_diff_imu.message.vector.x = mpu.getAngleX();
-    xicro.Publisher_diff_imu.message.vector.y = mpu.getAngleY();
-    xicro.Publisher_diff_imu.message.vector.z = mpu.getAngleZ();
 //    xicro.Publisher_IMU.message.vector.y = int(mpu.getAngleZ())%360;
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -302,6 +277,7 @@ void publishSpeed(double time) {
   xicro.publish_diff_encoder_vel();
   xicro.publish_diff_encoder_tick();
   xicro.publish_diff_imu();
+  xicro.publish_diff_imu_raw();
   xicro.Spin_node();
   xicro.Publisher_diff_speed_req.message.vector.x = speed_req_right;
   xicro.Publisher_diff_speed_req.message.vector.y = speed_req_left;
@@ -330,6 +306,64 @@ void encoderRightMotor() {
   if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right++;
   else pos_right--;
 }
+void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, float& y, float& z) {
+    
+    // Convert Euler angles to radians
+    roll = roll * M_PI / 180.0;
+    pitch = pitch * M_PI / 180.0;
+    yaw = yaw * M_PI / 180.0;
+
+    // Calculate the quaternion components
+    double cy = cos(yaw * 0.5);
+    double sy = sin(yaw * 0.5);
+    double cp = cos(pitch * 0.5);
+    double sp = sin(pitch * 0.5);
+    double cr = cos(roll * 0.5);
+    double sr = sin(roll * 0.5);
+
+    w = cy * cp * cr + sy * sp * sr;
+    x = cy * cp * sr - sy * sp * cr;
+    y = sy * cp * sr + cy * sp * cr;
+    z = sy * cp * cr - cy * sp * sr;
+}
+
+void IMUbringup(){
+    xicro.Publisher_diff_imu.message.vector.x = mpu.getAngleX();
+    xicro.Publisher_diff_imu.message.vector.y = mpu.getAngleY();
+    xicro.Publisher_diff_imu.message.vector.z = mpu.getAngleZ();
+
+
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration.x = mpu.getAccX();
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration.y = mpu.getAccY();
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration.z = mpu.getAccZ();
+    xicro.Publisher_diff_imu_raw.message.angular_velocity.x = mpu.getGyroX();
+    xicro.Publisher_diff_imu_raw.message.angular_velocity.y = mpu.getGyroY();
+    xicro.Publisher_diff_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
+    xicro.Publisher_diff_imu_raw.message.orientation_covariance[0] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.orientation_covariance[4] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.orientation_covariance[8] = 0.01;
+    
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
+    
+    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[0] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[4] = 0.01;
+    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[8] = 0.01;
+
+    float roll = mpu.getAngleX();
+    float pitch = mpu.getAngleY();
+    float yaw = mpu.getAngleZ();
+    float w, x, y, z;
+    eulerToQuaternion(roll, pitch, yaw, w, x, y, z);
+    
+    xicro.Publisher_diff_imu_raw.message.orientation.w = w;
+    xicro.Publisher_diff_imu_raw.message.orientation.x = x;
+    xicro.Publisher_diff_imu_raw.message.orientation.y = y;
+    xicro.Publisher_diff_imu_raw.message.orientation.z = z;
+      
+  
+  }
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));

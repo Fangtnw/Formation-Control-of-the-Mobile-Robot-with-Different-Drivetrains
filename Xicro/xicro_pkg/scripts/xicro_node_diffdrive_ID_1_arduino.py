@@ -19,7 +19,7 @@ from rclpy.executors import MultiThreadedExecutor
 import numpy as np
 import serial
 # gen Import interfaces
-# gen import msgfrom geometry_msgs.msg import Twistfrom geometry_msgs.msg import Vector3Stamped# gen import srv client# gen import srv server# gen import action client# gen import action serverimport struct
+# gen import msgfrom geometry_msgs.msg import Twistfrom geometry_msgs.msg import Vector3Stampedfrom sensor_msgs.msg import Imu# gen import srv client# gen import srv server# gen import action client# gen import action serverimport struct
 import time
 import multiprocessing as mp
 import argparse
@@ -91,7 +91,7 @@ def typetoProtocol(typee,Nofdata):
 
 def setup_var_protocol():
 
-    return [1, 2, 3, 4, 5, 6],['diff_encoder_tick', 'diff_speed_req', 'diff_PWM_cmd', 'diff_speed_cmd', 'diff_imu', 'diff_encoder_vel'],['geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg'],[['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32']],[['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z']],[[0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0]],[[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]],[[132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111]],[[4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4]]
+    return [1, 2, 3, 4, 5, 6, 7],['diff_encoder_tick', 'diff_speed_req', 'diff_PWM_cmd', 'diff_speed_cmd', 'diff_imu', 'diff_imu_raw', 'diff_encoder_vel'],['geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'geometry_msgs/Vector3Stamped.msg', 'sensor_msgs/Imu.msg', 'geometry_msgs/Vector3Stamped.msg'],[['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32', 'float32'], ['int32', 'uint32', 'string', 'float32', 'float32', 'float32']],[['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'orientation.x', 'orientation.y', 'orientation.z', 'orientation.w', 'orientation_covariance', 'angular_velocity.x', 'angular_velocity.y', 'angular_velocity.z', 'angular_velocity_covariance', 'linear_acceleration.x', 'linear_acceleration.y', 'linear_acceleration.z', 'linear_acceleration_covariance'], ['header.stamp.sec', 'header.stamp.nanosec', 'header.frame_id', 'vector.x', 'vector.y', 'vector.z']],[[0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0], [0, 0, '', 0.0, 0.0, 0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0, 0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 0.0, 0.0, 0.0, [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]], [0, 0, '', 0.0, 0.0, 0.0]],[[1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 9, 1, 1, 1, 9, 1, 1, 1, 9], [1, 1, 1, 1, 1, 1]],[[132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111], [132, 32, 242, 111, 111, 111, 111, 112, 111, 111, 111, 112, 111, 111, 111, 112], [132, 32, 242, 111, 111, 111]],[[4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4], [4, 4, 888, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4], [4, 4, 888, 4, 4, 4]]
 
 
 
@@ -143,7 +143,7 @@ def bufferToType(BUFFER,Typee):
 class Publisher_node(Node):
 
     def __init__(self):
-        super().__init__('xicro_publisher_node_coop_teleop')
+        super().__init__('xicro_publisher_node_diffdrive')
         self.Idmsg , self.nametopic ,  self.interfaceTopic ,self.dataType , self.dataName ,self.datagrab ,self.Nofdata,self.Protocoltype,self.byteTograb= setup_var_protocol()
         # print(self.Idmsg , self.nametopic ,  self.interfaceTopic ,self.dataType , self.dataName ,self.datagrab ,self.Nofdata)
         self.emptydatagrab=self.datagrab.copy()
@@ -472,7 +472,7 @@ class Xicro_instruction():
 
 class Subscriber_node(Node):
     def __init__(self,Obj_uart):
-        super().__init__('xicro_subscriber_node_coop_teleop')
+        super().__init__('xicro_subscriber_node_diffdrive')
         self.Obj_uart = Obj_uart
         self.xicro_instruction = Xicro_instruction(self.Obj_uart)
         time.sleep(1)
@@ -1071,7 +1071,7 @@ def Transmit_uart(Obj_uart): #processer 2
 
 class Srv_client_node(Node):
     def __init__(self,Obj_uart,OnIdsrv,Ongrab,sequence):
-        super().__init__('xicro_service_client_node_coop_teleop_'+str(sequence))        # gen Id mcu
+        super().__init__('xicro_service_client_node_diffdrive_'+str(sequence))        # gen Id mcu
         self.Idmcu = 1
         self.Obj_uart = Obj_uart
         self.xicro_instruction = Xicro_instruction(self.Obj_uart)
@@ -1204,7 +1204,7 @@ class Srv_client_node(Node):
 
 class Action_client_node(Node):
     def __init__(self,Obj_uart,OnIdaction,Ongrab,sequence):
-        super().__init__('xicro_action_client_node_coop_teleop_'+str(sequence))        # gen Id mcu
+        super().__init__('xicro_action_client_node_diffdrive_'+str(sequence))        # gen Id mcu
         self.Idmcu = 1
         self.Obj_uart = Obj_uart
         self.xicro_instruction = Xicro_instruction(self.Obj_uart)

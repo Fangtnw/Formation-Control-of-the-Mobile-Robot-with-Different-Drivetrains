@@ -8,6 +8,7 @@ from std_msgs.msg import Header
 from math import sin, cos
 import tf2_ros
 from tf2_ros import TransformBroadcaster
+import tf_transformations
 
 wheel_distance = 0.55
 
@@ -26,10 +27,11 @@ class OdometryNode(Node):
         # Initialize the robot state variables
         self.Robot_X = 0.0
         self.Robot_Y = 0.0
+        self.Robot_Roll = 0.0
+        self.Robot_Pitch = 0.0
         self.Robot_Yaw = 0.0
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
-
         self.odom_pub = self.create_publisher(Odometry, 'odom', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
@@ -42,15 +44,19 @@ class OdometryNode(Node):
         self.timer = self.create_timer(0.05, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
-        self.left_encoder_ticks = msg.vector.x
-        self.right_encoder_ticks = msg.vector.y
+        self.right_encoder_ticks = msg.vector.x
+        self.left_encoder_ticks = msg.vector.y
+        
 
     def encoder_vel_callback(self, msg):
-        self.left_vel = msg.vector.x
-        self.right_vel = msg.vector.y
-
+        self.right_vel = msg.vector.x
+        self.left_vel = msg.vector.y
+        
     def imu_callback(self, msg):
-        self.Robot_Yaw = msg.vector.z
+        # self.Robot_Roll = msg.vector.x
+        # self.Robot_Pitch = msg.vector.y
+        # self.Robot_Yaw = msg.vector.z
+        pass
         
     def publish_odometry(self):
         odom_msg = Odometry()
@@ -64,7 +70,7 @@ class OdometryNode(Node):
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.05 
+        time_step = 0.01
         self.forward_kinematic()
         self.odom_compute(time_step)
 
@@ -73,8 +79,11 @@ class OdometryNode(Node):
         odom_msg.pose.pose.position.z = 0.0
 
         # Assuming IMU provides yaw directly
-        odom_msg.pose.pose.orientation.z = sin(self.Robot_Yaw / 2)
-        odom_msg.pose.pose.orientation.w = cos(self.Robot_Yaw / 2)
+        quaternion = tf_transformations.quaternion_from_euler(self.Robot_Roll, self.Robot_Pitch, self.Robot_Yaw)
+        odom_msg.pose.pose.orientation.x = quaternion[0]
+        odom_msg.pose.pose.orientation.y = quaternion[1]
+        odom_msg.pose.pose.orientation.z = quaternion[2]
+        odom_msg.pose.pose.orientation.w = quaternion[3]
 
         odom_msg.twist.twist.linear.x = self.Robot_LinVel
         odom_msg.twist.twist.angular.z = self.Robot_AngVel
@@ -111,8 +120,12 @@ class OdometryNode(Node):
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0
-        transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
-        transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
+        quaternion = tf_transformations.quaternion_from_euler(self.Robot_Roll, self.Robot_Pitch, self.Robot_Yaw)
+        transform.transform.rotation.x = quaternion[0]
+        transform.transform.rotation.y = quaternion[1]
+        transform.transform.rotation.z = quaternion[2]
+        transform.transform.rotation.w = quaternion[3]
+
         self.tf_broadcaster.sendTransform(transform)
 
         # Publish TF transform from 'base_link' to 'base_footprint'
