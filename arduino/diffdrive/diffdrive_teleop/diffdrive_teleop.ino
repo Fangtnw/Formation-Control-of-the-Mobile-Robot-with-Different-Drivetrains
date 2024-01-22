@@ -9,11 +9,12 @@ Servo myservo;
 Xicro xicro;
 
 //initializing all the variables
-#define LOOPTIME                      100    //Looptime in millisecond
+#define LOOPTIME                      400  //Looptime in millisecond 200 ms = 5Hz   33 ms = 30Hz
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
 unsigned int noCommLoops = 0;                 //main loop without communication counter
   
 unsigned long lastMilli = 0;
+unsigned long lastPublishTime = 0;
 
 // Motor 1
 const int motor1INA = 12;
@@ -25,16 +26,16 @@ const int motor2INA = 6;
 const int motor2INB = 7;
 const int motor2PWM = 5;
 
-const int PIN_ENCOD_A_MOTOR_LEFT = 2;               //A channel for encoder of left motor                    
-const int PIN_ENCOD_B_MOTOR_LEFT = 8;               //B channel for encoder of left motor
+const int PIN_ENCOD_A_MOTOR_LEFT = 3;               //A channel for encoder of left motor                    
+const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 3;              //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 9;              //B channel for encoder of right motor 
+const int PIN_ENCOD_A_MOTOR_RIGHT = 2;              //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 8;              //B channel for encoder of right motor 
 
 const double radius = 0.06;                   //Wheel radius, in m
-const double wheelbase = 0.55;               //Wheelbase, in m
+const double wheelbase = 0.57;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
-const double speed_to_pwm_ratio = 0.00235;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
+const double speed_to_pwm_ratio = 0.00383;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
 double speed_req = 0;                         //Desired linear speed for the robot, in m/s
@@ -61,8 +62,8 @@ int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
                                                       
 // PID Parameters
-const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
-const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
+const double PID_left_param[] = { 0.3, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_right_param[] = { 0.3 , 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -70,8 +71,8 @@ volatile float pos_right = 0;      //Right motor encoder position
 //PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 //PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
 
-PID PID_leftMotor(&speed_cmd_left,&speed_act_left , &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
-PID PID_rightMotor(&speed_cmd_right,&speed_act_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
+PID PID_leftMotor(&speed_act_left,&speed_cmd_left , &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
+PID PID_rightMotor(&speed_act_right,&speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
 
 class motor{
     public:
@@ -124,25 +125,21 @@ void setup() {
   Wire.begin();
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
-  
-  pinMode(motor1INA, OUTPUT);
-  pinMode(motor1INB, OUTPUT);
-  pinMode(motor1PWM, OUTPUT);
-  pinMode(motor2INA, OUTPUT);
-  pinMode(motor2INB, OUTPUT);
-  pinMode(motor2PWM, OUTPUT);
 
   Serial.begin(115200);
   xicro.begin(&Serial);
 
   Serial.println("Setup complete");
   
-  leftMotor.pinA = 12;
+  leftMotor.pinA = 12;  //12  11 10
   leftMotor.pinB = 11;
   leftMotor.pinPWM = 10;
   rightMotor.pinA = 6;
   rightMotor.pinB = 7;
   rightMotor.pinPWM = 5;
+
+  leftMotor.motor_setup();
+  rightMotor.motor_setup();
   
   leftMotor.setSpeed(0);
   leftMotor.run("BRAKE");
@@ -150,8 +147,8 @@ void setup() {
   rightMotor.run("BRAKE");
  
   //setting PID parameters
-  PID_leftMotor.SetSampleTime(95);
-  PID_rightMotor.SetSampleTime(95);
+  PID_leftMotor.SetSampleTime(99);
+  PID_rightMotor.SetSampleTime(99);
   PID_leftMotor.SetOutputLimits(-max_speed, max_speed);
   PID_rightMotor.SetOutputLimits(-max_speed, max_speed);
   PID_leftMotor.SetMode(AUTOMATIC);
@@ -162,27 +159,27 @@ void setup() {
   pinMode(PIN_ENCOD_B_MOTOR_LEFT, INPUT); 
   digitalWrite(PIN_ENCOD_A_MOTOR_LEFT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_LEFT, HIGH);
-  attachInterrupt(0, encoderLeftMotor, RISING);
+  attachInterrupt(1, encoderLeftMotor, RISING);
 
   // Define the rotary encoder for right motor
   pinMode(PIN_ENCOD_A_MOTOR_RIGHT, INPUT); 
   pinMode(PIN_ENCOD_B_MOTOR_RIGHT, INPUT); 
   digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
-  attachInterrupt(1, encoderRightMotor, RISING);
+  attachInterrupt(0, encoderRightMotor, RISING);
 }
 
 void loop() {
-  xicro.Spin_node();
-  handle_cmd();
+    
+    xicro.Spin_node();     
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loop
     lastMilli = millis();
     
-    byte status = mpu.begin();
+//    byte status = mpu.begin();
 
-    IMUbringup();
     
+
 //    xicro.Publisher_IMU.message.vector.y = int(mpu.getAngleZ())%360;
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -199,21 +196,13 @@ void loop() {
     speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
     }
     
-    xicro.Publisher_diff_encoder_tick.message.vector.x = pos_right;
-    xicro.Publisher_diff_encoder_tick.message.vector.y = pos_left;
     pos_left = 0;
     pos_right = 0;
     
-//    theta = theta * 180 / 3.141592653589793238462643383279502 ;
-//    if(theta > 360)
-//    {
-//      theta = abs(theta - 360);
-//    }
-//    xicro.Publisher_encoder_tick.message.vector.z = theta;
-//    theta = theta * 3.141592653589793238462643383279502 / 180 ;
     
     speed_cmd_left = constrain(speed_cmd_left, -max_speed, max_speed);
-    PID_leftMotor.Compute();                                                 
+    PID_leftMotor.Compute();                 
+    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_left;                                   
     // compute PWM value for left motor. Check constant definition comments for more information.
     PWM_leftMotor = constrain(((speed_req_left+sgn(speed_req_left)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_left/speed_to_pwm_ratio), -255, 255); //
     
@@ -235,7 +224,9 @@ void loop() {
     }
     
     speed_cmd_right = constrain(speed_cmd_right, -max_speed, max_speed);    
-    PID_rightMotor.Compute();                                                 
+    PID_rightMotor.Compute();    
+    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_right;
+                                          
     // compute PWM value for right motor. Check constant definition comments for more information.
     PWM_rightMotor = constrain(((speed_req_right+sgn(speed_req_right)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_right/speed_to_pwm_ratio), -255, 255); // 
 
@@ -264,29 +255,29 @@ void loop() {
     if (noCommLoops == 65535){
       noCommLoops = noCommLoopMax;
     }
-
+    
    publishSpeed(LOOPTIME);
 
  }
 }
 void publishSpeed(double time) {
 //  xicro.Publisher_encode.message.header.stamp = nh.now;
-  xicro.Publisher_diff_encoder_vel.message.vector.x = speed_act_right;
-  xicro.Publisher_diff_encoder_vel.message.vector.y = speed_act_left;
-  xicro.Publisher_diff_encoder_vel.message.vector.z = time/1000;
+    handle_cmd();
+    IMUbringup();
+    xicro.Publisher_diff_encoder_tick.message.vector.x = pos_right;
+    xicro.Publisher_diff_encoder_tick.message.vector.y = pos_left;
+    xicro.Publisher_diff_encoder_vel.message.vector.x = speed_act_right;
+    xicro.Publisher_diff_encoder_vel.message.vector.y = speed_act_left;
+    xicro.Publisher_diff_encoder_vel.message.vector.z = 1000;
   xicro.publish_diff_encoder_vel();
   xicro.publish_diff_encoder_tick();
   xicro.publish_diff_imu();
   xicro.publish_diff_imu_raw();
-  xicro.Spin_node();
+  
   xicro.Publisher_diff_speed_req.message.vector.x = speed_req_right;
   xicro.Publisher_diff_speed_req.message.vector.y = speed_req_left;
         
   xicro.publish_diff_speed_req();
-
-    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_right;
-    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_left;
-          
     xicro.publish_diff_speed_cmd();
   
     xicro.Publisher_diff_PWM_cmd.message.vector.x = PWM_rightMotor;
@@ -297,14 +288,14 @@ void publishSpeed(double time) {
 }
 
 void encoderLeftMotor() {
-  if (digitalRead(PIN_ENCOD_A_MOTOR_LEFT) == digitalRead(PIN_ENCOD_B_MOTOR_LEFT)) pos_left--;
-  else pos_left++;
+  if (digitalRead(PIN_ENCOD_A_MOTOR_LEFT) == digitalRead(PIN_ENCOD_B_MOTOR_LEFT)) pos_left++;
+  else pos_left--;
 }
 
 //Right motor encoder counter
 void encoderRightMotor() {
-  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right++;
-  else pos_right--;
+  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right--;
+  else pos_right++;
 }
 void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, float& y, float& z) {
     

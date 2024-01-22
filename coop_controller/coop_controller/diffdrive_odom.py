@@ -10,7 +10,7 @@ import tf2_ros
 from tf2_ros import TransformBroadcaster
 import tf_transformations
 
-wheel_distance = 0.55
+wheel_distance = 0.5
 
 class OdometryNode(Node):
     def __init__(self):
@@ -32,7 +32,7 @@ class OdometryNode(Node):
         self.Robot_Yaw = 0.0
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
-        self.odom_pub = self.create_publisher(Odometry, 'odom', 100)
+        self.odom_pub = self.create_publisher(Odometry, 'diff_odom_raw', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
@@ -62,7 +62,7 @@ class OdometryNode(Node):
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
-        odom_msg.header.frame_id = 'odom'
+        odom_msg.header.frame_id = 'diff_odom_raw'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
@@ -70,7 +70,7 @@ class OdometryNode(Node):
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.01
+        time_step = 0.05
         self.forward_kinematic()
         self.odom_compute(time_step)
 
@@ -79,7 +79,7 @@ class OdometryNode(Node):
         odom_msg.pose.pose.position.z = 0.0
 
         # Assuming IMU provides yaw directly
-        quaternion = tf_transformations.quaternion_from_euler(self.Robot_Roll, self.Robot_Pitch, self.Robot_Yaw)
+        quaternion = tf_transformations.quaternion_from_euler(0.0, 0.0, self.Robot_Yaw)
         odom_msg.pose.pose.orientation.x = quaternion[0]
         odom_msg.pose.pose.orientation.y = quaternion[1]
         odom_msg.pose.pose.orientation.z = quaternion[2]
@@ -89,12 +89,12 @@ class OdometryNode(Node):
         odom_msg.twist.twist.angular.z = self.Robot_AngVel
 
         # Set covariance matrices
-        odom_msg.pose.covariance[0] = 0.1  # Example covariance value for x position
-        odom_msg.pose.covariance[7] = 0.1  # Example covariance value for y position
-        # ... Set other covariance values as needed
+        # odom_msg.pose.covariance[0] = 0.1  # Example covariance value for x position
+        # odom_msg.pose.covariance[7] = 0.1  # Example covariance value for y position
+        # # ... Set other covariance values as needed
 
-        odom_msg.twist.covariance[0] = 0.1  # Example covariance value for x linear velocity
-        odom_msg.twist.covariance[35] = 0.1  # Example covariance value for z angular velocity
+        # odom_msg.twist.covariance[0] = 0.1  # Example covariance value for x linear velocity
+        # odom_msg.twist.covariance[35] = 0.1  # Example covariance value for z angular velocity
         # ... Set other covariance values as needed
 
         # Publish odometry message
@@ -120,7 +120,7 @@ class OdometryNode(Node):
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0
-        quaternion = tf_transformations.quaternion_from_euler(self.Robot_Roll, self.Robot_Pitch, self.Robot_Yaw)
+        quaternion = tf_transformations.quaternion_from_euler(0.0, 0.0, self.Robot_Yaw)
         transform.transform.rotation.x = quaternion[0]
         transform.transform.rotation.y = quaternion[1]
         transform.transform.rotation.z = quaternion[2]
@@ -145,9 +145,9 @@ class OdometryNode(Node):
         self.Robot_AngVel = (self.right_vel - self.left_vel) / wheel_distance
 
     def odom_compute(self, time_step):
-        temp_tetra = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
-        self.Robot_X = self.Robot_X + cos(temp_tetra) * self.Robot_LinVel * time_step
-        self.Robot_Y = self.Robot_Y + sin(temp_tetra) * self.Robot_LinVel * time_step
+        theta = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
+        self.Robot_X = self.Robot_X + (cos(theta) * self.Robot_LinVel * time_step)
+        self.Robot_Y = self.Robot_Y + (sin(theta) * self.Robot_LinVel * time_step)
         self.Robot_Yaw = self.Robot_Yaw + self.Robot_AngVel * time_step
 
 def main(args=None):
