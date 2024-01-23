@@ -9,7 +9,7 @@ Servo myservo;
 Xicro xicro;
 
 //initializing all the variables
-#define LOOPTIME                      400  //Looptime in millisecond 200 ms = 5Hz   33 ms = 30Hz
+#define LOOPTIME                      100  //Looptime in millisecond 200 ms = 5Hz   33 ms = 30Hz
 const byte noCommLoopMax = 10;                //number of main loops the robot will execute without communication before stopping
 unsigned int noCommLoops = 0;                 //main loop without communication counter
   
