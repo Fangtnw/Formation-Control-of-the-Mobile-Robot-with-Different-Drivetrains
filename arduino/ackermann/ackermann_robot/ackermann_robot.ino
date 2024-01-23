@@ -24,7 +24,7 @@ const int motor2INB = 53;
 const int motor2PWM = 12;
 
 //SERVO
-const int servoIN = 13;
+const int servoIN = 2;
 bool key_pressed = false;
 const int servoMAX = 180;
 const int servoMIN = 0;
@@ -83,7 +83,6 @@ float linear_acceleration[3]={0};
 float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
 double theta = 0 ;
 
-int steer_cmd = 0;/* replace this with your input value */; 
 int servo_cmd = 90;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
@@ -149,11 +148,16 @@ void handle_cmd() {
 
   speed_req_right = speed_req;
   speed_req_left = speed_req;
-  //ang_req_servo = atan(angular_speed_req*wheel_length)/speed_req;
-  ang_req_servo = angular_speed_req;
+  if (speed_req != 0){
+  ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/3.14); }
+  else {
+    ang_req_servo = 0;
+  }
+  //pos_servo = (pos_servo_left + pos_servo_right)/2;
+  
+  //calculate degree for servo
+  servo_cmd = 90 - (ang_req_servo); 
 
-  pos_servo = (pos_servo_left + pos_servo_right)/2;
- 
 //  servo.write(servo_pos);
 }
 
@@ -162,6 +166,7 @@ motor leftMotor, rightMotor;
 void setup() {
   // Set the motor control pins as outputs
   Wire.begin();
+  servo.attach(2);
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
 
@@ -189,7 +194,7 @@ void setup() {
   rightMotor.setSpeed(0);
   rightMotor.run("BRAKE");
 
-  //servo.write(90);
+  servo.write(90);
   
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
@@ -239,13 +244,13 @@ void loop() {
   xicro.Spin_node();
   handle_cmd();
   if((millis()-lastMilli) >= LOOPTIME)   
-  {                                                                           // enter timed loop
+  {                                                                           // enter timed loopf
     lastMilli = millis();
     byte status = mpu.begin();
-    //ang_req_servo = constrain(ang_req_servo, min_angle, max_angle);
-    ang_req_servo = 60;
+    servo_cmd = constrain(min_angle ,servo_cmd, max_angle);
+    //ang_req_servo = 60;
     //PID_servoMotor.Compute();                                               
-    servo.write(ang_req_servo);
+    servo.write(servo_cmd);
 
     if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
       ang_act_servo = 0;
@@ -342,7 +347,7 @@ void publishSpeed(double time) {
     xicro.publish_ack_speed_req();
     xicro.Publisher_ack_speed_cmd.message.vector.x = speed_cmd_left;
     xicro.Publisher_ack_speed_cmd.message.vector.y = speed_cmd_right;
-    xicro.Publisher_ack_speed_cmd.message.vector.z = ang_cmd_servo;
+    xicro.Publisher_ack_speed_cmd.message.vector.z = servo_cmd;
     xicro.publish_ack_speed_cmd();
   
     xicro.Publisher_ack_PWM_cmd.message.vector.x = PWM_leftMotor;
@@ -372,15 +377,7 @@ void encoderLeftServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_RIGHT) == digitalRead(PIN_ENCOD_B_SERVO_RIGHT)) pos_servo_left++;
   else pos_servo_left--;
 }
-void Steertoservo(){
-  if (steer_cmd < 0) {
-  servo_cmd += steer_cmd;
-} else if (steer_cmd > 0) {
-  servo_cmd -= steer_cmd;
-}
   
-  }
-
 
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
