@@ -23,6 +23,11 @@ const int motor2INA = 51;
 const int motor2INB = 53;
 const int motor2PWM = 12;
 
+//Servo
+const int servoPIN = 4;
+const double max_angle = 120;                 //Max angle (degree)
+const double min_angle = 60;                 //Min angle (degree)
+
 //Encoder
 const int PIN_ENCOD_A_MOTOR_LEFT = 8;               //A channel for encoder of left motor                    
 const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
@@ -38,8 +43,8 @@ const int PIN_ENCOD_B_SERVO_RIGHT = 6;              //B channel for encoder of r
 
 //Define Value
 const double radius = 0.06;                   //Wheel radius, in m
-const double wheelbase = 0.58;               //Wheelbase, in m
-const double wheel_length = 0.58;               //Wheelbase, in m
+const double wheelbase = 0.5;               //Wheelbase, in m
+const double wheel_length = 0.5;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 const double speed_to_pwm_ratio = 0.00235;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
@@ -60,8 +65,6 @@ double ang_act_servo = 0;                     //Actual angle for servo motor
 double ang_cmd_servo = 0;                     //Command angle for servo motor
 
 const double max_speed = 0.4;                 //Max speed (m/s)
-const double max_angle = 120;                 //Max angle (degree)
-const double min_angle = 60;                 //Min angle (degree)
 
 double speedlinx = 0;
 double speedliny = 0;
@@ -92,6 +95,7 @@ volatile float pos_right = 0;      //Right motor encoder position
 volatile float pos_servo = 0;      //Servo motor encoder position
 volatile float pos_servo_left = 0;      //Servo motor encoder position
 volatile float pos_servo_right = 0;      //Servo motor encoder position
+volatile float pos_ack = 0;
 double ang_act_servo_left = 0;                     //Actual angle for servo motor
 double ang_act_servo_right = 0;                     //Actual angle for servo motor
 
@@ -142,14 +146,21 @@ void handle_cmd() {
 
   speed_req_right = speed_req;
   speed_req_left = speed_req;
+
+  //Servo Command formula
   if (speed_req != 0){
   ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/3.14); }
   else {
     ang_req_servo = 0;
   }
- 
-  pos_servo = ((pos_servo_left/encoder_cpr*360) + (pos_servo_right/encoder_cpr*360))/2;
-  
+
+ //Servo encoder formula
+  pos_ack = atan((tan(pos_servo_left)*wheelbase)/(wheelbase+(0.5*wheel_length)*tan(pos_servo_left)));
+  if (pos_ack != 0){
+  pos_servo =  (pos_ack/encoder_cpr*360);
+  }
+  else{
+    pos_servo = 0;}
   //calculate degree for servo
   servo_cmd = 90 - (ang_req_servo); 
 
@@ -161,7 +172,7 @@ motor leftMotor, rightMotor;
 void setup() {
   // Set the motor control pins as outputs
   Wire.begin();
-  servo.attach(4);
+  servo.attach(servoPIN);
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
 
@@ -243,7 +254,7 @@ void loop() {
   {                                                                           // enter timed loopf
     lastMilli = millis();
     byte status = mpu.begin();
-    servo_cmd = constrain(servo_cmd,min_angle , max_angle);
+    servo_cmd = constrain(servo_cmd, min_angle , max_angle);
     //ang_req_servo = 60;
     //PID_servoMotor.Compute();                                               
     servo.write(servo_cmd);
@@ -252,7 +263,7 @@ void loop() {
       ang_act_servo = 0;
     }
     else {
-      ang_act_servo=((pos_servo/encoder_cpr)*360)*(1000/LOOPTIME);          // calculate speed of left wheel
+      ang_act_servo= (pos_servo)*(1000/LOOPTIME);             // calculate degree of servo
     }
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -328,7 +339,7 @@ void publishSpeed(double time) {
     xicro.Spin_node();
     xicro.Publisher_ack_encoder_vel.message.vector.x = pos_servo_right;
     xicro.Publisher_ack_encoder_vel.message.vector.y = pos_servo_left;
-    xicro.Publisher_ack_encoder_vel.message.vector.z = pos_servo;
+    xicro.Publisher_ack_encoder_vel.message.vector.z = ang_act_servo;
     xicro.publish_ack_encoder_vel();
     xicro.Publisher_ack_encoder_tick.message.vector.x = pos_right;
     xicro.Publisher_ack_encoder_tick.message.vector.y = pos_left;
