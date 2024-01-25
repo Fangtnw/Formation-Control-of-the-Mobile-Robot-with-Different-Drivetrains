@@ -175,7 +175,7 @@ void loop() {
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loop
     lastMilli = millis();
-    
+    handle_cmd();
 //    byte status = mpu.begin();
 
     
@@ -202,7 +202,7 @@ void loop() {
     
     speed_cmd_left = constrain(speed_cmd_left, -max_speed, max_speed);
     PID_leftMotor.Compute();                 
-    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_left;                                   
+//    xicro.Publisher_diff_speed_cmd.message.vector.y = speed_cmd_left;                                   
     // compute PWM value for left motor. Check constant definition comments for more information.
     PWM_leftMotor = constrain(((speed_req_left+sgn(speed_req_left)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_left/speed_to_pwm_ratio), -255, 255); //
     
@@ -225,7 +225,7 @@ void loop() {
     
     speed_cmd_right = constrain(speed_cmd_right, -max_speed, max_speed);    
     PID_rightMotor.Compute();    
-    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_right;
+//    xicro.Publisher_diff_speed_cmd.message.vector.x = speed_cmd_right;
                                           
     // compute PWM value for right motor. Check constant definition comments for more information.
     PWM_rightMotor = constrain(((speed_req_right+sgn(speed_req_right)*min_speed_cmd)/speed_to_pwm_ratio) + (speed_cmd_right/speed_to_pwm_ratio), -255, 255); // 
@@ -247,9 +247,6 @@ void loop() {
       rightMotor.run("BACKWARD");
     }
 
-    if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
-      Serial.println("Time out");
-    }
 
     noCommLoops++;
     if (noCommLoops == 65535){

@@ -1,5 +1,5 @@
 #include <PID_v1.h>
-#include <Xicro_diffdrive_ID_1.h>
+#include <Xicro_mec_xicro_ID_3.h>
 #include <Wire.h>
 #include <MPU6050_light.h>
 
@@ -374,26 +374,26 @@ void publishSpeed(double time) {
 //  xicro.Publisher_encode.message.header.stamp = nh.now;
     handle_cmd();
     IMUbringup();
-//    xicro.Publisher_diff_encoder_tick.message.vector.x = pos_right;
-//    xicro.Publisher_diff_encoder_tick.message.vector.y = pos_left;
-//    xicro.Publisher_diff_encoder_vel.message.vector.x = speed_act_right;
-//    xicro.Publisher_diff_encoder_vel.message.vector.y = speed_act_left;
-//    xicro.Publisher_diff_encoder_vel.message.vector.z = 1000;
-  xicro.publish_diff_encoder_vel();
-  xicro.publish_diff_encoder_tick();
-  xicro.publish_diff_imu();
-  xicro.publish_diff_imu_raw();
+//    xicro.Publisher_mec_encoder_tick.message.vector.x = pos_right;
+//    xicro.Publisher_mec_encoder_tick.message.vector.y = pos_left;
+//    xicro.Publisher_mec_encoder_vel.message.vector.x = speed_act_right;
+//    xicro.Publisher_mec_encoder_vel.message.vector.y = speed_act_left;
+//    xicro.Publisher_mec_encoder_vel.message.vector.z = 1000;
+  xicro.publish_mec_encoder_vel();
+  xicro.publish_mec_encoder_tick();
+  xicro.publish_mec_imu();
+  xicro.publish_mec_imu_raw();
   
-//  xicro.Publisher_diff_speed_req.message.vector.x = speed_req_right;
-//  xicro.Publisher_diff_speed_req.message.vector.y = speed_req_left;
+//  xicro.Publisher_mec_speed_req.message.vector.x = speed_req_right;
+//  xicro.Publisher_mec_speed_req.message.vector.y = speed_req_left;
         
-  xicro.publish_diff_speed_req();
-    xicro.publish_diff_speed_cmd();
+  xicro.publish_mec_speed_req();
+    xicro.publish_mec_speed_cmd();
   
-//    xicro.Publisher_diff_PWM_cmd.message.vector.x = PWM_rightMotor;
-//    xicro.Publisher_diff_PWM_cmd.message.vector.y = PWM_leftMotor;
+//    xicro.Publisher_mec_PWM_cmd.message.vector.x = PWM_rightMotor;
+//    xicro.Publisher_mec_PWM_cmd.message.vector.y = PWM_leftMotor;
           
-    xicro.publish_diff_PWM_cmd();
+    xicro.publish_mec_PWM_cmd();
 //  xicro.loginfo("Publishing odometry");
 }
 
@@ -419,28 +419,28 @@ void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, f
 }
 
 void IMUbringup(){
-    xicro.Publisher_diff_imu.message.vector.x = mpu.getAngleX();
-    xicro.Publisher_diff_imu.message.vector.y = mpu.getAngleY();
-    xicro.Publisher_diff_imu.message.vector.z = mpu.getAngleZ();
+    xicro.Publisher_mec_imu.message.linear.x = mpu.getAngleX();
+    xicro.Publisher_mec_imu.message.linear.y = mpu.getAngleY();
+    xicro.Publisher_mec_imu.message.angular.z = mpu.getAngleZ();
 
 
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration.x = mpu.getAccX();
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration.y = mpu.getAccY();
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration.z = mpu.getAccZ();
-    xicro.Publisher_diff_imu_raw.message.angular_velocity.x = mpu.getGyroX();
-    xicro.Publisher_diff_imu_raw.message.angular_velocity.y = mpu.getGyroY();
-    xicro.Publisher_diff_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[8] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration.x = mpu.getAccX();
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration.y = mpu.getAccY();
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration.z = mpu.getAccZ();
+    xicro.Publisher_mec_imu_raw.message.angular_velocity.x = mpu.getGyroX();
+    xicro.Publisher_mec_imu_raw.message.angular_velocity.y = mpu.getGyroY();
+    xicro.Publisher_mec_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
+    xicro.Publisher_mec_imu_raw.message.orientation_covariance[0] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.orientation_covariance[4] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.orientation_covariance[8] = 0.01;
     
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
     
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[8] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[0] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[4] = 0.01;
+    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[8] = 0.01;
 
     float roll = mpu.getAngleX();
     float pitch = mpu.getAngleY();
@@ -448,10 +448,10 @@ void IMUbringup(){
     float w, x, y, z;
     eulerToQuaternion(roll, pitch, yaw, w, x, y, z);
     
-    xicro.Publisher_diff_imu_raw.message.orientation.w = w;
-    xicro.Publisher_diff_imu_raw.message.orientation.x = x;
-    xicro.Publisher_diff_imu_raw.message.orientation.y = y;
-    xicro.Publisher_diff_imu_raw.message.orientation.z = z;
+    xicro.Publisher_mec_imu_raw.message.orientation.w = w;
+    xicro.Publisher_mec_imu_raw.message.orientation.x = x;
+    xicro.Publisher_mec_imu_raw.message.orientation.y = y;
+    xicro.Publisher_mec_imu_raw.message.orientation.z = z;
   
   }
 

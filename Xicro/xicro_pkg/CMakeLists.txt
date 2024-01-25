@@ -33,6 +33,7 @@ install(PROGRAMS
   scripts/xicro_node_ack_xicro_ID_2_arduino.py
   scripts/xicro_node_diffdrive_ID_1_arduino.py
   scripts/xicro_node_mec_xicro_ID_3_arduino.py
+  scripts/xicro_node_diffdrive_ID_10_arduino.py
 #orcix
   DESTINATION lib/${PROJECT_NAME}
 )

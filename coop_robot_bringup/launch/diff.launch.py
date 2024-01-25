@@ -21,7 +21,7 @@ def generate_launch_description():
     )
 
     xicro = ExecuteProcess(
-        cmd=['ros2', 'run', 'xicro_pkg', 'xicro_node_diffdrive_ID_1_arduino.py'],
+        cmd=['ros2', 'run', 'xicro_pkg', 'xicro_node_diffdrive_ID_10_arduino.py'],
         output='screen',
     )
 
@@ -54,15 +54,20 @@ def generate_launch_description():
     )
 
     nav2 = ExecuteProcess(
-        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py'],
         output='screen',
     )
+
+    # nav2 = ExecuteProcess(
+    #     cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
+    #     output='screen',
+    # )
 
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    ld.add_action(ydliar)
-    ld.add_action(xicro)
+    # ld.add_action(ydliar)
+    # ld.add_action(xicro)
     ld.add_action(odom_compute)
     # ld.add_action(robot_localization_odom)
     ld.add_action(rviz)
