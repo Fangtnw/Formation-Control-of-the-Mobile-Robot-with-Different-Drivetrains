@@ -171,11 +171,13 @@ void setup() {
 
 void loop() {
     
-    xicro.Spin_node();     
+    xicro.Spin_node();    
+    
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loop
     lastMilli = millis();
     handle_cmd();
+//    IMUbringup();
 //    byte status = mpu.begin();
 
     
@@ -316,28 +318,29 @@ void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, f
 }
 
 void IMUbringup(){
+    mpu.update(); 
     xicro.Publisher_diff_imu.message.vector.x = mpu.getAngleX();
     xicro.Publisher_diff_imu.message.vector.y = mpu.getAngleY();
     xicro.Publisher_diff_imu.message.vector.z = mpu.getAngleZ();
 
-
+    xicro.Publisher_diff_imu_raw.message.header.frame_id = "Imu";
     xicro.Publisher_diff_imu_raw.message.linear_acceleration.x = mpu.getAccX();
     xicro.Publisher_diff_imu_raw.message.linear_acceleration.y = mpu.getAccY();
     xicro.Publisher_diff_imu_raw.message.linear_acceleration.z = mpu.getAccZ();
     xicro.Publisher_diff_imu_raw.message.angular_velocity.x = mpu.getGyroX();
     xicro.Publisher_diff_imu_raw.message.angular_velocity.y = mpu.getGyroY();
     xicro.Publisher_diff_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.orientation_covariance[8] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.orientation_covariance[0] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.orientation_covariance[4] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.orientation_covariance[8] = 0.01;
     
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
-    
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[0] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[4] = 0.01;
-    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[8] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
+//    
+//    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[0] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[4] = 0.01;
+//    xicro.Publisher_diff_imu_raw.message.angular_velocity_covariance[8] = 0.01;
 
     float roll = mpu.getAngleX();
     float pitch = mpu.getAngleY();

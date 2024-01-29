@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "diffdrive_odom = coop_controller.diffdrive_odom:main"
+            "diffdrive_odom = coop_controller.diffdrive_odom:main",
+            "mec_odom = coop_controller.mec_odom:main"
         ],
     },
 )

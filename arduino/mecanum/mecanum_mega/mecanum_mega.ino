@@ -247,7 +247,7 @@ void loop() {
   {                                                                           // enter timed loop
     lastMilli = millis();
     handle_cmd();
-//    byte status = mpu.begin();
+    byte status = mpu.begin();
 
     
 
@@ -365,9 +365,9 @@ void loop() {
     if (noCommLoops == 65535){
       noCommLoops = noCommLoopMax;
     }
-    
+    xicro.publish_mec_encoder_vel();
    publishSpeed(LOOPTIME);
-
+  
  }
 }
 void publishSpeed(double time) {
@@ -379,6 +379,10 @@ void publishSpeed(double time) {
 //    xicro.Publisher_mec_encoder_vel.message.vector.x = speed_act_right;
 //    xicro.Publisher_mec_encoder_vel.message.vector.y = speed_act_left;
 //    xicro.Publisher_mec_encoder_vel.message.vector.z = 1000;
+  xicro.Publisher_mec_encoder_vel.message.linear.x = speed_act_motor1;
+  xicro.Publisher_mec_encoder_vel.message.linear.y = speed_act_motor2;
+  xicro.Publisher_mec_encoder_vel.message.angular.x = speed_act_motor3;
+  xicro.Publisher_mec_encoder_vel.message.angular.y = speed_act_motor4;
   xicro.publish_mec_encoder_vel();
   xicro.publish_mec_encoder_tick();
   xicro.publish_mec_imu();
@@ -419,10 +423,11 @@ void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, f
 }
 
 void IMUbringup(){
+    mpu.update(); 
     xicro.Publisher_mec_imu.message.linear.x = mpu.getAngleX();
     xicro.Publisher_mec_imu.message.linear.y = mpu.getAngleY();
     xicro.Publisher_mec_imu.message.angular.z = mpu.getAngleZ();
-
+    xicro.Publisher_mec_imu_raw.message.header.frame_id = "Imu";
 
     xicro.Publisher_mec_imu_raw.message.linear_acceleration.x = mpu.getAccX();
     xicro.Publisher_mec_imu_raw.message.linear_acceleration.y = mpu.getAccY();
@@ -430,17 +435,17 @@ void IMUbringup(){
     xicro.Publisher_mec_imu_raw.message.angular_velocity.x = mpu.getGyroX();
     xicro.Publisher_mec_imu_raw.message.angular_velocity.y = mpu.getGyroY();
     xicro.Publisher_mec_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
-    xicro.Publisher_mec_imu_raw.message.orientation_covariance[0] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.orientation_covariance[4] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.orientation_covariance[8] = 0.01;
-    
-    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
-    
-    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[0] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[4] = 0.01;
-    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[8] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.orientation_covariance[0] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.orientation_covariance[4] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.orientation_covariance[8] = 0.01;
+//    
+//    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
+//    
+//    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[0] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[4] = 0.01;
+//    xicro.Publisher_mec_imu_raw.message.angular_velocity_covariance[8] = 0.01;
 
     float roll = mpu.getAngleX();
     float pitch = mpu.getAngleY();

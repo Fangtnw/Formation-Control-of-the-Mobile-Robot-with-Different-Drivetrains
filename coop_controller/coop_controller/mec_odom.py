@@ -2,7 +2,7 @@
 
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Vector3Stamped, TransformStamped
+from geometry_msgs.msg import Vector3Stamped, TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Header
 from math import sin, cos
@@ -10,17 +10,23 @@ import tf2_ros
 from tf2_ros import TransformBroadcaster
 import tf_transformations
 
-wheel_distance = 0.5
+# wheel_distance = 0.5
+radius = 0.076;                   
+wheelbase = 0.55;               
 
 class OdometryNode(Node):
     def __init__(self):
         super().__init__('odometry_node')
 
-        self.get_logger().info('Differentail-drive Odometry Node is running')
+        self.get_logger().info('Mecanum Odometry Node is running')
 
         self.left_encoder_ticks = 0
         self.right_encoder_ticks = 0
         self.left_vel = 0.0
+        self.motor1_vel = 0.0
+        self.motor2_vel = 0.0
+        self.motor3_vel = 0.0
+        self.motor4_vel = 0.0
         self.right_vel = 0.0
         self.angular_velocity = 0.0
 
@@ -32,11 +38,11 @@ class OdometryNode(Node):
         self.Robot_Yaw = 0.0
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
-        self.odom_pub = self.create_publisher(Odometry, 'diff_odom_raw', 100)
+        self.odom_pub = self.create_publisher(Odometry, 'mec_odom_raw', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
-            Vector3Stamped, 'diff_encoder_vel', self.encoder_vel_callback, 1)
+            Twist, 'mec_encoder_vel', self.encoder_vel_callback, 1)
         # self.imu_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_imu', self.imu_callback, 1)
 
@@ -44,13 +50,17 @@ class OdometryNode(Node):
         self.timer = self.create_timer(0.05, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
-        self.right_encoder_ticks = msg.vector.x
-        self.left_encoder_ticks = msg.vector.y
+        self.motor1_ticks = msg.linear.x
+        self.motor2_ticks = msg.linear.y
+        self.motor3_ticks = msg.angular.x
+        self.motor4_ticks = msg.angular.y
         
 
     def encoder_vel_callback(self, msg):
-        self.right_vel = msg.vector.x
-        self.left_vel = msg.vector.y
+        self.motor1_vel = msg.linear.x
+        self.motor2_vel = msg.linear.y
+        self.motor3_vel = msg.angular.x
+        self.motor4_vel = msg.angular.y
         
     # def imu_callback(self, msg):
     #     # self.Robot_Roll = msg.vector.x
@@ -62,7 +72,7 @@ class OdometryNode(Node):
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
-        odom_msg.header.frame_id = 'diff_odom_raw'
+        odom_msg.header.frame_id = 'mec_odom_raw'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
@@ -141,8 +151,9 @@ class OdometryNode(Node):
         self.tf_broadcaster.sendTransform(transform_base_link_to_base_footprint)
 
     def forward_kinematic(self):
-        self.Robot_LinVel = (self.right_vel + self.left_vel) * 0.5
-        self.Robot_AngVel = (self.right_vel - self.left_vel) / wheel_distance
+        self.Robot_LinVel = (self.motor1_vel + self.motor2_vel + self.motor3_vel + self.motor4_vel) * radius / 4 
+        self.Robot_AngVel = (self.motor4_vel - self.motor3_vel - self.motor2_vel + self.motor1_vel) * radius /  ( 4 * wheelbase)
+
 
     def odom_compute(self, time_step):
         theta = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)

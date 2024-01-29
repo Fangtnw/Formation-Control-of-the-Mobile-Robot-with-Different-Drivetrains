@@ -21,7 +21,10 @@ setup(
     entry_points={
         'console_scripts': [
             'spawn_long_pallet= my_robot_bringup.spawn_long_pallet:main',
-            'diff_launch= diff.launch.py:main'
+            'diff_launch= diff.launch.py:main',
+            'pi_diff_launch= pi_diff.launch.py:main',
+            'mec_launch= mec.launch.py:main',
+            'pi_mec_launch= pi_mec.launch.py:main'
         ],
     },
 )

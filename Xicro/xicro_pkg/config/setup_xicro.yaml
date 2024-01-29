@@ -23,30 +23,9 @@
 #   action_client: [                        ]
 #   action_server: [                        ]
 
-microcontroller:
-  idmcu: 10 # id of mcu 
-  namespace: "diffdrive" # namespace
-  generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
-  connection:
-    type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
-    serial_port: "/dev/ttyACM0"  # for Serial UART example "/dev/ttyUSB0"
-    baudrate: 115200  # for UART
-
-
-ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
-  publisher:  [     
-                    [1,"diff_imu_raw", "sensor_msgs/Imu.msg"],
-                    [2,"diff_encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
-                       ]
-  subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
-  srv_client: [                           ]
-  srv_server: [                           ]
-  action_client: [                        ]
-  action_server: [                        ]
-
 # microcontroller:
-#   idmcu: 3 # id of mcu 
-#   namespace: "mec_xicro" # namespace
+#   idmcu: 10 # id of mcu 
+#   namespace: "diffdrive" # namespace
 #   generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
 #   connection:
 #     type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
@@ -55,19 +34,40 @@ ros: # setup ros is reference from microcontroller example publisher is mean mic
 
 
 # ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
-#   publisher:  [     [1,"mec_encoder_tick", "geometry_msgs/Twist.msg"] ,
-#                     [2,"mec_speed_req", "geometry_msgs/Twist.msg"],
-#                     [3,"mec_PWM_cmd", "geometry_msgs/Twist.msg"],
-#                     [4,"mec_speed_cmd", "geometry_msgs/Twist.msg"],
-#                     [5,"mec_imu", "geometry_msgs/Twist.msg"],
-#                     [6,"mec_imu_raw", "sensor_msgs/Imu.msg"],
-#                     [7,"mec_encoder_vel", "geometry_msgs/Twist.msg"]
+#   publisher:  [     
+#                     [1,"diff_imu_raw", "sensor_msgs/Imu.msg"],
+#                     [2,"diff_encoder_vel", "geometry_msgs/Vector3Stamped.msg"]
 #                        ]
 #   subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
 #   srv_client: [                           ]
 #   srv_server: [                           ]
 #   action_client: [                        ]
 #   action_server: [                        ]
+
+microcontroller:
+  idmcu: 3 # id of mcu 
+  namespace: "mec_xicro" # namespace
+  generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
+  connection:
+    type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
+    serial_port: "/dev/ttyACM0"  # for Serial UART example "/dev/ttyUSB0"
+    baudrate: 115200  # for UART
+
+
+ros: # setup ros is reference from microcontroller example publisher is mean microcontroller publish to ros network
+  publisher:  [     [1,"mec_encoder_tick", "geometry_msgs/Twist.msg"] ,
+                    [2,"mec_speed_req", "geometry_msgs/Twist.msg"],
+                    [3,"mec_PWM_cmd", "geometry_msgs/Twist.msg"],
+                    [4,"mec_speed_cmd", "geometry_msgs/Twist.msg"],
+                    [5,"mec_imu", "geometry_msgs/Twist.msg"],
+                    [6,"mec_imu_raw", "sensor_msgs/Imu.msg"],
+                    [7,"mec_encoder_vel", "geometry_msgs/Twist.msg"]
+                       ]
+  subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
+  srv_client: [                           ]
+  srv_server: [                           ]
+  action_client: [                        ]
+  action_server: [                        ]
 
 # microcontroller:
 #   idmcu: 2 # id of mcu 
