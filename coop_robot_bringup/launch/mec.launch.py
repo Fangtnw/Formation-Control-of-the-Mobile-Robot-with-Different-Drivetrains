@@ -20,6 +20,14 @@ def generate_launch_description():
 
     )
 
+    # xicro = Node(
+    #     package='xicro_pkg',
+    #     executable='xicro_node_mec_xicro_ID_3_arduino.py',
+    #     output='screen',
+    #     # ros_arguments=['--remap','__ns:=/mecanum',],
+    
+    # )
+
     xicro = ExecuteProcess(
         cmd=['ros2', 'run', 'xicro_pkg', 'xicro_node_mec_xicro_ID_3_arduino.py'],
         output='screen',
@@ -29,6 +37,7 @@ def generate_launch_description():
         package='coop_controller',
         executable='mec_odom',
         output='screen',
+        # ros_arguments=['--remap','__ns:=/mecanum',],
     )
 
     robot_localization_odom = Node(
@@ -36,7 +45,7 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
-            remappings=[('/odometry/filtered', '/odom')],
+            remappings=[('/odometry/filtered', '/mecanum/odom')],
             ros_arguments=['--params-file','coop_ws/src/coop_robot_bringup/config/ekf_mec.yaml'],  # Replace with the actual path
         )
     

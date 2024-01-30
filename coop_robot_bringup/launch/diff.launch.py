@@ -5,6 +5,7 @@ from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import PushRosNamespace
 
 def generate_launch_description():
     diffbot_bringup_dir = get_package_share_directory("coop_robot_bringup")
@@ -36,7 +37,7 @@ def generate_launch_description():
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
-            remappings=[('/odometry/filtered', '/odom')],
+            remappings=[('/odometry/filtered', '/diffdrive/odom')],
             ros_arguments=['--params-file','coop_ws/src/coop_robot_bringup/config/ekf.yaml'],  # Replace with the actual path
         )
     
@@ -94,8 +95,9 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    # ld.add_action(ydliar)
-    # ld.add_action(xicro)
+    ld.add_action(ydliar)
+    ld.add_action(xicro)
+    
     ld.add_action(laser_to_base_link_tf)
     ld.add_action(odom_compute)
     ld.add_action(imu_to_base_link_tf)
@@ -104,6 +106,7 @@ def generate_launch_description():
     ld.add_action(slam_toolbox)
     # ld.add_action(nav2_default)
     ld.add_action(nav2)
+
     return ld
 
 if __name__ == "__main__":

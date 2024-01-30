@@ -42,7 +42,7 @@ class OdometryNode(Node):
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
-            Twist, 'mec_encoder_vel', self.encoder_vel_callback, 1)
+            Twist, '/mec_encoder_vel', self.encoder_vel_callback, 1)
         # self.imu_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_imu', self.imu_callback, 1)
 
@@ -151,15 +151,23 @@ class OdometryNode(Node):
         self.tf_broadcaster.sendTransform(transform_base_link_to_base_footprint)
 
     def forward_kinematic(self):
-        self.Robot_LinVel = (self.motor1_vel + self.motor2_vel + self.motor3_vel + self.motor4_vel) * radius / 4 
-        self.Robot_AngVel = (self.motor4_vel - self.motor3_vel - self.motor2_vel + self.motor1_vel) * radius /  ( 4 * wheelbase)
+        # self.Robot_LinVel = (self.motor1_vel + self.motor2_vel + self.motor3_vel + self.motor4_vel) * radius / 4 
+        # self.Robot_AngVel = (self.motor4_vel - self.motor3_vel - self.motor2_vel + self.motor1_vel) * radius /  ( 4 * wheelbase)
+        self.Robot_LinVel = (self.motor1_vel + self.motor2_vel + self.motor3_vel + self.motor4_vel)  / 4
+
+        # Calculate angular velocity
+        self.Robot_AngVel = ((self.motor4_vel - self.motor3_vel - self.motor2_vel + self.motor1_vel)  ) / (4 * wheelbase)
 
 
     def odom_compute(self, time_step):
-        theta = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
-        self.Robot_X = self.Robot_X + (cos(theta) * self.Robot_LinVel * time_step)
-        self.Robot_Y = self.Robot_Y + (sin(theta) * self.Robot_LinVel * time_step)
-        self.Robot_Yaw = self.Robot_Yaw + self.Robot_AngVel * time_step
+        # theta = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
+        # self.Robot_X = self.Robot_X + (cos(theta) * self.Robot_LinVel * time_step)
+        # self.Robot_Y = self.Robot_Y + (sin(theta) * self.Robot_LinVel * time_step)
+        # self.Robot_Yaw = self.Robot_Yaw + self.Robot_AngVel * time_step
+
+        self.Robot_X = self.Robot_X + (((self.motor1_vel + self.motor2_vel + self.motor3_vel + self.motor4_vel)  / 4 ) * time_step)
+        self.Robot_Y = self.Robot_Y + (((-self.motor1_vel + self.motor2_vel + self.motor3_vel - self.motor4_vel)  / 4 ) * time_step)
+        self.Robot_Yaw = self.Robot_Yaw+ (((-self.motor1_vel + self.motor2_vel - self.motor3_vel + self.motor4_vel)  /  ( 4 * wheelbase) ) * time_step)
 
 def main(args=None):
     rclpy.init(args=args)

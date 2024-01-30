@@ -374,11 +374,10 @@ void publishSpeed(double time) {
 //  xicro.Publisher_encode.message.header.stamp = nh.now;
     handle_cmd();
     IMUbringup();
-//    xicro.Publisher_mec_encoder_tick.message.vector.x = pos_right;
-//    xicro.Publisher_mec_encoder_tick.message.vector.y = pos_left;
-//    xicro.Publisher_mec_encoder_vel.message.vector.x = speed_act_right;
-//    xicro.Publisher_mec_encoder_vel.message.vector.y = speed_act_left;
-//    xicro.Publisher_mec_encoder_vel.message.vector.z = 1000;
+  xicro.Publisher_mec_encoder_tick.message.linear.x = counter1;
+  xicro.Publisher_mec_encoder_tick.message.linear.y = counter2;
+  xicro.Publisher_mec_encoder_tick.message.angular.x = counter3;
+  xicro.Publisher_mec_encoder_tick.message.angular.y = counter4;
   xicro.Publisher_mec_encoder_vel.message.linear.x = speed_act_motor1;
   xicro.Publisher_mec_encoder_vel.message.linear.y = speed_act_motor2;
   xicro.Publisher_mec_encoder_vel.message.angular.x = speed_act_motor3;

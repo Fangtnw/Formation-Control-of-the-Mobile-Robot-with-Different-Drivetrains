@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             "diffdrive_odom = coop_controller.diffdrive_odom:main",
-            "mec_odom = coop_controller.mec_odom:main"
+            "mec_odom = coop_controller.mec_odom:main",
+            "formation_controller = coop_controller.formation_controller:main"
         ],
     },
 )
