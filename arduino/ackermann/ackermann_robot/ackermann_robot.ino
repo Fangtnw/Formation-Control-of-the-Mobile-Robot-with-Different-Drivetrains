@@ -263,7 +263,7 @@ void loop() {
       ang_act_servo = 0;
     }
     else {
-      ang_act_servo= (pos_servo)*(1000/LOOPTIME);             // calculate degree of servo
+      ang_act_servo= pos_servo;             // calculate degree of servo
     }
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -339,7 +339,7 @@ void publishSpeed(double time) {
     xicro.Spin_node();
     xicro.Publisher_ack_encoder_vel.message.vector.x = pos_servo_right;
     xicro.Publisher_ack_encoder_vel.message.vector.y = pos_servo_left;
-    xicro.Publisher_ack_encoder_vel.message.vector.z = ang_act_servo;
+    xicro.Publisher_ack_encoder_vel.message.vector.z = ang_req_servo;
     xicro.publish_ack_encoder_vel();
     xicro.Publisher_ack_encoder_tick.message.vector.x = pos_right;
     xicro.Publisher_ack_encoder_tick.message.vector.y = pos_left;
