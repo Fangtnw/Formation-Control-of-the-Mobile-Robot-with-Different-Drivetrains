@@ -50,7 +50,7 @@ def generate_launch_description():
         )
     
     imu_to_base_link_tf = ExecuteProcess(
-        cmd=['ros2', 'run', 'tf2_ros', 'static_transform_publisher', '0', '0', '0', '0', '0', '0', 'Imu', 'base_link'],
+        cmd=['ros2', 'run', 'tf2_ros', 'static_transform_publisher', '0', '0', '0', '0', '0', '0', 'Imu_mec', 'base_link_mec'],
         output='screen',
     )
 
@@ -90,7 +90,7 @@ def generate_launch_description():
 
     # Add actions to the LaunchDescription
     # ld.add_action(ydliar) 
-    ld.add_action(xicro)
+    # ld.add_action(xicro)
     ld.add_action(odom_compute)
     ld.add_action(imu_to_base_link_tf)
     ld.add_action(robot_localization_odom)
