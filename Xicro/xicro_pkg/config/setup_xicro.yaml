@@ -46,7 +46,7 @@
 
 microcontroller:
   idmcu: 3 # id of mcu 
-  namespace: "mec_xicro" # namespace
+  namespace: "mec" # namespace
   generate_library_Path: "/home/fang/Arduino/libraries/"  # path for generate library
   connection:
     type: "UART"   # ["UART","UDP"] support 2 mode 1.Serial UART 2.Wifi UDP (Only arduino and esp32)
@@ -63,7 +63,7 @@ ros: # setup ros is reference from microcontroller example publisher is mean mic
                     [6,"mec_imu_raw", "sensor_msgs/Imu.msg"],
                     [7,"mec_encoder_vel", "geometry_msgs/Twist.msg"]
                        ]
-  subscriber: [   [1,"cmd_vel", "geometry_msgs/Twist.msg"]  ]
+  subscriber: [   [1,"cmd_vel_follower", "geometry_msgs/Twist.msg"]  ]
   srv_client: [                           ]
   srv_server: [                           ]
   action_client: [                        ]

@@ -35,8 +35,8 @@ const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of l
 const int PIN_ENCOD_A_MOTOR_RIGHT = 47;         //A channel for encoder of right motor         
 const int PIN_ENCOD_B_MOTOR_RIGHT = 49;         //B channel for encoder of right motor 
 
-const int PIN_ENCOD_A_SERVO_LEFT = 2;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_SERVO_LEFT = 5;              //B channel for encoder of left servo motor 
+const int PIN_ENCOD_A_SERVO_LEFT = 18;              //A channel for encoder of left servo motor         
+const int PIN_ENCOD_B_SERVO_LEFT = 19;              //B channel for encoder of left servo motor 
 
 const int PIN_ENCOD_A_SERVO_RIGHT = 3;              //A channel for encoder of right servo motor         
 const int PIN_ENCOD_B_SERVO_RIGHT = 6;              //B channel for encoder of right servo motor 
@@ -235,7 +235,7 @@ void setup() {
   pinMode(PIN_ENCOD_B_SERVO_LEFT, INPUT); 
   digitalWrite(PIN_ENCOD_A_SERVO_LEFT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_SERVO_LEFT, HIGH);
-  attachInterrupt(0, encoderLeftServo, RISING);
+  attachInterrupt(5, encoderLeftServo, RISING);
 
   //  Define the rotary encoder for right servo motor
   pinMode(PIN_ENCOD_A_SERVO_RIGHT, INPUT);

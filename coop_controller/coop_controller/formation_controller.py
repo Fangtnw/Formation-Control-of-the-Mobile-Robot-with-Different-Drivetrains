@@ -7,16 +7,26 @@ from tf2_geometry_msgs import do_transform_vector3
 class FormationController(Node):
     def __init__(self):
         super().__init__('formation_controller')
-        self.robot1_frame = 'robot1/base_link'
-        self.robot2_frame = 'robot2/base_link'
+        self.robot1_frame = 'base_link'
+        self.robot2_frame = 'base_link_follower'
         self.target_distance = 1.0
         self.target_orientation = 0.0
 
-        self.publisher = self.create_publisher(Twist, 'cmd_vel', 10)
+        self.publisher = self.create_publisher(Twist, 'cmd_vel_follower', 10)
+        self.subscription = self.create_subscription(
+            Twist,
+            'cmd_vel',
+            self.cmd_vel_callback,
+            10
+        )
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        self.timer = self.create_timer(1.0, self.control_callback)
+        # self.timer = self.create_timer(1.0, self.control_callback)
+
+    def cmd_vel_callback(self, msg):
+        # Simply copy the Twist message from cmd_vel and publish on cmd_vel_follower
+        self.publisher.publish(msg)
 
     def control_callback(self):
         try:
@@ -34,15 +44,17 @@ class FormationController(Node):
         linear_velocity = 0.1 * distance_error
         angular_velocity = 0.1 * orientation_error
 
-        # Publish control command
+        # Publish control command for the second robot (follower)
         cmd_msg = Twist()
         cmd_msg.linear.x = linear_velocity
         cmd_msg.angular.z = angular_velocity
         self.publisher.publish(cmd_msg)
 
     def calculate_distance_error(self, transform):
-        distance_vector = transform.transform.translation
-        distance_error = self.target_distance - do_transform_vector3(distance_vector, transform).x
+        # distance_vector = transform.transform.translation
+        # transformed_distance_vector = do_transform_vector3(distance_vector, transform)
+        # distance_error = self.target_distance - transformed_distance_vector.x
+        distance_error=0
         return distance_error
 
     def calculate_orientation_error(self, transform):

@@ -1,5 +1,5 @@
 #include <PID_v1.h>
-#include <Xicro_mec_xicro_ID_3.h>
+#include <Xicro_mec_ID_3.h>
 #include <Wire.h>
 #include <MPU6050_light.h>
 
@@ -146,12 +146,12 @@ class motor{
 
 void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
-  linx = xicro.Subscription_cmd_vel.message.linear.x;
-  liny = xicro.Subscription_cmd_vel.message.linear.y;
-  linz = xicro.Subscription_cmd_vel.message.linear.z;
-  angx = xicro.Subscription_cmd_vel.message.angular.x;
-  angy = xicro.Subscription_cmd_vel.message.angular.y;
-  angz = xicro.Subscription_cmd_vel.message.angular.z;
+  linx = xicro.Subscription_cmd_vel_follower.message.linear.x;
+  liny = xicro.Subscription_cmd_vel_follower.message.linear.y;
+  linz = xicro.Subscription_cmd_vel_follower.message.linear.z;
+  angx = xicro.Subscription_cmd_vel_follower.message.angular.x;
+  angy = xicro.Subscription_cmd_vel_follower.message.angular.y;
+  angz = xicro.Subscription_cmd_vel_follower.message.angular.z;
 
     speed_req_motor1 = (linx-liny-(wheelbase*angz));
     speed_req_motor2 = (linx+liny+(wheelbase*angz));

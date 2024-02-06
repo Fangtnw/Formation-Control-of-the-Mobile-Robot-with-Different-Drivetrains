@@ -162,7 +162,7 @@ controller_server:
         trajectory_step: 5
         time_step: 3
       AckermannConstraints:
-        min_turning_r: 1.0
+        min_turning_r: 7.0
       critics: ["ConstraintCritic", "ObstaclesCritic", "GoalCritic", "GoalAngleCritic", "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
       ConstraintCritic:
         enabled: true
@@ -230,8 +230,8 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.05
-      footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"   
-      # footprint: "[ [1.0, 0.25], [1.0, -0.25], [-1.0, -0.25], [-1.0, 0.25] ]"   
+      # footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"   
+      footprint: "[ [1.0, 0.25], [1.0, -0.25], [-1.0, -0.25], [-1.0, 0.25] ]"   
       origin_x: 0.0  
       origin_y: 5.0
       plugins: ["voxel_layer", "inflation_layer"]
@@ -273,9 +273,9 @@ global_costmap:
       robot_base_frame: base_link
       use_sim_time: True
       # robot_radius: 0.22
-      footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"   
+      # footprint: "[ [0.15, 0.15], [0.15, -0.15], [-0.15, -0.15], [-0.15, 0.15] ]"   
       resolution: 0.05
-      # footprint: "[ [1.0, 0.25], [1.0, -0.25], [-1.0, -0.25], [-1.0, 0.25] ]"   
+      footprint: "[ [1.0, 0.25], [1.0, -0.25], [-1.0, -0.25], [-1.0, 0.25] ]"   
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
       obstacle_layer:
@@ -306,7 +306,7 @@ map_server:
     use_sim_time: True
     # Overridden in launch by the "map" launch configuration or provided default value.
     # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
-    yaml_filename: ""
+    yaml_filename: "/home/fang/map/my_map_2.yaml"
 
 map_saver:
   ros__parameters:

@@ -95,8 +95,8 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    ld.add_action(ydliar)
-    ld.add_action(xicro)
+    # ld.add_action(ydliar)
+    # ld.add_action(xicro)
     
     ld.add_action(laser_to_base_link_tf)
     ld.add_action(odom_compute)

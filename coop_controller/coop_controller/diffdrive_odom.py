@@ -112,21 +112,21 @@ class OdometryNode(Node):
         # self.tf_broadcaster.sendTransform(map_to_odom_transform)
         
         # Publish TF transform
-        transform = TransformStamped()
-        transform.header = Header()
-        transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = 'odom'
-        transform.child_frame_id = 'base_link'
-        transform.transform.translation.x = self.Robot_X
-        transform.transform.translation.y = self.Robot_Y
-        transform.transform.translation.z = 0.0
-        quaternion = tf_transformations.quaternion_from_euler(0.0, 0.0, self.Robot_Yaw)
-        transform.transform.rotation.x = quaternion[0]
-        transform.transform.rotation.y = quaternion[1]
-        transform.transform.rotation.z = quaternion[2]
-        transform.transform.rotation.w = quaternion[3]
+        # transform = TransformStamped()
+        # transform.header = Header()
+        # transform.header.stamp = self.get_clock().now().to_msg()
+        # transform.header.frame_id = 'odom'
+        # transform.child_frame_id = 'base_link'
+        # transform.transform.translation.x = self.Robot_X
+        # transform.transform.translation.y = self.Robot_Y
+        # transform.transform.translation.z = 0.0
+        # quaternion = tf_transformations.quaternion_from_euler(0.0, 0.0, self.Robot_Yaw)
+        # transform.transform.rotation.x = quaternion[0]
+        # transform.transform.rotation.y = quaternion[1]
+        # transform.transform.rotation.z = quaternion[2]
+        # transform.transform.rotation.w = quaternion[3]
 
-        self.tf_broadcaster.sendTransform(transform)
+        # self.tf_broadcaster.sendTransform(transform)
 
         # Publish TF transform from 'base_link' to 'base_footprint'
         transform_base_link_to_base_footprint = TransformStamped()

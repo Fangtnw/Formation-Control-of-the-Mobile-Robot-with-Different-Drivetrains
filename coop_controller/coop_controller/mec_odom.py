@@ -112,13 +112,13 @@ class OdometryNode(Node):
 
         map_to_odom_transform = TransformStamped()
         map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
-        map_to_odom_transform.header.frame_id = 'map'
+        map_to_odom_transform.header.frame_id = 'odom'
         map_to_odom_transform.child_frame_id = 'odom_mec'
         map_to_odom_transform.transform.translation.x = 1.0  # Adjust as needed
-        map_to_odom_transform.transform.translation.y = 1.0  # Adjust as needed
+        map_to_odom_transform.transform.translation.y = 0.0  # Adjust as needed
         map_to_odom_transform.transform.translation.z = 0.0  # Adjust as needed
-        map_to_odom_transform.transform.rotation.z = 10.0  # Adjust as needed
-        map_to_odom_transform.transform.rotation.w = 5.0  # Adjust as needed
+        map_to_odom_transform.transform.rotation.z = 0.0  # Adjust as needed
+        map_to_odom_transform.transform.rotation.w = 1.0  # Adjust as needed
         self.tf_broadcaster.sendTransform(map_to_odom_transform)
         
         # Publish TF transform
@@ -126,7 +126,7 @@ class OdometryNode(Node):
         transform.header = Header()
         transform.header.stamp = self.get_clock().now().to_msg()
         transform.header.frame_id = 'odom_mec'
-        transform.child_frame_id = 'base_link_mec'
+        transform.child_frame_id = 'base_link_follower'
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0
@@ -141,7 +141,7 @@ class OdometryNode(Node):
         # Publish TF transform from 'base_link' to 'base_footprint'
         transform_base_link_to_base_footprint = TransformStamped()
         transform_base_link_to_base_footprint.header.stamp = self.get_clock().now().to_msg()
-        transform_base_link_to_base_footprint.header.frame_id = 'base_link_mec'
+        transform_base_link_to_base_footprint.header.frame_id = 'base_link_follower'
         transform_base_link_to_base_footprint.child_frame_id = 'base_footprint_mec'
         transform_base_link_to_base_footprint.transform.translation.x = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.translation.y = 0.0  # Adjust as needed
