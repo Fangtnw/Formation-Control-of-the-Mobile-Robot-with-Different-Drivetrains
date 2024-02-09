@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'spawn_long_pallet= my_robot_bringup.spawn_long_pallet:main',
+            'spawn_diff= my_robot_bringup.diffdrive_spawn.launch.py:main',
             'diff_launch= diff.launch.py:main',
             'pi_diff_launch= pi_diff.launch.py:main',
             'mec_launch= mec.launch.py:main',

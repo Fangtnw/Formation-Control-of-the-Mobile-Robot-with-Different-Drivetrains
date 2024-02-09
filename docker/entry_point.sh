@@ -18,6 +18,7 @@ source /opt/ros/humble/setup.bash
 cd
 cd ~/coop_ws/src
 rm -r sim_car/
+rm -r URDF/
 cd ..
 
 colcon build --symlink-install

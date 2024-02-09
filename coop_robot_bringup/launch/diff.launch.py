@@ -78,9 +78,14 @@ def generate_launch_description():
     )
 
     slam_toolbox = ExecuteProcess(
-        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py'],
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py' , 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
         output='screen',
     )
+
+    # slam_toolbox_localize = ExecuteProcess(
+    #     cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py' , 'params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml'],
+    #     output='screen',
+    # )
 
     nav2_default = ExecuteProcess(
         cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py'],
@@ -88,15 +93,35 @@ def generate_launch_description():
     )
 
     nav2= ExecuteProcess(
-        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'map:=/home/fang/maps/test.yaml'],
+        output='screen',
+    )
+
+    map_server = ExecuteProcess(
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=mappy.yaml'],
+        output='screen',
+    )
+
+    lifecycle_map_server = ExecuteProcess(
+        cmd=['ros2', 'run', 'nav2_util', 'lifecycle_bringup', 'map_server'],
+        output='screen',
+    )
+
+    amcl = ExecuteProcess(
+        cmd=['ros2', 'run', 'nav2_amcl', 'amcl'],
+        output='screen',
+    )
+
+    lifecycle_amcl = ExecuteProcess(
+        cmd=['ros2', 'run', 'nav2_util', 'lifecycle_bringup', 'amcl'],
         output='screen',
     )
 
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    # ld.add_action(ydliar)
-    # ld.add_action(xicro)
+    ld.add_action(ydliar)
+    ld.add_action(xicro)
     
     ld.add_action(laser_to_base_link_tf)
     ld.add_action(odom_compute)
@@ -106,6 +131,11 @@ def generate_launch_description():
     ld.add_action(slam_toolbox)
     # ld.add_action(nav2_default)
     ld.add_action(nav2)
+
+    # ld.add_action(map_server)
+    # ld.add_action(lifecycle_map_server)
+    # ld.add_action(amcl)
+    # ld.add_action(lifecycle_amcl)
 
     return ld
 

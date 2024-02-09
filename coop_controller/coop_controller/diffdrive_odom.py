@@ -66,7 +66,7 @@ class OdometryNode(Node):
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
-        odom_msg.child_frame_id = "base_link"
+        odom_msg.child_frame_id = "base_footprint"
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
@@ -131,8 +131,8 @@ class OdometryNode(Node):
         # Publish TF transform from 'base_link' to 'base_footprint'
         transform_base_link_to_base_footprint = TransformStamped()
         transform_base_link_to_base_footprint.header.stamp = self.get_clock().now().to_msg()
-        transform_base_link_to_base_footprint.header.frame_id = 'base_link'
-        transform_base_link_to_base_footprint.child_frame_id = 'base_footprint'
+        transform_base_link_to_base_footprint.header.frame_id = 'base_footprint'
+        transform_base_link_to_base_footprint.child_frame_id = 'base_link'
         transform_base_link_to_base_footprint.transform.translation.x = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.translation.y = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.translation.z = 0.0  # Adjust as needed

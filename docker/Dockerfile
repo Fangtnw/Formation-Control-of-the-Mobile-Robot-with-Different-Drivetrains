@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop
+FROM ros:humble
 
 # Example of installing programs
 RUN apt-get update && \
@@ -50,7 +50,7 @@ COPY bashrc /home/${USERNAME}/.bashrc
 
 # Clone the Git repository
 RUN git clone https://github.com/Fangtnw/MCE07_Senior_project.git /home/${USERNAME}/coop_ws/src
-RUN git clone -b humble https://github.com/YDLIDAR/ydlidar_ros2_driver.git /home/${USERNAME}/coop_ws/src/ydlidar_ros2_driver
+# RUN git clone -b humble https://github.com/YDLIDAR/ydlidar_ros2_driver.git /home/${USERNAME}/coop_ws/src/ydlidar_ros2_driver
 RUN git clone https://github.com/YDLIDAR/YDLidar-SDK.git /home/${USERNAME}/YDLidar-SDK
 
 # Add commands to build and install YDLidar-SDK

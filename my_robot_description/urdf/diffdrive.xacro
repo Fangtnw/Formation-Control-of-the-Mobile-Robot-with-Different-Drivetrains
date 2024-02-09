@@ -1,0 +1,631 @@
+<?xml version="1.0"?>
+<robot name="diffdrive" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="base_footprint">
+  </link>
+
+
+  <joint name="base_link_to_base_footprint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+
+
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.410002757772882 0.223304099954227 0.383656044234519"
+        rpy="0 0 0" />
+      <mass
+        value="3.99707593295727" />
+      <inertia
+        ixx="0.0338286081756613"
+        ixy="2.69812394512863E-07"
+        ixz="6.04312596661445E-10"
+        iyy="0.0771999899846764"
+        iyz="1.18867676606539E-08"
+        izz="0.0441560434041183" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/base_link.STL" />  
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 0.4" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link
+    name="caster_wheel_01">
+    <inertial>
+      <origin
+        xyz="0.00442419024671004 0.0407882700915736 5.11365806366015E-08"
+        rpy="0 0 0" />
+      <mass
+        value="0.0159163609587196" />
+      <inertia
+        ixx="3.04804887255873E-06"
+        ixy="3.8115153686273E-07"
+        ixz="1.01515368617414E-10"
+        iyy="2.55687129048666E-06"
+        iyz="-5.57379950267749E-11"
+        izz="2.82872222947099E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_01.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_01.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_wheel_01"
+    type="continuous">
+    <origin
+      xyz="0.649922237049609 -0.238297834751047 0.157919253158435"
+      rpy="1.5707963267949 0 -1.55646155726161" />
+    <parent
+      link="base_link" />
+    <child
+      link="caster_wheel_01" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+
+  <link
+    name="caster_01">
+    <inertial>
+      <origin
+        xyz="0.0214652433425613 0.00180092427509927 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.0351037181525611" />
+      <inertia
+        ixx="6.69573691459496E-06"
+        ixy="-4.2351647362715E-22"
+        ixz="-1.4756902127946E-20"
+        iyy="6.69573691459495E-06"
+        iyz="-1.46444055646388E-20"
+        izz="1.13592998252083E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_01.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.250980392156863 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_01.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_01"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="0 0 0.296802859073811" />
+    <parent
+      link="caster_wheel_01" />
+    <child
+      link="caster_01" />
+    <axis
+      xyz="0.292464356117457 0.956276424681065 0" />
+  </joint>
+
+  <link
+    name="caster_wheel_02">/diffdrive
+    <inertial>
+      <origin
+        xyz="-0.00376546230151442 0.0407882700171175 -0.00232266139324588"
+        rpy="0 0 0" />
+      <mass
+        value="0.0159163608550056" />
+      <inertia
+        ixx="2.98751038693051E-06"
+        ixy="-3.24432619179736E-07"
+        ixz="9.80449894252071E-08"
+        iyy="2.55687121621709E-06"
+        iyz="-2.00049983095585E-07"
+        izz="2.88926070956337E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_02.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_02.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_wheel_02"
+    type="continuous">
+    <origin
+      xyz="0.649922237049609 -0.548297834751047 0.157919253158437"
+      rpy="1.5707963267949 0 2.14107688053925" />
+    <parent
+      link="base_link" />
+    <child
+      link="caster_wheel_02" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+
+  <link
+    name="caster_02">
+    <inertial>
+      <origin
+        xyz="0.0214652433425611 0.00180092427509934 1.11022302462516E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.0351037181525611" />
+      <inertia
+        ixx="6.69573691459496E-06"
+        ixy="3.17637355220363E-22"
+        ixz="2.2446373102239E-20"
+        iyy="6.69573691459495E-06"
+        iyz="-2.1572870375383E-21"
+        izz="1.13592998252083E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_02.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.250980392156863 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_02.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_02"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="2.96311522163044 0.525941308677483 2.79662415169577" />
+    <parent
+      link="caster_wheel_02" />
+    <child
+      link="caster_02" />
+    <axis
+      xyz="0.292464356117457 0.956276424681065 0" />
+  </joint>
+
+  <link
+    name="caster_wheel_03">
+    <inertial>
+      <origin
+        xyz="-0.00376546080228934 0.0407882711178764 -0.00232265994952238"
+        rpy="0 0 0" />
+      <mass
+        value="0.0159163611002415" />
+      <inertia
+        ixx="2.98751079488814E-06"
+        ixy="-3.24432397210381E-07"
+        ixz="9.8043942933475E-08"
+        iyy="2.55687160406272E-06"
+        iyz="-2.0005032862318E-07"
+        izz="2.88926023574823E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_03.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_03.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_wheel_03"
+    type="continuous">
+    <origin
+      xyz="0.169922237049587 -0.548297834751047 0.157919253158437"
+      rpy="1.5707963267949 0 2.11677958982226" />
+    <parent
+      link="base_link" />
+    <child
+      link="caster_wheel_03" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="caster_03">
+    <inertial>
+      <origin
+        xyz="0.0214652433425609 0.00180092427509926 1.11022302462516E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.0351037181525611" />
+      <inertia
+        ixx="6.69573691459494E-06"
+        ixy="3.17637355220363E-22"
+        ixz="8.37106779903664E-22"
+        iyy="6.69573691459494E-06"
+        iyz="-3.25743725223382E-21"
+        izz="1.13592998252082E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_03.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.250980392156863 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_03.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_03"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="2.96311522163044 0.525941308677473 2.79662415169576" />
+    <parent
+      link="caster_wheel_03" />
+    <child
+      link="caster_03" />
+    <axis
+      xyz="0.292464356117462 0.956276424681064 0" />
+  </joint>
+
+  <link
+    name="caster_wheel_04">
+    <inertial>
+      <origin
+        xyz="0.0404249060706092 -0.00700596278140952 -5.14370523119201E-08"
+        rpy="0 0 0" />
+      <mass
+        value="0.0159163608704481" />
+      <inertia
+        ixx="2.79652754247248E-06"
+        ixy="4.53381671510528E-07"
+        ixz="2.53127233188317E-11"
+        iyy="2.80839192000701E-06"
+        iyz="-1.12354417786115E-10"
+        izz="2.82872309017874E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_04.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_04.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_wheel_04"
+    type="continuous">
+    <origin
+      xyz="0.169922237049587 -0.238297834751047 0.157919253158437"
+      rpy="-1.5707963267949 -1.29114800642175 -1.58217190075403" />
+    <parent
+      link="base_link" />
+    <child
+      link="caster_wheel_04" />
+    <axis
+      xyz="0.961152567529158 -0.276017647863517 0" />
+  </joint>
+
+  <link
+    name="caster_04">
+    <inertial>
+      <origin
+        xyz="0.021465243342561 0.00180092427509938 2.77555756156289E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.035103718152561" />
+      <inertia
+        ixx="6.69573691459492E-06"
+        ixy="-6.35274710440725E-22"
+        ixz="2.06464280893236E-21"
+        iyy="6.69573691459492E-06"
+        iyz="7.0475788189518E-22"
+        izz="1.13592998252082E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_04.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.250980392156863 0.250980392156863 0.250980392156863 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_04.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_caster_04"
+    type="continuous">
+    <origin
+      xyz="0 0 0"
+      rpy="3.14159265358979 0 0.994345147347936" />
+    <parent
+      link="caster_wheel_04" />
+    <child
+      link="caster_04" />
+    <axis
+      xyz="0.292464356117458 0.956276424681065 0" />
+  </joint>
+
+  <link
+    name="wheel_01">
+    <inertial>
+      <origin
+        xyz="5.55111512312578E-17 0.0257257525083612 5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="4.26861241081053E-21"
+        ixz="-6.7762635780344E-21"
+        iyy="0.000452624182450972"
+        iyz="1.59972478988236E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_01.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_01.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_wheel_01"
+    type="continuous">
+    <origin
+      xyz="0.659922237049609 -0.392297834751047 0.200418917757862"
+      rpy="3.14159265358979 -0.53712555837446 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="wheel_01" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+
+  <link
+    name="wheel_02">
+    <inertial>
+      <origin
+        xyz="0 -0.0152742474916388 2.77555756156289E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="5.12745004835681E-20"
+        ixz="0"
+        iyy="0.000452624182450971"
+        iyz="-5.57841424911612E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_02.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh                                    
+          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_02.STL" />
+      </geometry>
+    </collision>
+  </link>
+
+  <joint
+    name="joint_wheel_02"
+    type="continuous">
+    <origin
+      xyz="0.118922237049587 -0.39229783475107 0.200418917757862"
+      rpy="0 0.774914173734372 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="wheel_02" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+
+    <gazebo>
+        <plugin name="gazebo_ros_diff_drive" filename="libgazebo_ros_diff_drive.so">
+            <!-- Update rate in Hz -->
+            <ros>
+            <!-- Add a namespace -->
+            <namespace></namespace>
+            </ros>
+            <update_rate>50</update_rate>
+            <!-- wheels -->
+            <left_joint>joint_wheel_01</left_joint>
+            <right_joint>joint_wheel_02</right_joint>
+            <!-- kinematics -->
+            <wheel_separation>0.5</wheel_separation>
+            <wheel_diameter>0.12</wheel_diameter>
+            <!-- input -->
+            <command_topic>cmd_vel</command_topic>
+            <!-- output -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+            <odometry_topic>odom</odometry_topic>
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_footprint</robot_base_frame>
+        </plugin>
+    </gazebo>
+  
+</robot>
