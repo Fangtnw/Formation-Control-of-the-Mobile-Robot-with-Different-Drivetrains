@@ -1,16 +1,13 @@
 <?xml version="1.0"?>
-<robot name="diffdrive" xmlns:xacro="http://www.ros.org/wiki/xacro">
-
-  <link name="base_footprint">
-  </link>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffdrive" >
 
 
+  <link name="base_footprint"></link>
   <joint name="base_link_to_base_footprint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
     <parent link="base_footprint"/>
     <child link="base_link"/>
   </joint>
-
 
   <link
     name="base_link">
@@ -19,7 +16,7 @@
         xyz="0.410002757772882 0.223304099954227 0.383656044234519"
         rpy="0 0 0" />
       <mass
-        value="3.99707593295727" />
+        value="10" />
       <inertia
         ixx="0.0338286081756613"
         ixy="2.69812394512863E-07"
@@ -34,7 +31,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/base_link.STL" />  
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/base_link.STL" />  
       </geometry>
       <material
         name="">
@@ -48,7 +45,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/base_link.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -74,8 +71,8 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
-        <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_01.STL" />
+        <mesh  
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_01.STL"/>
       </geometry>
       <material
         name="">
@@ -89,7 +86,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_01.STL" />
       </geometry>
     </collision>
   </link>
@@ -130,7 +127,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_01.STL" />
       </geometry>
       <material
         name="">
@@ -144,7 +141,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_01.STL" />
       </geometry>
     </collision>
   </link>
@@ -164,7 +161,7 @@
   </joint>
 
   <link
-    name="caster_wheel_02">/diffdrive
+    name="caster_wheel_02">
     <inertial>
       <origin
         xyz="-0.00376546230151442 0.0407882700171175 -0.00232266139324588"
@@ -185,7 +182,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_02.STL" />
       </geometry>
       <material
         name="">
@@ -199,7 +196,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_02.STL" />
       </geometry>
     </collision>
   </link>
@@ -240,7 +237,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_02.STL" />
       </geometry>
       <material
         name="">
@@ -254,7 +251,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_02.STL" />
       </geometry>
     </collision>
   </link>
@@ -295,7 +292,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_03.STL" />
       </geometry>
       <material
         name="">
@@ -309,7 +306,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_03.STL" />
       </geometry>
     </collision>
   </link>
@@ -349,7 +346,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_03.STL" />
       </geometry>
       <material
         name="">
@@ -363,7 +360,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_03.STL" />
       </geometry>
     </collision>
   </link>
@@ -404,7 +401,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_04.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_04.STL" />
       </geometry>
       <material
         name="">
@@ -418,7 +415,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_wheel_04.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_wheel_04.STL" />
       </geometry>
     </collision>
   </link>
@@ -459,7 +456,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_04.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_04.STL" />
       </geometry>
       <material
         name="">
@@ -473,7 +470,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/caster_04.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/caster_04.STL" />
       </geometry>
     </collision>
   </link>
@@ -499,7 +496,7 @@
         xyz="5.55111512312578E-17 0.0257257525083612 5.55111512312578E-17"
         rpy="0 0 0" />
       <mass
-        value="0.240470068076377" />
+        value="2" />
       <inertia
         ixx="0.000245137261047143"
         ixy="4.26861241081053E-21"
@@ -514,7 +511,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_01.STL" />
       </geometry>
       <material
         name="">
@@ -528,7 +525,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_01.STL" />
       </geometry>
     </collision>
   </link>
@@ -554,7 +551,7 @@
         xyz="0 -0.0152742474916388 2.77555756156289E-17"
         rpy="0 0 0" />
       <mass
-        value="0.240470068076377" />
+        value="2" />
       <inertia
         ixx="0.000245137261047143"
         ixy="5.12745004835681E-20"
@@ -569,7 +566,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_02.STL" />
       </geometry>
       <material
         name="">
@@ -583,7 +580,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh                                    
-          filename="package://my_robot_description/meshes/diffdrive_meshes/wheel_02.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_02.STL" />
       </geometry>
     </collision>
   </link>
@@ -614,12 +611,17 @@
             <left_joint>joint_wheel_01</left_joint>
             <right_joint>joint_wheel_02</right_joint>
             <!-- kinematics -->
-            <wheel_separation>0.5</wheel_separation>
+            <wheel_separation>0.55</wheel_separation>
             <wheel_diameter>0.12</wheel_diameter>
+            <wheelAcceleration>0.0</wheelAcceleration>
+            <!-- Maximum torque which the wheels can produce, in Nm, defaults to 5 Nm -->
+            <wheelTorque>5</wheelTorque>
             <!-- input -->
             <command_topic>cmd_vel</command_topic>
             <!-- output -->
             <publish_odom>true</publish_odom>
+            <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
+            <odometrySource>1</odometrySource>
             <publish_odom_tf>true</publish_odom_tf>
             <publish_wheel_tf>true</publish_wheel_tf>
             <odometry_topic>odom</odometry_topic>

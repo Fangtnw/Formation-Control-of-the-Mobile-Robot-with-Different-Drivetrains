@@ -5,6 +5,7 @@ from launch.actions import ExecuteProcess
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.actions import TimerAction
 
 def generate_launch_description():
     diffbot_bringup_dir = get_package_share_directory("coop_robot_bringup")
@@ -20,10 +21,16 @@ def generate_launch_description():
 
     )
 
+    xicro_delay = TimerAction(
+        period=5.0,  # 5 seconds delay
+        actions=[xicro]  # Launch xicro_node after 5 seconds
+    )
+
     xicro = ExecuteProcess(
         cmd=['ros2', 'run', 'xicro_pkg', 'xicro_node_diffdrive_ID_1_arduino.py'],
         output='screen',
     )
+
 
     odom_compute = Node(
         package='coop_controller',
@@ -81,7 +88,7 @@ def generate_launch_description():
 
     # Add actions to the LaunchDescription
     ld.add_action(ydliar) 
-    ld.add_action(xicro)
+    ld.add_action(xicro_delay)
     # ld.add_action(odom_compute)
     # ld.add_action(imu_to_base_link_tf)
     # ld.add_action(robot_localization_odom)

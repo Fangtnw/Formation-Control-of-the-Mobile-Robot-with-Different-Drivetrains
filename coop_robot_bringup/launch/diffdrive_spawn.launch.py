@@ -17,62 +17,16 @@ def generate_launch_description():
     xacro_file=os.path.join(get_package_share_path('my_robot_description'),
                            'urdf','diffdrive.xacro')
     
-    robot_description_raw = xacro.process_file(xacro_file).toxml()
-    
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
-    world_path = os.path.join(get_package_share_path('gazebo_ros'), 'worlds', 'empty.world')
+
     robot_description = ParameterValue(Command(['xacro ',xacro_file]),value_type=str)
-
-    environment = 'worlds/car.world'
-    environment_path = os.path.join(get_package_share_directory('coop_robot_bringup'),environment)  
-    os.environ["GAZEBO_MODEL_PATH"] = environment_path
     
-    headless = LaunchConfiguration('headless')
-    use_simulator = LaunchConfiguration('use_simulator')
-    world = LaunchConfiguration('world')
-
-    declare_simulator_cmd = DeclareLaunchArgument(
-        name='headless',
-        default_value='False',
-        description='Whether to execute gzclient')
-        
-    declare_use_sim_time_cmd = DeclareLaunchArgument(
-        name='use_sim_time',
-        default_value='true',
-        description='Use simulation (Gazebo) clock if true')
     
-    declare_use_simulator_cmd = DeclareLaunchArgument(
-        name='use_simulator',
-        default_value='True',
-        description='Whether to start the simulator')
-
-    declare_world_cmd = DeclareLaunchArgument(
-        name='world',
-        default_value=environment_path,
-        description='Full path to the world model file to load'
-    )
-    
-    gazebo_server = IncludeLaunchDescription(
+    gazebo_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('gazebo_ros'),
-                'launch',
-                'gzserver.launch.py'
-            ])
-        ]),
-        condition=IfCondition(use_simulator),
-        launch_arguments={'world': world}.items()
-    )    
-    gazebo_client = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('gazebo_ros'),
-                'launch',
-                'gzclient.launch.py'
-            ])
-        ]),
-        condition=IfCondition(PythonExpression([use_simulator, ' and not ', headless]))
+            PathJoinSubstitution([FindPackageShare('gazebo_ros'), 'launch', 'gazebo.launch.py'])
+        ])
     )
 
     robot_state_publisher_node = Node(
@@ -91,28 +45,45 @@ def generate_launch_description():
         executable="rviz2",
         arguments=['-d', rviz_config_path]
     )
-
-    gazebo_node = ExecuteProcess(
-        cmd=['ros2', 'launch', 'gazebo_ros', 'gazebo.launch.py'],
-        output='screen',
-    )
        
+    spawn_ackermann= Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=["-topic", "robot_description", "-entity", "ackermann"]
+    )
+    static_transform_publisher_node = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="tf_footprint_base",
+        output="screen",
+        arguments=["0", "0", "0", "0", "0", "0", "base_link", "base_footprint"]
+    )
+
     spawn_diffdrive= Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=["-topic", "robot_description", "-entity", "diffdrive"]
     )
 
+    fake_joint_calibration_node = Node(
+        package='ros2topic',
+        executable='ros2',
+        name='fake_joint_calibration',
+        arguments=['topic', 'pub', '/calibrated', 'std_msgs/Bool', 'true']
+    )
+
+    spawn_mecanum= Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=["-topic", "robot_description", "-entity", "mecanum"]
+    )
+
     return LaunchDescription([
-        declare_simulator_cmd,
-        declare_use_sim_time_cmd,
-        declare_use_simulator_cmd,
-        declare_world_cmd,
-        gazebo_server,
-        gazebo_client,
+        gazebo_launch_description,
+        static_transform_publisher_node,
         robot_state_publisher_node,
-        joint_state_publisher_gui_node,
+        # joint_state_publisher_gui_node,
         rviz2_node,
-        # gazebo_node,
-        spawn_diffdrive
+        spawn_diffdrive,
+        fake_joint_calibration_node
     ])
