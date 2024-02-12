@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="DiffDrive">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.00843797932248264 7.91524717263514E-05 0.0510944704707574"
+        rpy="0 0 0" />
+      <mass
+        value="4.20115624935193" />
+      <inertia
+        ixx="0.0441950216113175"
+        ixy="-6.1273841754346E-08"
+        ixz="1.5363609769836E-06"
+        iyy="0.0338853571996096"
+        iyz="2.75308042467669E-07"
+        izz="0.077237000418039" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Wheel_left">
+    <inertial>
+      <origin
+        xyz="0 0.0257257525083612 -2.77555756156289E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047142"
+        ixy="5.12745004835681E-20"
+        ixz="0"
+        iyy="0.000452624182450971"
+        iyz="-5.57841424911612E-20"
+        izz="0.000245137261047142" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_left"
+    type="continuous">
+    <origin
+      xyz="-0.000999999999839296 -0.249999999999933 0.0305000000006919"
+      rpy="0 0.774914173734372 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="Wheel_right">
+    <inertial>
+      <origin
+        xyz="5.55111512312578E-17 0.0257257525083612 5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="4.26861241081053E-21"
+        ixz="-6.7762635780344E-21"
+        iyy="0.000452624182450972"
+        iyz="1.59972478988236E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_right"
+    type="continuous">
+    <origin
+      xyz="-0.000999999999862333 0.250000000000088 0.0305000000006919"
+      rpy="3.14159265358979 -0.53712555837446 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+</robot>
