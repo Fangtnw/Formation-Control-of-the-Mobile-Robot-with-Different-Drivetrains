@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="Holonomic">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-1.14613076807046E-08 -4.91918539569092E-07 -0.0135289818533382"
+        rpy="0 0 0" />
+      <mass
+        value="2.24419958157651" />
+      <inertia
+        ixx="0.0309992310016982"
+        ixy="8.37847231197466E-20"
+        ixz="-5.59749891842054E-14"
+        iyy="0.0132010146771586"
+        iyz="-2.84366610935995E-08"
+        izz="0.0439799394184025" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Wheel_fr_right">
+    <inertial>
+      <origin
+        xyz="0.0194370630585373 -0.0176353488184189 0.00817275304865103"
+        rpy="0 0 0" />
+      <mass
+        value="0.321375664058357" />
+      <inertia
+        ixx="0.000101891013612784"
+        ixy="-9.57568374744443E-06"
+        ixz="4.43766093577299E-06"
+        iyy="0.000100025098642494"
+        iyz="-4.02631294167378E-06"
+        izz="9.32029457421026E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_fr_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_fr_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_fr_right"
+    type="continuous">
+    <origin
+      xyz="0.196431540449915 0.18250000000009 -0.0500000000000465"
+      rpy="2.56826265176299 -0.701812030330357 2.7542816171153" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_fr_right" />
+    <axis
+      xyz="0.707106781183754 -0.64156167526822 0.297319048886856" />
+  </joint>
+  <link
+    name="Wheel_bk_right">
+    <inertial>
+      <origin
+        xyz="0.0194370630585368 -0.017635348818419 0.00817275304865139"
+        rpy="0 0 0" />
+      <mass
+        value="0.321375664058357" />
+      <inertia
+        ixx="0.000101891013612795"
+        ixy="-9.5756837474443E-06"
+        ixz="4.43766093577766E-06"
+        iyy="0.000100025098642499"
+        iyz="-4.02631294167157E-06"
+        izz="9.32029457421106E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_bk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_bk_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_bk_right"
+    type="continuous">
+    <origin
+      xyz="0.196431540449915 -0.182499999999932 -0.0500000000000465"
+      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_bk_right" />
+    <axis
+      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
+  </joint>
+  <link
+    name="Wheel_fr_left">
+    <inertial>
+      <origin
+        xyz="0.0194370630585371 -0.0176353488184191 0.00817275304865112"
+        rpy="0 0 0" />
+      <mass
+        value="0.321375664058359" />
+      <inertia
+        ixx="0.00010189101361281"
+        ixy="-9.57568374744545E-06"
+        ixz="4.43766093577687E-06"
+        iyy="0.000100025098642513"
+        iyz="-4.02631294167532E-06"
+        izz="9.32029457421263E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_fr_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_fr_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_fr_left"
+    type="continuous">
+    <origin
+      xyz="-0.141459172223538 0.18250000000009 -0.0500000000000464"
+      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_fr_left" />
+    <axis
+      xyz="0.707106781183754 -0.641561675268221 0.297319048886855" />
+  </joint>
+  <link
+    name="Wheel_bk_left">
+    <inertial>
+      <origin
+        xyz="0.019437063058537 -0.0176353488184191 0.00817275304865073"
+        rpy="0 0 0" />
+      <mass
+        value="0.321375664058357" />
+      <inertia
+        ixx="0.000101891013612814"
+        ixy="-9.57568374744545E-06"
+        ixz="4.43766093577952E-06"
+        iyy="0.000100025098642514"
+        iyz="-4.02631294167438E-06"
+        izz="9.32029457421311E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_bk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Holonomic/meshes/Wheel_bk_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_bk_left"
+    type="continuous">
+    <origin
+      xyz="-0.141459172223538 -0.182499999999932 -0.0500000000000464"
+      rpy="2.56826265176298 -0.701812030330358 2.7542816171153" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_bk_left" />
+    <axis
+      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
+  </joint>
+</robot>
