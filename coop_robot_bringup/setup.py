@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'spawn_diff= my_robot_bringup.diffdrive_spawn.launch.py:main',
+            'spawn_mec= my_robot_bringup.mecanum_spawn.launch.py:main',
             'diff_launch= diff.launch.py:main',
             'pi_diff_launch= pi_diff.launch.py:main',
             'mec_launch= mec.launch.py:main',

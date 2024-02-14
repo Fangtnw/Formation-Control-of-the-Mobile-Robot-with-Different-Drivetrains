@@ -93,7 +93,7 @@ def generate_launch_description():
     )
 
     nav2= ExecuteProcess(
-        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'map:=/home/fang/maps/test.yaml'],
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'use_sim_time:=true'],
         output='screen',
     )
 
@@ -120,14 +120,15 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    ld.add_action(ydliar)
-    ld.add_action(xicro)
+    # ld.add_action(ydliar)
+    # ld.add_action(xicro)
     
-    ld.add_action(laser_to_base_link_tf)
-    ld.add_action(odom_compute)
-    ld.add_action(imu_to_base_link_tf)
-    ld.add_action(robot_localization_odom)
+    # ld.add_action(laser_to_base_link_tf)
+    # ld.add_action(odom_compute)
+    # ld.add_action(imu_to_base_link_tf)
+    # ld.add_action(robot_localization_odom)
     ld.add_action(rviz)
+
     ld.add_action(slam_toolbox)
     # ld.add_action(nav2_default)
     ld.add_action(nav2)

@@ -14,13 +14,15 @@ import xacro
 
 def generate_launch_description():
 
-    xacro_diff=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','diffdrive.xacro')
 
+    xacro_mec=os.path.join(get_package_share_path('my_robot_description'),
+                           'urdf','mecanum.xacro')
+    
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
 
-    diff_description = ParameterValue(Command(['xacro ',xacro_diff]),value_type=str)
+    mec_description = ParameterValue(Command(['xacro ',xacro_mec]),value_type=str)
+    
     
     gazebo_launch_description = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
@@ -28,32 +30,12 @@ def generate_launch_description():
         ])
     )
 
-    gazebo_server = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('gazebo_ros'),
-                'launch',
-                'gzserver.launch.py'
-            ])
-        ]),
-        launch_arguments={'world': get_package_share_directory('my_robot_description') + '/urdf/workshop_test.world','verbose': 'false'}.items(),
-    )   
-
-    gazebo_client = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([
-                FindPackageShare('gazebo_ros'),
-                'launch',
-                'gzclient.launch.py'
-            ])
-        ]),
-    )
-
-    diff_state_publisher = Node(
+    mecanum_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        parameters=[{'robot_description':diff_description} , {'use_sim_time': True}]
+        parameters=[{'robot_description':mec_description} , {'use_sim_time': True}]
     )
+
 
     joint_state_publisher_gui = Node(
         package="joint_state_publisher_gui",
@@ -65,6 +47,7 @@ def generate_launch_description():
         executable="rviz2",
         arguments=['-d', rviz_config_path]
     )
+       
 
     static_transform_publisher = Node(
         package="tf2_ros",
@@ -74,25 +57,23 @@ def generate_launch_description():
         arguments=["0", "0", "0", "0", "0", "0", "base_link", "base_footprint"]
     )
 
-    spawn_diffdrive= Node(
+    spawn_mecanum= Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=[
-            "-topic", "robot_description",
-            "-entity", "diffdrive",
-            "-x", "1.25",   # Example: Set x-coordinate to 1.0
-            "-y", "0.0",   # Example: Set y-coordinate to 2.0
-            "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","1.57",
-        ]
+        arguments=["-topic", "robot_description", "-entity", "mecanum"]
     )
 
-
     return LaunchDescription([
+        # gazebo_launch_description,
+        # static_transform_publisher,
+
+        # ackermann_state_publisher,
+        # spawn_ackermann,
+        # joint_state_publisher_gui,
+        # rviz2,
+
+        mecanum_state_publisher,
+        spawn_mecanum,
         
-        gazebo_server,
-        gazebo_client,
-        diff_state_publisher,
-        spawn_diffdrive,
-        rviz2,
+        # fake_joint_calibration
     ])

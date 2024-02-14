@@ -1,24 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
-     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
-     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
-<robot
-  name="mecanum">
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mecanum" >
+
+  <link name="base_footprint"></link>
+  <joint name="base_link_to_base_footprint" type="fixed">
+    <origin xyz="0 0 0.11" rpy="0 0 1.57"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <dynamics damping="0" friction="0.00001"/>
+    
+  </joint>
+
+  <link name="laser_frame">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </collision>
+      <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.1" />
+      <inertia
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="laser_frame"/>
+    <dynamics damping="0" friction="0.00001"/>
+    
+  </joint>
+
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="0.351806015356857 0.274861498867373 0.395577155294245"
+        xyz="-1.14613076807046E-08 -4.91918539569092E-07 -0.0135289818533382"
         rpy="0 0 0" />
       <mass
-        value="2.0229199501028" />
+        value="2" />
       <inertia
-        ixx="0.0130277088512019"
-        ixy="2.84366610936317E-08"
-        ixz="-6.62413626810912E-20"
-        iyy="0.0427706330641988"
-        iyz="5.3832707352464E-16"
-        izz="0.0299520637832313" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -44,21 +79,20 @@
       </geometry>
     </collision>
   </link>
+
+
   <link
-    name="Wheel_01">
+    name="wheel_fr_right">
     <inertial>
       <origin
-        xyz="-0.00910192948839045 0.0203724822485673 -0.0223132954397111"
+        xyz="0.0194370630585373 -0.0176353488184189 0.00817275304865103"
         rpy="0 0 0" />
       <mass
-        value="0.199180638989129" />
+        value="0.0002" />
       <inertia
-        ixx="0.000106836233715406"
-        ixy="2.35922457854813E-06"
-        ixz="-2.58397942811303E-06"
-        iyy="0.000102609720496205"
-        iyz="5.78361709963215E-06"
-        izz="0.000101555676344914" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -66,7 +100,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_right.STL" />
       </geometry>
       <material
         name="">
@@ -80,38 +114,37 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_right.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="wheel_J1_joint"
-    type="continuous">
+    name="joint_fr_right"
+    type="fixed">
     <origin
-      xyz="0.169305469629096 -0.538072117578766 0.235572147509167"
-      rpy="-1.35872938250007 1.21658582746707 0.981977586530455" />
+      xyz="0.196431540449915 0.18250000000009 -0.0500000000000465"
+      rpy="2.56826265176299 -0.701812030330357 2.7542816171153" />
     <parent
       link="base_link" />
     <child
-      link="Wheel_01" />
+      link="wheel_fr_right" />
     <axis
-      xyz="0.288439512685233 -0.645602546092763 0.707106781186863" />
+      xyz="0.707106781183754 -0.64156167526822 0.297319048886856" />
+    <dynamics damping="0" friction="0.00001"/>
+    
   </joint>
   <link
-    name="Wheel01_ball01">
+    name="wheel_bk_right">
     <inertial>
       <origin
-        xyz="-0.0402740558208334 -0.0418043308783602 -0.0194356671750471"
+        xyz="0.0194370630585368 -0.017635348818419 0.00817275304865139"
         rpy="0 0 0" />
       <mass
-        value="0.0137538624053492" />
+        value="0.0002" />
       <inertia
-        ixx="2.72479617507416E-06"
-        ixy="-1.58818677610181E-22"
-        ixz="1.74700545371199E-21"
-        iyy="2.72479617507411E-06"
-        iyz="-1.73377056391115E-21"
-        izz="6.02477450305521E-07" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -119,1332 +152,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball01.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball01.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball01_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="-3.14159265358979 0 1.56562261314474" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball01" />
-    <axis
-      xyz="0.644101608802806 -0.291775800122612 0.707106781186863" />
-  </joint>
-  <link
-    name="Wheel01_ball02">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207703 -0.0418043308785501 -0.0194356671747692"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507474E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="-7.18770983216318E-18"
-        iyy="2.72479617507474E-06"
-        iyz="-7.18522167288062E-18"
-        izz="6.02477450306733E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball02.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball02.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball02_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="2.78299843386616 -0.0849715703112149 1.9555303213579" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball02" />
-    <axis
-      xyz="0.644101608804425 -0.291775800118351 0.707106781187146" />
-  </joint>
-  <link
-    name="Wheel01_ball03">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207018 -0.041804330878756 -0.0194356671744681"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750741E-06"
-        ixy="0"
-        ixz="-1.49742190184759E-17"
-        iyy="2.7247961750741E-06"
-        iyz="-1.49760454332685E-17"
-        izz="6.0247745030547E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball03.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball03.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball03_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="2.41921187729642 -0.0249635401401731 2.3502466957237" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball03" />
-    <axis
-      xyz="0.644101608806368 -0.291775800114774 0.707106781186852" />
-  </joint>
-  <link
-    name="Wheel01_ball04">
-    <inertial>
-      <origin
-        xyz="-0.0402740558206848 -0.0418043308788076 -0.0194356671743925"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="5.29395592033938E-23"
-        ixz="-1.69269740690319E-17"
-        iyy="2.72479617507479E-06"
-        iyz="-1.69235462325735E-17"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball04.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball04.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball04_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="2.10230543117965 0.16441253380222 2.70238074706886" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball04" />
-    <axis
-      xyz="0.644101608806124 -0.291775800115496 0.707106781186777" />
-  </joint>
-  <link
-    name="Wheel01_ball05">
-    <inertial>
-      <origin
-        xyz="-0.0402740558206904 -0.0418043308787904 -0.0194356671744176"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="-1.62825672846286E-17"
-        iyy="2.72479617507479E-06"
-        iyz="-1.62781071267657E-17"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball05.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball05.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball05_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="1.85144469355685 0.445033001889154 3.00050251403779" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball05" />
-    <axis
-      xyz="0.64410160880548 -0.291775800118029 0.707106781186318" />
-  </joint>
-  <link
-    name="Wheel01_ball06">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207288 -0.0418043308786749 -0.0194356671745866"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="-1.19106596669348E-17"
-        iyy="2.72479617507479E-06"
-        iyz="-1.19094817617425E-17"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball06.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball06.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball06_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="1.6652572697239 0.781001133938953 -3.01704196863527" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball06" />
-    <axis
-      xyz="0.644101608804014 -0.291775800122483 0.707106781185816" />
-  </joint>
-  <link
-    name="Wheel01_ball07">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207894 -0.0418043308784926 -0.0194356671748534"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053491" />
-      <inertia
-        ixx="2.72479617506858E-06"
-        ixy="0"
-        ixz="-5.0118939489037E-18"
-        iyy="2.72479617506858E-06"
-        iyz="-5.01063663437261E-18"
-        izz="6.02477450295143E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball07.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball07.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball07_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="1.57079632679204 1.14545327196842 -2.72142331241704" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball07" />
-    <axis
-      xyz="0.64410160880213 -0.291775800127654 0.707106781185399" />
-  </joint>
-  <link
-    name="Wheel01_ball08">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207875 -0.0418043308784979 -0.0194356671748455"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507543E-06"
-        ixy="2.11758236813575E-22"
-        ixz="-5.21224371070894E-18"
-        iyy="2.72479617507543E-06"
-        iyz="-5.21927143719319E-18"
-        izz="6.02477450308112E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball08.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball08.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball08_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="2.38732459750617 1.47874847071753 -1.5447942596054" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball08" />
-    <axis
-      xyz="0.644101608803899 -0.29177580012741 0.707106781183888" />
-  </joint>
-  <link
-    name="Wheel01_ball09">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207759 -0.041804330878533 -0.0194356671747942"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507474E-06"
-        ixy="3.17637355220363E-22"
-        ixz="-6.5374796962475E-18"
-        iyy="2.72479617507474E-06"
-        iyz="-6.54363392000489E-18"
-        izz="6.02477450306733E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball09.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball09.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball09_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="-2.35953885416806 1.2106866398232 0.349274029383596" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball09" />
-    <axis
-      xyz="0.644101608806132 -0.291775800125432 0.70710678118267" />
-  </joint>
-  <link
-    name="Wheel01_ball10">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207958 -0.0418043308784736 -0.019435667174881"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750748E-06"
-        ixy="-1.58818677610181E-22"
-        ixz="-4.29511878706935E-18"
-        iyy="2.7247961750748E-06"
-        iyz="-4.2912674341373E-18"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball10.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball10.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball10_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="-2.42243995636448 0.843875713495476 0.669012709826411" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball10" />
-    <axis
-      xyz="0.644101608806243 -0.291775800124893 0.707106781182791" />
-  </joint>
-  <link
-    name="Wheel01_ball11">
-    <inertial>
-      <origin
-        xyz="-0.0402740558208085 -0.041804330878435 -0.0194356671749376"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507474E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="-2.83136644487511E-18"
-        iyy="2.72479617507474E-06"
-        iyz="-2.83378842970866E-18"
-        izz="6.02477450306733E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball11.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball11.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball11_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="-2.59662676521586 0.501121633469378 0.933221994211825" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball11" />
-    <axis
-      xyz="0.64410160880592 -0.291775800123645 0.7071067811836" />
-  </joint>
-  <link
-    name="Wheel01_ball12">
-    <inertial>
-      <origin
-        xyz="-0.0402740558208223 -0.0418043308783936 -0.0194356671749981"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="2.64697796016969E-22"
-        ixz="-1.27150233294711E-18"
-        iyy="2.72479617507479E-06"
-        iyz="-1.26890829454615E-18"
-        izz="6.02477450306837E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball12.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel01_ball12.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel01_ball12_joint"
-    type="continuous">
-    <origin
-      xyz="0.0819035958512037 -0.183321520420573 0.200785903047669"
-      rpy="-2.83593403424161 0.208411918064974 1.22334010202265" />
-    <parent
-      link="Wheel_01" />
-    <child
-      link="Wheel01_ball12" />
-    <axis
-      xyz="0.644101608804667 -0.291775800122806 0.707106781185087" />
-  </joint>
-  <link
-    name="Wheel_02">
-    <inertial>
-      <origin
-        xyz="1.11022302462516E-16 0.0315557650320768 -1.36640698755741E-13"
-        rpy="0 0 0" />
-      <mass
-        value="0.19918063898913" />
-      <inertia
-        ixx="0.000107890277866713"
-        ixy="3.50811556471424E-19"
-        ixz="6.93173217416374E-20"
-        iyy="9.52210748231001E-05"
-        iyz="1.3131824581572E-16"
-        izz="0.000107890277866713" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_02.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_02.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="wheel_J2"
-    type="continuous">
-    <origin
-      xyz="0.534305469629118 -0.538072117578766 0.235572147509167"
-      rpy="3.14159265358979 0 0" />
-    <parent
-      link="base_link" />
-    <child
-      link="Wheel_02" />
-    <axis
-      xyz="0 1 0" />
-  </joint>
-  <link
-    name="Wheel02_ball01">
-    <inertial>
-      <origin
-        xyz="-0.0402740558208335 -0.0418043308783602 -0.0194356671750471"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507417E-06"
-        ixy="5.29395592033938E-23"
-        ixz="-1.77347523331369E-21"
-        iyy="2.72479617507411E-06"
-        iyz="-1.90582413132218E-21"
-        izz="6.02477450305521E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball01.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball01.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball01_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="1.49296950806428 -0.35109669563078 2.38568822338323" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball01" />
-    <axis
-      xyz="0.644101608802808 -0.291775800122612 0.707106781186862" />
-  </joint>
-  <link
-    name="Wheel02_ball02">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207704 -0.0418043308785499 -0.0194356671747692"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750748E-06"
-        ixy="-1.05879118406788E-22"
-        ixz="-7.18424229103536E-18"
-        iyy="2.7247961750748E-06"
-        iyz="-7.19191852711985E-18"
-        izz="6.02477450306837E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball02.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball02.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball02_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="1.14253844947704 0.0437947145930823 2.44093599452664" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball02" />
-    <axis
-      xyz="0.644101608804423 -0.291775800118352 0.707106781187148" />
-  </joint>
-  <link
-    name="Wheel02_ball03">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207018 -0.041804330878756 -0.0194356671744681"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="5.29395592033938E-23"
-        ixz="-1.49733984553083E-17"
-        iyy="2.72479617507479E-06"
-        iyz="-1.49765086544115E-17"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball03.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball03.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball03_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="0.779448622362797 0.433178932733729 2.35259484959205" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball03" />
-    <axis
-      xyz="0.644101608806368 -0.291775800114774 0.707106781186853" />
-  </joint>
-  <link
-    name="Wheel02_ball04">
-    <inertial>
-      <origin
-        xyz="-0.0402740558206847 -0.0418043308788077 -0.0194356671743925"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053491" />
-      <inertia
-        ixx="2.72479617506994E-06"
-        ixy="-1.05879118406788E-22"
-        ixz="-1.69265770223379E-17"
-        iyy="2.72479617506989E-06"
-        iyz="-1.69240359234961E-17"
-        izz="6.02477450297824E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball04.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball04.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball04_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="0.27200509255726 0.752220603060549 2.06124541653251" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball04" />
-    <axis
-      xyz="0.644101608806125 -0.291775800115494 0.707106781186777" />
-  </joint>
-  <link
-    name="Wheel02_ball05">
-    <inertial>
-      <origin
-        xyz="-0.0402740558206904 -0.0418043308787903 -0.0194356671744175"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750741E-06"
-        ixy="-1.58818677610181E-22"
-        ixz="-1.62808202791749E-17"
-        iyy="2.72479617507405E-06"
-        iyz="-1.62810982118607E-17"
-        izz="6.02477450305417E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball05.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball05.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball05_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-0.480120408562965 0.869003579269575 1.50292896323359" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball05" />
-    <axis
-      xyz="0.644101608805479 -0.291775800118028 0.70710678118632" />
-  </joint>
-  <link
-    name="Wheel02_ball06">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207288 -0.0418043308786751 -0.0194356671745862"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507406E-06"
-        ixy="5.29395592033938E-22"
-        ixz="-1.19151330596874E-17"
-        iyy="2.72479617507406E-06"
-        iyz="-1.19217637394777E-17"
-        izz="6.02477450305366E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball06.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball06.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball06_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-1.18620735760954 0.693823201966188 0.993229991607023" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball06" />
-    <axis
-      xyz="0.644101608804016 -0.291775800122478 0.707106781185816" />
-  </joint>
-  <link
-    name="Wheel02_ball07">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207891 -0.0418043308784927 -0.0194356671748535"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617508164E-06"
-        ixy="1.05879118406788E-22"
-        ixz="-5.00435006171721E-18"
-        iyy="2.72479617508164E-06"
-        iyz="-5.00659999298336E-18"
-        izz="6.02477450319818E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball07.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball07.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball07_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-1.64862314552894 0.351096695634743 0.755904430206935" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball07" />
-    <axis
-      xyz="0.644101608802128 -0.291775800127654 0.7071067811854" />
-  </joint>
-  <link
-    name="Wheel02_ball08">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207875 -0.0418043308784984 -0.0194356671748449"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750748E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="-5.22500214447696E-18"
-        iyy="2.7247961750748E-06"
-        iyz="-5.22753000842892E-18"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball08.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball08.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball08_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-1.99905420412024 -0.043794714587134 0.700656659062253" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball08" />
-    <axis
-      xyz="0.644101608803904 -0.291775800127405 0.707106781183885" />
-  </joint>
-  <link
-    name="Wheel02_ball09">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207757 -0.0418043308785334 -0.0194356671747939"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507411E-06"
-        ixy="3.70576914423756E-22"
-        ixz="-6.54497064387478E-18"
-        iyy="2.72479617507406E-06"
-        iyz="-6.54794849407997E-18"
-        izz="6.02477450305418E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball09.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball09.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball09_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-2.3621440312352 -0.433178932727873 0.788997803994652" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball09" />
-    <axis
-      xyz="0.644101608806137 -0.291775800125426 0.707106781182668" />
-  </joint>
-  <link
-    name="Wheel02_ball10">
-    <inertial>
-      <origin
-        xyz="-0.0402740558207957 -0.0418043308784737 -0.0194356671748808"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.7247961750748E-06"
-        ixy="5.29395592033938E-23"
-        ixz="-4.30361558632149E-18"
-        iyy="2.7247961750748E-06"
-        iyz="-4.29804369771533E-18"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball10.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball10.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball10_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="-2.86958756103767 -0.75222060305719 1.08034723705175" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball10" />
-    <axis
-      xyz="0.644101608806246 -0.291775800124889 0.70710678118279" />
-  </joint>
-  <link
-    name="Wheel02_ball11">
-    <inertial>
-      <origin
-        xyz="-0.0402740558208085 -0.0418043308784349 -0.0194356671749375"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507479E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="-2.83417224151289E-18"
-        iyy="2.72479617507474E-06"
-        iyz="-2.83667363568525E-18"
-        izz="6.02477450306785E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball11.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball11.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball11_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="2.661472245024 -0.86900357926923 1.63866369035211" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball11" />
-    <axis
-      xyz="0.644101608805921 -0.291775800123644 0.7071067811836" />
-  </joint>
-  <link
-    name="Wheel02_ball12">
-    <inertial>
-      <origin
-        xyz="-0.0402740558208222 -0.0418043308783936 -0.0194356671749981"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507478E-06"
-        ixy="2.64697796016969E-22"
-        ixz="-1.27584337680179E-18"
-        iyy="2.72479617507473E-06"
-        iyz="-1.26438196223426E-18"
-        izz="6.02477450306784E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball12.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel02_ball12.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel02_ball12_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.283954147223343 0"
-      rpy="1.95538529597895 -0.69382320196506 2.14836266198265" />
-    <parent
-      link="Wheel_02" />
-    <child
-      link="Wheel02_ball12" />
-    <axis
-      xyz="0.644101608804669 -0.291775800122807 0.707106781185086" />
-  </joint>
-  <link
-    name="Wheel_03">
-    <inertial>
-      <origin
-        xyz="-0.0226297037626574 0.0506511546571676 -0.0554765081858071"
-        rpy="0 0 0" />
-      <mass
-        value="0.19918063898913" />
-      <inertia
-        ixx="0.000106836233715405"
-        ixy="2.35922457854822E-06"
-        ixz="-2.58397942811325E-06"
-        iyy="0.000102609720496205"
-        iyz="5.78361709963271E-06"
-        izz="0.000101555676344914" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_right.STL" />
       </geometry>
       <material
         name="">
@@ -1458,38 +166,37 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_03.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_right.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="wheel_J3"
-    type="continuous">
+    name="joint_bk_right"
+    type="fixed">
     <origin
-      xyz="0.169305469629096 -0.14307714257908 0.235572147507459"
-      rpy="-1.35872938250008 1.21658582746708 0.98197758653045" />
+      xyz="0.196431540449915 -0.182499999999932 -0.0500000000000465"
+      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
     <parent
       link="base_link" />
     <child
-      link="Wheel_03" />
+      link="wheel_bk_right" />
     <axis
-      xyz="0.288439512685231 -0.645602546092766 0.707106781186862" />
+      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
+    <dynamics damping="0" friction="0.00001"/>
+    
   </joint>
   <link
-    name="Wheel03_ball01">
+    name="wheel_fr_left">
     <inertial>
       <origin
-        xyz="-0.00553342724119932 -0.0575417154186503 0.0187032440086382"
+        xyz="0.0194370630585371 -0.0176353488184191 0.00817275304865112"
         rpy="0 0 0" />
       <mass
-        value="0.0137538624053492" />
+        value="0.0002" />
       <inertia
-        ixx="2.72479617507416E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="1.6675961149069E-21"
-        iyy="2.72479617507411E-06"
-        iyz="6.65714956982677E-21"
-        izz="6.02477450305521E-07" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -1497,12 +204,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_left.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
       </material>
     </visual>
     <collision>
@@ -1511,674 +218,37 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_left.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Wheel03_ball01_joint"
-    type="continuous">
+    name="joint_fr_left"
+    type="fixed">
     <origin
-      xyz="-0.113932158103627 0.255009761553067 -0.279303625356888"
-      rpy="-3.14159265358979 0 1.56562261314473" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball01" />
-    <axis
-      xyz="0.644101608802805 -0.291775800122617 0.707106781186862" />
-  </joint>
-  <link
-    name="Wheel03_ball02">
-    <inertial>
-      <origin
-        xyz="-0.00486626500745327 -0.0578439376022464 0.019435667174833"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507476E-06"
-        ixy="-1.58818677610181E-22"
-        ixz="7.20144764777646E-18"
-        iyy="2.72479617507476E-06"
-        iyz="7.19242145293228E-18"
-        izz="6.02477450306747E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball02.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball02.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball02_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="2.78299843385967 -0.0849715703197327 1.95553032135449" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball02" />
-    <axis
-      xyz="0.64410160879783 -0.291775800127117 0.707106781189537" />
-  </joint>
-  <link
-    name="Wheel03_ball03">
-    <inertial>
-      <origin
-        xyz="-0.00486626500771781 -0.0578439376023013 0.0194356671746029"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507472E-06"
-        ixy="-3.70576914423756E-22"
-        ixz="1.49734778646471E-17"
-        iyy="2.72479617507472E-06"
-        iyz="1.49814717380868E-17"
-        izz="6.02477450306744E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball03.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball03.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball03_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="2.41921187728231 -0.0249635401592623 2.35024669572339" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball03" />
-    <axis
-      xyz="0.644101608792639 -0.291775800133036 0.707106781191823" />
-  </joint>
-  <link
-    name="Wheel03_ball04">
-    <inertial>
-      <origin
-        xyz="-0.00486626500778342 -0.057843937602315 0.0194356671745458"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053491" />
-      <inertia
-        ixx="2.72479617506996E-06"
-        ixy="0"
-        ixz="1.69116745364221E-17"
-        iyy="2.72479617506996E-06"
-        iyz="1.69140435816965E-17"
-        izz="6.02477450297877E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball04.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball04.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball04_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="2.10230543116476 0.164412533781619 2.70238074707533" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball04" />
-    <axis
-      xyz="0.644101608790612 -0.291775800136125 0.707106781192394" />
-  </joint>
-  <link
-    name="Wheel03_ball05">
-    <inertial>
-      <origin
-        xyz="-0.00486626500776188 -0.0578439376023104 0.0194356671745648"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507747E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="1.62731175733108E-17"
-        iyy="2.72479617507747E-06"
-        iyz="1.62699279648688E-17"
-        izz="6.02477450312186E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball05.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball05.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball05_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="1.85144469354669 0.445033001871483 3.00050251404983" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball05" />
-    <axis
-      xyz="0.644101608790557 -0.291775800137871 0.707106781191724" />
-  </joint>
-  <link
-    name="Wheel03_ball06">
-    <inertial>
-      <origin
-        xyz="-0.00486626500761367 -0.0578439376022796 0.0194356671746935"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507747E-06"
-        ixy="2.64697796016969E-22"
-        ixz="1.19149742410098E-17"
-        iyy="2.72479617507753E-06"
-        iyz="1.19156889250591E-17"
-        izz="6.02477450312251E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball06.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball06.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball06_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="1.6652572697228 0.781001133927717 -3.0170419686209" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball06" />
-    <axis
-      xyz="0.644101608793092 -0.291775800137008 0.707106781189771" />
-  </joint>
-  <link
-    name="Wheel03_ball07">
-    <inertial>
-      <origin
-        xyz="-0.00486626500737919 -0.0578439376022308 0.0194356671748974"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507474E-06"
-        ixy="1.05879118406788E-22"
-        ixz="5.01784964931408E-18"
-        iyy="2.72479617507474E-06"
-        iyz="5.01524237602331E-18"
-        izz="6.02477450306732E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball07.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball07.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball07_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="1.57079632679774 1.14545327196411 -2.7214233124056" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball07" />
-    <axis
-      xyz="0.644101608797532 -0.291775800133768 0.707106781187064" />
-  </joint>
-  <link
-    name="Wheel03_ball08">
-    <inertial>
-      <origin
-        xyz="-0.00486626500738591 -0.0578439376022322 0.0194356671748917"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.7247961750759E-06"
-        ixy="3.70576914423756E-22"
-        ixz="5.21748472707007E-18"
-        iyy="2.7247961750759E-06"
-        iyz="5.21064228904304E-18"
-        izz="6.02477450309041E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball08.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball08.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball08_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="2.38732459750239 1.47874847071089 -1.54479425960426" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball08" />
-    <axis
-      xyz="0.644101608799118 -0.291775800133769 0.707106781185619" />
-  </joint>
-  <link
-    name="Wheel03_ball09">
-    <inertial>
-      <origin
-        xyz="-0.00486626500743131 -0.0578439376022417 0.019435667174852"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617507683E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="6.54213837745739E-18"
-        iyy="2.72479617507682E-06"
-        iyz="6.55248806128166E-18"
-        izz="6.02477450310859E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball09.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball09.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball09_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="-2.35953885419635 1.21068663982278 0.349274029359961" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball09" />
-    <axis
-      xyz="0.644101608800134 -0.291775800133415 0.707106781184839" />
-  </joint>
-  <link
-    name="Wheel03_ball10">
-    <inertial>
-      <origin
-        xyz="-0.0048662650073544 -0.0578439376022258 0.0194356671749188"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617507686E-06"
-        ixy="3.17637355220363E-22"
-        ixz="4.28434558677145E-18"
-        iyy="2.72479617507682E-06"
-        iyz="4.2897189520306E-18"
-        izz="6.02477450310905E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball10.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball10.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball10_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="-2.42243995637463 0.843875713494856 0.669012709818235" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball10" />
-    <axis
-      xyz="0.64410160880231 -0.291775800130124 0.707106781184216" />
-  </joint>
-  <link
-    name="Wheel03_ball11">
-    <inertial>
-      <origin
-        xyz="-0.00486626500730489 -0.0578439376022154 0.019435667174962"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507475E-06"
-        ixy="1.58818677610181E-22"
-        ixz="2.8249342884319E-18"
-        iyy="2.72479617507475E-06"
-        iyz="2.82918268805797E-18"
-        izz="6.02477450306734E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball11.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball11.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball11_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="-2.59662676522042 0.501121633468355 0.933221994207877" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball11" />
-    <axis
-      xyz="0.644101608803326 -0.291775800127098 0.707106781184539" />
-  </joint>
-  <link
-    name="Wheel03_ball12">
-    <inertial>
-      <origin
-        xyz="-0.00486626500725187 -0.0578439376022044 0.019435667175008"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053492" />
-      <inertia
-        ixx="2.72479617507478E-06"
-        ixy="1.05879118406788E-22"
-        ixz="1.26832595939491E-18"
-        iyy="2.72479617507478E-06"
-        iyz="1.27245524501277E-18"
-        izz="6.02477450306836E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball12.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel03_ball12.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel03_ball12_joint"
-    type="continuous">
-    <origin
-      xyz="-0.113633391655868 0.254341044644066 -0.278571202190481"
-      rpy="-2.8359340342431 0.208411918064156 1.22334010202122" />
-    <parent
-      link="Wheel_03" />
-    <child
-      link="Wheel03_ball12" />
-    <axis
-      xyz="0.644101608803503 -0.291775800124355 0.707106781185509" />
-  </joint>
-  <link
-    name="Wheel_04">
-    <inertial>
-      <origin
-        xyz="-1.11022302462516E-16 -0.0784556302694706 3.39478445354757E-13"
-        rpy="0 0 0" />
-      <mass
-        value="0.199180638989129" />
-      <inertia
-        ixx="0.000107890277866712"
-        ixy="-3.20335217712901E-19"
-        ixz="1.62098532749485E-19"
-        iyy="9.52210748230996E-05"
-        iyz="1.31465568892939E-16"
-        izz="0.000107890277866713" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_04.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel_04.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="wheel_J4"
-    type="continuous">
-    <origin
-      xyz="0.534305469629117 -0.14307714257908 0.235572147507459"
-      rpy="0 0 0" />
+      xyz="-0.141459172223538 0.18250000000009 -0.0500000000000464"
+      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
     <parent
       link="base_link" />
     <child
-      link="Wheel_04" />
+      link="wheel_fr_left" />
     <axis
-      xyz="0 1 0" />
+      xyz="0.707106781183754 -0.641561675268221 0.297319048886855" />
+    <dynamics damping="0" friction="0.00001"/>
+    
   </joint>
   <link
-    name="Wheel04_ball01">
+    name="wheel_bk_left">
     <inertial>
       <origin
-        xyz="-0.00553342724119932 -0.0575417154186504 0.0187032440086382"
+        xyz="0.019437063058537 -0.0176353488184191 0.00817275304865073"
         rpy="0 0 0" />
       <mass
-        value="0.0137538624053492" />
+        value="0.0002" />
       <inertia
-        ixx="2.72479617507417E-06"
-        ixy="-5.29395592033938E-23"
-        ixz="-1.77347523331369E-21"
-        iyy="2.72479617507412E-06"
-        iyz="6.3659819942081E-21"
-        izz="6.02477450305521E-07" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -2186,12 +256,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_left.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
       </material>
     </visual>
     <collision>
@@ -2200,604 +270,85 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball01.STL" />
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_left.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Wheel04_ball01_joint"
-    type="continuous">
+    name="joint_bk_left"
+    type="fixed">
     <origin
-      xyz="0 -0.394994974999686 0"
-      rpy="-1.64862314552552 0.351096695630783 -2.38568822338323" />
+      xyz="-0.141459172223538 -0.182499999999932 -0.0500000000000464"
+      rpy="2.56826265176298 -0.701812030330358 2.7542816171153" />
     <parent
-      link="Wheel_04" />
+      link="base_link" />
     <child
-      link="Wheel04_ball01" />
+      link="wheel_bk_left" />
     <axis
-      xyz="0.644101608802807 -0.291775800122617 0.70710678118686" />
+      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
+    <dynamics damping="0" friction="0.00001"/>
+
   </joint>
-  <link
-    name="Wheel04_ball02">
-    <inertial>
-      <origin
-        xyz="-0.00486626500745335 -0.0578439376022463 0.0194356671748331"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507481E-06"
-        ixy="1.05879118406788E-22"
-        ixz="7.20306230433216E-18"
-        iyy="2.72479617507481E-06"
-        iyz="7.18637310829329E-18"
-        izz="6.02477450306837E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball02.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball02.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball02_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="-1.99905420411914 -0.0437947145902835 -2.44093599453538" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball02" />
-    <axis
-      xyz="0.644101608797829 -0.291775800127117 0.707106781189538" />
-  </joint>
-  <link
-    name="Wheel04_ball03">
-    <inertial>
-      <origin
-        xyz="-0.0048662650077177 -0.0578439376023011 0.0194356671746028"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507404E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="1.49745895953904E-17"
-        iyy="2.72479617507404E-06"
-        iyz="1.49805452958008E-17"
-        izz="6.02477450305378E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball03.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball03.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball03_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="-2.3621440312323 -0.433178932734729 -2.35259484961306" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball03" />
-    <axis
-      xyz="0.644101608792638 -0.291775800133036 0.707106781191824" />
-  </joint>
-  <link
-    name="Wheel04_ball04">
-    <inertial>
-      <origin
-        xyz="-0.00486626500778348 -0.0578439376023149 0.0194356671745458"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507413E-06"
-        ixy="5.29395592033938E-23"
-        ixz="1.69127597973858E-17"
-        iyy="2.72479617507408E-06"
-        iyz="1.69146259168477E-17"
-        izz="6.02477450305419E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball04.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball04.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball04_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="-2.86958756103138 -0.752220603072005 -2.06124541655754" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball04" />
-    <axis
-      xyz="0.644101608790613 -0.291775800136123 0.707106781192395" />
-  </joint>
-  <link
-    name="Wheel04_ball05">
-    <inertial>
-      <origin
-        xyz="-0.00486626500776177 -0.0578439376023101 0.0194356671745649"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507589E-06"
-        ixy="1.05879118406788E-22"
-        ixz="1.62751292765605E-17"
-        iyy="2.72479617507595E-06"
-        iyz="1.62668971751044E-17"
-        izz="6.02477450309098E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball05.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball05.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball05_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="2.66147224501777 -0.869003579289632 -1.50292896324181" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball05" />
-    <axis
-      xyz="0.644101608790557 -0.29177580013787 0.707106781191725" />
-  </joint>
-  <link
-    name="Wheel04_ball06">
-    <inertial>
-      <origin
-        xyz="-0.00486626500761378 -0.0578439376022796 0.0194356671746936"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617507953E-06"
-        ixy="-1.05879118406788E-22"
-        ixz="1.19186535403745E-17"
-        iyy="2.72479617507952E-06"
-        iyz="1.19122875583803E-17"
-        izz="6.02477450316312E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball06.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball06.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball06_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="1.95538529596356 -0.693823201979883 -0.993229991598475" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball06" />
-    <axis
-      xyz="0.644101608793091 -0.291775800137007 0.707106781189773" />
-  </joint>
-  <link
-    name="Wheel04_ball07">
-    <inertial>
-      <origin
-        xyz="-0.00486626500737919 -0.0578439376022309 0.0194356671748973"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617508032E-06"
-        ixy="0"
-        ixz="5.02489061068813E-18"
-        iyy="2.72479617508032E-06"
-        iyz="5.02365976593665E-18"
-        izz="6.02477450317175E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball07.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball07.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball07_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="1.49296950805428 -0.351096695638668 -0.755904430201561" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball07" />
-    <axis
-      xyz="0.64410160879753 -0.291775800133769 0.707106781187065" />
-  </joint>
-  <link
-    name="Wheel04_ball08">
-    <inertial>
-      <origin
-        xyz="-0.00486626500738607 -0.0578439376022322 0.0194356671748916"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507476E-06"
-        ixy="2.11758236813575E-22"
-        ixz="5.22087285885909E-18"
-        iyy="2.72479617507476E-06"
-        iyz="5.21114521485547E-18"
-        izz="6.02477450306747E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball08.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball08.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball08_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="1.14253844946491 0.0437947145851027 -0.700656659055909" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball08" />
-    <axis
-      xyz="0.644101608799117 -0.291775800133769 0.70710678118562" />
-  </joint>
-  <link
-    name="Wheel04_ball09">
-    <inertial>
-      <origin
-        xyz="-0.00486626500743115 -0.0578439376022418 0.019435667174852"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.72479617507671E-06"
-        ixy="-2.64697796016969E-22"
-        ixz="6.5422442565758E-18"
-        iyy="2.72479617507671E-06"
-        iyz="6.55647176311171E-18"
-        izz="6.02477450310627E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball09.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball09.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball09_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="0.779448622352277 0.433178932728306 -0.788997803985469" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball09" />
-    <axis
-      xyz="0.644101608800135 -0.291775800133414 0.707106781184838" />
-  </joint>
-  <link
-    name="Wheel04_ball10">
-    <inertial>
-      <origin
-        xyz="-0.00486626500735449 -0.0578439376022257 0.0194356671749187"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053495" />
-      <inertia
-        ixx="2.72479617507687E-06"
-        ixy="-1.05879118406788E-22"
-        ixz="4.28426617743265E-18"
-        iyy="2.72479617507682E-06"
-        iyz="4.2912277294679E-18"
-        izz="6.02477450310904E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball10.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball10.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball10_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="0.272005092552415 0.752220603060097 -1.0803472370454" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball10" />
-    <axis
-      xyz="0.644101608802309 -0.291775800130125 0.707106781184216" />
-  </joint>
-  <link
-    name="Wheel04_ball11">
-    <inertial>
-      <origin
-        xyz="-0.00486626500730489 -0.0578439376022154 0.0194356671749618"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053494" />
-      <inertia
-        ixx="2.7247961750748E-06"
-        ixy="1.58818677610181E-22"
-        ixz="2.82252553848814E-18"
-        iyy="2.72479617507475E-06"
-        iyz="2.82841506444952E-18"
-        izz="6.02477450306785E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball11.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball11.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball11_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="-0.480120408567364 0.869003579272718 -1.63866369035068" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball11" />
-    <axis
-      xyz="0.644101608803327 -0.291775800127098 0.707106781184538" />
-  </joint>
-  <link
-    name="Wheel04_ball12">
-    <inertial>
-      <origin
-        xyz="-0.0048662650072519 -0.0578439376022044 0.0194356671750078"
-        rpy="0 0 0" />
-      <mass
-        value="0.0137538624053493" />
-      <inertia
-        ixx="2.72479617507477E-06"
-        ixy="1.58818677610181E-22"
-        ixz="1.26435549245465E-18"
-        iyy="2.72479617507472E-06"
-        iyz="1.27658453063064E-18"
-        izz="6.02477450306784E-07" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball12.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.298039215686275 0.298039215686275 0.298039215686275 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/Wheel04_ball12.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Wheel04_ball12_joint"
-    type="continuous">
-    <origin
-      xyz="0 -0.393959172224357 0"
-      rpy="-1.18620735761263 0.69382320196652 -2.14836266198356" />
-    <parent
-      link="Wheel_04" />
-    <child
-      link="Wheel04_ball12" />
-    <axis
-      xyz="0.644101608803504 -0.291775800124356 0.707106781185508" />
-  </joint>
-</robot>
+
+<gazebo>
+<plugin name="gazebo_ros_planar_move" filename="libgazebo_ros_planar_move.so">
+
+  <ros>
+
+    <!-- Add a namespace -->
+    <namespace>mec</namespace>
+
+    <!-- Remap the default topic -->
+    <remapping>cmd_vel:=cmd_vel</remapping>
+    <remapping>odom:=odom</remapping>
+
+  </ros>
+
+  <update_rate>100</update_rate>
+  <publish_rate>10</publish_rate>
+
+  <!-- output -->
+  <publish_odom>true</publish_odom>
+  <publish_odom_tf>true</publish_odom_tf>
+
+  <odometry_frame>mec_odom</odometry_frame>
+  <robot_base_frame>base_footprint</robot_base_frame>
+  <publish_wheel_tf>true</publish_wheel_tf>
+
+  <covariance_x>0.0001</covariance_x>
+  <covariance_y>0.0001</covariance_y>
+  <covariance_yaw>0.01</covariance_yaw>
+
+</plugin>
+</gazebo>
+    <gazebo reference="laser_frame">
+        <material>Gazebo/Red</material>
+
+        <sensor name="laser" type="ray">
+            <pose> 0 0 0 0 0 0 </pose>
+            <visualize>false</visualize>
+            <update_rate>10</update_rate>
+            <ray>
+                <scan>
+                    <horizontal>
+                        <samples>360</samples>
+                        <min_angle>-3.14</min_angle>
+                        <max_angle>3.14</max_angle>
+                    </horizontal>
+                </scan>
+                <range>
+                    <min>0.3</min>
+                    <max>12</max>
+                </range>
+            </ray>
+            <plugin name="laser_mec" filename="libgazebo_ros_ray_sensor.so">
+                <namespace>mec</namespace>
+                <ros>
+                    <argument>/out:=scan</argument>
+                </ros>
+                <output_type>sensor_msgs/LaserScan</output_type>
+                <frame_name>laser_frame</frame_name>
+            </plugin>
+        </sensor>
+    </gazebo>
+</robot>    
