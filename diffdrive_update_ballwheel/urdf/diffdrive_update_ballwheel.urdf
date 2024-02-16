@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="diffdrive_update_ballwheel">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.0890706220948416 -2.39392719159071E-06 0.0563041299481992"
+        rpy="0 0 0" />
+      <mass
+        value="5.69187270267524" />
+      <inertia
+        ixx="0.0445237130262451"
+        ixy="-1.13440911269809E-15"
+        ixz="-2.9127932149511E-14"
+        iyy="0.0738152483985909"
+        iyz="4.88708777058737E-16"
+        izz="0.116920038135618" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="wheel_left">
+    <inertial>
+      <origin
+        xyz="-5.5511E-17 0.025726 -5.5511E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="5.1275E-20"
+        ixz="0"
+        iyy="0.00045262"
+        iyz="-5.5784E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/wheel_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/wheel_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_left"
+    type="continuous">
+    <origin
+      xyz="-0.001 -0.25 0.0305"
+      rpy="0 0.77491 3.1416" />
+    <parent
+      link="base_link" />
+    <child
+      link="wheel_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="wheel_right">
+    <inertial>
+      <origin
+        xyz="5.5511E-17 0.025726 5.5511E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="4.2686E-21"
+        ixz="-6.7763E-21"
+        iyy="0.00045262"
+        iyz="1.5997E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/wheel_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://diffdrive_update_ballwheel/meshes/wheel_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_right"
+    type="continuous">
+    <origin
+      xyz="-0.001 0.25 0.0305"
+      rpy="3.1416 -0.53713 3.1416" />
+    <parent
+      link="base_link" />
+    <child
+      link="wheel_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+</robot>
