@@ -13,42 +13,33 @@ const byte noCommLoopMax = 10;                //number of main loops the robot w
 unsigned int noCommLoops = 0;                 //main loop without communication counter
 unsigned long lastMilli = 0;
 
-//DC MOTOR1
-const int motor1INA = 50;
-const int motor1INB = 52;
-const int motor1PWM = 11;
+//Servo Angle 
+int servo_cmd = 90;
+const double max_angle = 135;                 //Max angle (degree)
+const double min_angle = 45;                 //Min angle (degree)
 
-//DC MOTOR2
-const int motor2INA = 51;
-const int motor2INB = 53;
-const int motor2PWM = 12;
+//Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
+const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
+const int PIN_ENCOD_B_MOTOR_LEFT = 19;               //B channel for encoder of left motor
 
-//Servo
-const int servoPIN = 4;
-const double max_angle = 120;                 //Max angle (degree)
-const double min_angle = 60;                 //Min angle (degree)
+const int PIN_ENCOD_A_MOTOR_RIGHT = 16;         //A channel for encoder of right motor         
+const int PIN_ENCOD_B_MOTOR_RIGHT = 18;         //B channel for encoder of right motor 
 
-//Encoder
-const int PIN_ENCOD_A_MOTOR_LEFT = 8;               //A channel for encoder of left motor                    
-const int PIN_ENCOD_B_MOTOR_LEFT = 9;               //B channel for encoder of left motor
+const int PIN_ENCOD_A_SERVO_LEFT = 5;              //A channel for encoder of left servo motor         
+const int PIN_ENCOD_B_SERVO_LEFT = 2;              //B channel for encoder of left servo motor 
 
-const int PIN_ENCOD_A_MOTOR_RIGHT = 47;         //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 49;         //B channel for encoder of right motor 
+const int PIN_ENCOD_A_SERVO_RIGHT = 6;              //A channel for encoder of right servo motor         
+const int PIN_ENCOD_B_SERVO_RIGHT = 3;              //B channel for encoder of right servo motor 
 
-const int PIN_ENCOD_A_SERVO_LEFT = 18;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_SERVO_LEFT = 19;              //B channel for encoder of left servo motor 
-
-const int PIN_ENCOD_A_SERVO_RIGHT = 3;              //A channel for encoder of right servo motor         
-const int PIN_ENCOD_B_SERVO_RIGHT = 6;              //B channel for encoder of right servo motor 
-
-//Define Value
-const double radius = 0.06;                   //Wheel radius, in m
+//Define Value of Parameter
+const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 const double speed_to_pwm_ratio = 0.00235;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
+//Set Value to Zero
 double speed_req = 0;                         //Desired linear speed for the robot, in m/s
 double angular_speed_req = 0;                 //Desired angular speed for the robot, in rad/s
 
@@ -78,17 +69,10 @@ float angular_velocity[3]={0};
 float angular_velocity_covariance[9]={1,0,0,0,1,0,0,0,1};
 float linear_acceleration[3]={0};
 float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
-double theta = 0 ;
-
-int servo_cmd = 90;
+double theta = 0;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
-
-//PID Parameters
-const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
-const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
-const double PID_servo_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -96,12 +80,20 @@ volatile float pos_servo = 0;      //Servo motor encoder position
 volatile float pos_servo_left = 0;      //Servo motor encoder position
 volatile float pos_servo_right = 0;      //Servo motor encoder position
 volatile float pos_ack = 0;
-double ang_act_servo_left = 0;                     //Actual angle for servo motor
-double ang_act_servo_right = 0;                     //Actual angle for servo motor
+volatile float rad = 0;
+volatile float servo_left_calculated = 0;
+volatile float servo_right_calculated = 0;
+//double ang_act_servo_left = 0;                     //Actual angle for servo motor
+//double ang_act_servo_right = 0;                     //Actual angle for servo motor
+
+//PID Parameters
+const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
+const double PID_servo_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
-PID PID_servoMotor(&ang_act_servo, &ang_cmd_servo, &ang_req_servo, PID_servo_param[0], PID_servo_param[1], PID_servo_param[2], DIRECT);   //Setting up the PID for right motor
+PID PID_servoMotor(&ang_act_servo, &ang_cmd_servo, &ang_req_servo, PID_servo_param[0], PID_servo_param[1], PID_servo_param[2], DIRECT);   //Setting up the PID for Servo
 
 //const unsigned long print_interval = 1000; // 1 second
 //unsigned long previous_print_time = 0;
@@ -136,7 +128,6 @@ class motor{
             digitalWrite(pinB, HIGH);
        }
     }
-//    steer_servo.write(servo_pos);
 };
 
 void handle_cmd() {
@@ -147,62 +138,70 @@ void handle_cmd() {
   speed_req_right = speed_req;
   speed_req_left = speed_req;
 
-  //Servo Command formula
+  //Servo SPD Command
   if (speed_req != 0){
-  ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/3.14); }
+    ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI); }
   else {
     ang_req_servo = 0;
   }
 
- //Servo encoder formula
-  pos_ack = atan((tan(pos_servo_left)*wheelbase)/(wheelbase+(0.5*wheel_length)*tan(pos_servo_left)));
-  if (pos_ack != 0){
-  pos_servo =  (pos_ack/encoder_cpr*360);
+  //Find actual steering angle 
+//   if (abs(pos_servo_right) < 10) {
+//    pos_servo_right = 0;
+//   }
+//   if (abs(pos_servo_left) < 10)  {
+//    pos_servo_left = 0;
+//  }
+  
+  servo_left_calculated = (abs(pos_servo_left)/encoder_cpr)*360;
+  servo_right_calculated = (abs(pos_servo_right)/encoder_cpr)*360;
+ 
+  if (servo_right_calculated > servo_left_calculated) {
+    pos_ack = servo_right_calculated;
   }
-  else{
-    pos_servo = 0;}
+  else if (servo_right_calculated < servo_left_calculated)  {
+    pos_ack = servo_left_calculated;
+  }
+    
   //calculate degree for servo
   servo_cmd = 90 - (ang_req_servo); 
-
-//  servo.write(servo_pos);
 }
 
 motor leftMotor, rightMotor;
-
 void setup() {
-  // Set the motor control pins as outputs
   Wire.begin();
-  servo.attach(servoPIN);
+
+  //SERVO PIN
+  servo.attach(4);
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
 
-  leftMotor.pinA = 50;
-  leftMotor.pinB = 52;
-  leftMotor.pinPWM = 11;
-  rightMotor.pinA = 51;
-  rightMotor.pinB = 53;
-  rightMotor.pinPWM = 12;
-  
-  pinMode(motor1INA, OUTPUT);
-  pinMode(motor1INB, OUTPUT);
-  pinMode(motor1PWM, OUTPUT);
-  pinMode(motor2INA, OUTPUT);
-  pinMode(motor2INB, OUTPUT);
-  pinMode(motor2PWM, OUTPUT);
-    
+  //DC MOTOR PIN
+  //Left DC
+  leftMotor.pinA = 9;
+  leftMotor.pinB = 8;
+  leftMotor.pinPWM = 10;
 
+  //Right DC
+  rightMotor.pinA = 12;
+  rightMotor.pinB = 13;
+  rightMotor.pinPWM = 11;
+ 
   Serial.begin(115200);
   xicro.begin(&Serial);
   Serial.println("Setup complete");
   
+  //Set SPD to 0 when start
   leftMotor.setSpeed(0);
   leftMotor.run("BRAKE");
   rightMotor.setSpeed(0);
   rightMotor.run("BRAKE");
 
+  //Set DEG to 0 when start
   servo.write(90);
   pos_servo_left = 0;
   pos_servo_right = 0;
+  
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
   PID_rightMotor.SetSampleTime(95);
@@ -214,29 +213,30 @@ void setup() {
   PID_leftMotor.SetMode(AUTOMATIC);
   PID_rightMotor.SetMode(AUTOMATIC);
   PID_servoMotor.SetMode(AUTOMATIC);
-    
+  
+  //Define Encoder **Interrupt PIN: 0 = PIN2, 1 = PIN3, 2 = PIN21, 3 = PIN20, 4 = PIN19, 5 = PIN18**
+  
   // Define the rotary encoder for left motor
-//  pinMode(PIN_ENCOD_A_MOTOR_LEFT, INPUT); 
-//  pinMode(PIN_ENCOD_B_MOTOR_LEFT, INPUT); 
-//  digitalWrite(PIN_ENCOD_A_MOTOR_LEFT, HIGH);                // turn on pullup resistor
-//  digitalWrite(PIN_ENCOD_B_MOTOR_LEFT, HIGH);
-//  attachInterrupt(0, encoderLeftMotor, RISING);
-//
-//  // Define the rotary encoder for right motor
-//  pinMode(PIN_ENCOD_A_MOTOR_RIGHT, INPUT); 
-//  pinMode(PIN_ENCOD_B_MOTOR_RIGHT, INPUT); 
-//  digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
-//  digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
-//  attachInterrupt(1, encoderRightMotor, RISING);
+  pinMode(PIN_ENCOD_A_MOTOR_LEFT, INPUT); 
+  pinMode(PIN_ENCOD_B_MOTOR_LEFT, INPUT); 
+  digitalWrite(PIN_ENCOD_A_MOTOR_LEFT, HIGH);                // turn on pullup resistor
+  digitalWrite(PIN_ENCOD_B_MOTOR_LEFT, HIGH);
+  attachInterrupt(4, encoderLeftMotor, RISING);
 
+  // Define the rotary encoder for right motor
+  pinMode(PIN_ENCOD_A_MOTOR_RIGHT, INPUT); 
+  pinMode(PIN_ENCOD_B_MOTOR_RIGHT, INPUT); 
+  digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
+  digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
+  attachInterrupt(5, encoderRightMotor, RISING);
 
   // Define the rotary encoder for left servo motor
   pinMode(PIN_ENCOD_A_SERVO_LEFT, INPUT); 
   pinMode(PIN_ENCOD_B_SERVO_LEFT, INPUT); 
   digitalWrite(PIN_ENCOD_A_SERVO_LEFT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_SERVO_LEFT, HIGH);
-  attachInterrupt(5, encoderLeftServo, RISING);
-
+  attachInterrupt(0, encoderLeftServo, RISING);             
+  
   //  Define the rotary encoder for right servo motor
   pinMode(PIN_ENCOD_A_SERVO_RIGHT, INPUT);
   pinMode(PIN_ENCOD_B_SERVO_RIGHT, INPUT);
@@ -255,7 +255,6 @@ void loop() {
     lastMilli = millis();
     byte status = mpu.begin();
     servo_cmd = constrain(servo_cmd, min_angle , max_angle);
-    //ang_req_servo = 60;
     //PID_servoMotor.Compute();                                               
     servo.write(servo_cmd);
 
@@ -337,9 +336,9 @@ void loop() {
 }
 void publishSpeed(double time) {
     xicro.Spin_node();
-    xicro.Publisher_ack_encoder_vel.message.vector.x = pos_servo_right;
-    xicro.Publisher_ack_encoder_vel.message.vector.y = pos_servo_left;
-    xicro.Publisher_ack_encoder_vel.message.vector.z = ang_req_servo;
+    xicro.Publisher_ack_encoder_vel.message.vector.x = servo_left_calculated;
+    xicro.Publisher_ack_encoder_vel.message.vector.y = servo_right_calculated;
+    xicro.Publisher_ack_encoder_vel.message.vector.z = pos_ack;
     xicro.publish_ack_encoder_vel();
     xicro.Publisher_ack_encoder_tick.message.vector.x = pos_right;
     xicro.Publisher_ack_encoder_tick.message.vector.y = pos_left;
@@ -378,14 +377,21 @@ void encoderRightMotor() {
 void encoderRightServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_RIGHT) == digitalRead(PIN_ENCOD_B_SERVO_RIGHT)) pos_servo_right--;
   else pos_servo_right++;
+
+  if (abs(pos_servo_right) < 10) {
+    pos_servo_right = 0;
+   }
 }
 
 void encoderLeftServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_LEFT) == digitalRead(PIN_ENCOD_B_SERVO_LEFT)) pos_servo_left--;
   else pos_servo_left++;
+
+  if (abs(pos_servo_left) < 10)  {
+    pos_servo_left = 0;
+  }
 }
   
-
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
