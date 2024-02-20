@@ -14,66 +14,41 @@ import xacro
 
 def generate_launch_description():
 
-
     xacro_mec=os.path.join(get_package_share_path('my_robot_description'),
                            'urdf','mecanum.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
-
-    mec_description = ParameterValue(Command(['xacro ',xacro_mec]),value_type=str)
     
-    
-    gazebo_launch_description = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            PathJoinSubstitution([FindPackageShare('gazebo_ros'), 'launch', 'gazebo.launch.py'])
-        ])
-    )
+    mec_description=xacro.process_file(xacro_mec).toxml()
 
+    
     mecanum_state_publisher = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        parameters=[{'robot_description':mec_description} , {'use_sim_time': True}]
-    )
-
-
-    joint_state_publisher_gui = Node(
-        package="joint_state_publisher_gui",
-        executable="joint_state_publisher_gui"
-    )
-
-    rviz2 = Node(
-        package="rviz2",
-        executable="rviz2",
-        arguments=['-d', rviz_config_path]
-    )
-       
-
-    static_transform_publisher = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="tf_footprint_base",
-        output="screen",
-        arguments=["0", "0", "0", "0", "0", "0", "base_link", "base_footprint"]
+        parameters=[{'robot_description':mec_description} , {'use_sim_time': True}],
+        # remappings=[('/robot_description', '/mecanum_description')]
+        namespace="mecanum",
+        output='screen'
     )
 
     spawn_mecanum= Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
-        arguments=["-topic", "robot_description", "-entity", "mecanum"]
+        arguments=[
+            "-topic", "/mecanum/robot_description",
+            "-entity", "mecanum",
+            "-x", "1.25",   # Example: Set x-coordinate to 1.0
+            "-y", "2",   # Example: Set y-coordinate to 2.0
+            "-z", "0.0",   # Example: Set z-coordinate to 0.0
+            "-Y","1.57",
+        ],
+        namespace="mecanum",
+        output='screen'
     )
 
     return LaunchDescription([
-        # gazebo_launch_description,
-        # static_transform_publisher,
-
-        # ackermann_state_publisher,
-        # spawn_ackermann,
-        # joint_state_publisher_gui,
-        # rviz2,
-
-        mecanum_state_publisher,
         spawn_mecanum,
+        mecanum_state_publisher,
         
-        # fake_joint_calibration
     ])

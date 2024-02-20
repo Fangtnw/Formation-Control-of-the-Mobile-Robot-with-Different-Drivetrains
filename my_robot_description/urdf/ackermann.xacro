@@ -1,32 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
-     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
-     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
-<robot
-  name="ackermann">
-
-  <link name="base_footprint"></link>
-  <joint name="base_link_to_base_footprint" type="fixed">
-    <origin xyz="0 0 0.05" rpy="0 0 0"/>
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ackermann" >
+  <link name="base_footprint_ack">
+  </link>
+  <joint name="base_link_ack_to_base_footprint_ack" type="fixed">
+    <origin xyz="0 0 0.12" rpy="0 0 1.57"/>
+    <parent link="base_footprint_ack"/>
+    <child link="base_link_ack"/>
   </joint>
 
   <link
-    name="base_link">
+    name="base_link_ack">
     <inertial>
       <origin
-        xyz="0.401114315271127 -0.448682126989679 0.224781274259531"
+        xyz="-4.21303280262464E-07 -0.0595327816236317 -0.0394837308817142"
         rpy="0 0 0" />
       <mass
-        value="3.65693181713568" />
+        value="1" />
       <inertia
-        ixx="0.015169090067713"
-        ixy="1.82796488685576E-07"
-        ixz="-1.05010040455871E-07"
-        iyy="0.0313226511863623"
-        iyz="3.45960820674392E-07"
-        izz="0.0456140714001489" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -39,7 +32,7 @@
       <material
         name="">
         <color
-          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          rgba="1 1 1 0.4" />
       </material>
     </visual>
     <collision>
@@ -52,22 +45,18 @@
       </geometry>
     </collision>
   </link>
-
   <link
-    name="Bk_Turn_R">
+    name="front_left">
     <inertial>
       <origin
-        xyz="-0.00706815393332894 -0.0356877943586188 -0.0125569877404127"
+        xyz="9.4647E-14 -0.015274 3.8664E-14"
         rpy="0 0 0" />
       <mass
-        value="0.0449308336357259" />
+        value="0.2" />
       <inertia
-        ixx="1.53282078261686E-05"
-        ixy="2.85913088017762E-06"
-        ixz="2.99325552978407E-06"
-        iyy="2.1535058174114E-05"
-        iyz="7.01449169886432E-07"
-        izz="1.46105917335225E-05" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -75,12 +64,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Turn_R.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/front_left.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+          rgba="0 1 0 0.5" />
       </material>
     </visual>
     <collision>
@@ -89,38 +78,35 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Turn_R.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/front_left.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Bk_Turn_R_joint"
+    name="front_left_joint"
     type="continuous">
     <origin
-      xyz="0.614114914635943 -0.813820257624567 0.180513128382613"
-      rpy="-1.5707963267949 0 2.56288301873173" />
+      xyz="-0.301000000000045 0.0190000000000679 -0.0695000000000887"
+      rpy="3.14159265358979 0.0849179307157281 -1.5707963267949" />
     <parent
-      link="base_link" />
+      link="base_link_ack" />
     <child
-      link="Bk_Turn_R" />
+      link="front_left" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
   </joint>
   <link
-    name="Bk_Wheel_R">
+    name="front_right">
     <inertial>
       <origin
-        xyz="-2.77555756156289E-17 0.0504681649917319 5.55111512312578E-16"
+        xyz="-9.9698E-14 0.025726 -2.2427E-14"
         rpy="0 0 0" />
       <mass
-        value="0.244535505413318" />
+        value="0.2" />
       <inertia
-        ixx="0.000245434009544367"
-        ixy="3.23675773692E-21"
-        ixz="9.52912065661088E-22"
-        iyy="0.000452680377893099"
-        iyz="2.39664157346858E-12"
-        izz="0.00024545772767572" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -128,12 +114,12 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Wheel_R.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/front_right.STL" />
       </geometry>
       <material
         name="">
         <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+          rgba="0 1 0 0.5" />
       </material>
     </visual>
     <collision>
@@ -142,197 +128,35 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Wheel_R.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/front_right.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Bk_Wheel_R_joint"
+    name="front_right_joint"
     type="continuous">
     <origin
-      xyz="-0.0163421491079695 -0.02 -0.0109496604336587"
-      rpy="-0.590327377498936 -0.00292714142874161 1.57275759373491" />
-    <parent
-      link="Bk_Turn_R" />
-    <child
-      link="Bk_Wheel_R" />
-    <axis
-      xyz="0 1 0" />
-  </joint>
-  <link
-    name="Bk_Turn_L">
-    <inertial>
-      <origin
-        xyz="0.0143010532701583 -0.0356877943586189 0.00176093097815799"
-        rpy="0 0 0" />
-      <mass
-        value="0.0449308336357259" />
-      <inertia
-        ixx="1.68201754225655E-05"
-        ixy="-1.73615991020943E-06"
-        ixz="2.37971797833216E-06"
-        iyy="2.1535058174114E-05"
-        iyz="-2.37751390995214E-06"
-        izz="1.31186241371256E-05" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Turn_L.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Turn_L.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Bk_Turn_L_joint"
-    type="continuous">
-    <origin
-      xyz="0.188114914635943 -0.813820257624567 0.180513128382613"
-      rpy="-1.5707963267949 0 2.56288301873173" />
-    <parent
-      link="base_link" />
-    <child
-      link="Bk_Turn_L" />
-    <axis
-      xyz="0 1 0" />
-  </joint>
-  <link
-    name="Bk_Wheel_L">
-    <inertial>
-      <origin
-        xyz="7.7715611723761E-16 -0.0505106053235812 -2.77555756156289E-16"
-        rpy="0 0 0" />
-      <mass
-        value="0.244535505413318" />
-      <inertia
-        ixx="0.00024544286767645"
-        ixy="-1.03566467273163E-12"
-        ixz="-5.15583806439448E-09"
-        iyy="0.0004526803778931"
-        iyz="1.80112434138771E-12"
-        izz="0.000245448869543638" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Wheel_L.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Bk_Wheel_L.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Bk_Wheel_L_joint"
-    type="continuous">
-    <origin
-      xyz="0.0163068913739661 -0.02 0.0109260368445909"
-      rpy="-1.14425122408063 0.912951464656435 0.521303974013017" />
-    <parent
-      link="Bk_Turn_L" />
-    <child
-      link="Bk_Wheel_L" />
-    <axis
-      xyz="0 1 0" />
-  </joint>
-  <link
-    name="Fr_Wheel_R">
-    <inertial>
-      <origin
-        xyz="2.77555756156289E-17 0.0257257525083612 -5.55111512312578E-17"
-        rpy="0 0 0" />
-      <mass
-        value="0.240470068076377" />
-      <inertia
-        ixx="0.000245137261047143"
-        ixy="1.04886744620899E-20"
-        ixz="0"
-        iyy="0.000452624182450971"
-        iyz="4.51755671686582E-20"
-        izz="0.000245137261047143" />
-    </inertial>
-    <visual>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Fr_Wheel_R.STL" />
-      </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
-    </visual>
-    <collision>
-      <origin
-        xyz="0 0 0"
-        rpy="0 0 0" />
-      <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Fr_Wheel_R.STL" />
-      </geometry>
-    </collision>
-  </link>
-  <joint
-    name="Fr_Wheel_R_joint"
-    type="continuous">
-    <origin
-      xyz="0.661114914635897 -0.250070257624499 0.198763128382747"
+      xyz="0.259999999999977 0.0190000000000679 -0.0695000000000887"
       rpy="3.14159265358979 -0.692237011731428 1.5707963267949" />
     <parent
-      link="base_link" />
+      link="base_link_ack" />
     <child
-      link="Fr_Wheel_R" />
+      link="front_right" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="Fr_Wheel_L">
+    name="left_steering">
     <inertial>
       <origin
-        xyz="-5.55111512312578E-17 -0.0152742474916388 -2.77555756156289E-17"
+        xyz="0.013865 -0.0153 -0.021185"
         rpy="0 0 0" />
       <mass
-        value="0.240470068076377" />
+        value="0.2" />
       <inertia
-        ixx="0.000245137261047143"
-        ixy="4.91794459651664E-21"
-        ixz="-8.470329472543E-21"
-        iyy="0.000452624182450972"
-        iyz="6.52659177808279E-20"
-        izz="0.000245137261047143" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -340,7 +164,107 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Fr_Wheel_L.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/left_steering.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/left_steering.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_steering_joint"
+    type="continuous">
+    <origin
+      xyz="-0.229999999999977 -0.544750000000063 -0.0837500000002837"
+      rpy="3.14159265358979 0 1.56870378020951" />
+    <parent
+      link="base_link_ack" />
+    <child
+      link="left_steering" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rear_left">
+    <inertial>
+      <origin
+        xyz="-3.3074E-13 0.025977 4.563E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.2" />
+      <inertia
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/rear_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/rear_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.0367488381424265 -0.0159999999999999"
+      rpy="3.14159265358979 1.57056930363849 0" />
+    <parent
+      link="left_steering" />
+    <child
+      link="rear_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="right_steering">
+    <inertial>
+      <origin
+        xyz="-0.0138648135893726 -0.0152975648321685 -0.0211847288398291"
+        rpy="0 0 0" />
+      <mass
+        value="0.202056975407" />
+      <inertia
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/right_steering.STL" />
       </geometry>
       <material
         name="">
@@ -354,72 +278,128 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/Fr_Wheel_L.STL" />
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/right_steering.STL" />
       </geometry>
     </collision>
   </link>
   <joint
-    name="Fr_Wheel_L_joint"
+    name="right_steering_joint"
     type="continuous">
     <origin
-      xyz="0.100114914635876 -0.250070257624499 0.198763128382747"
-      rpy="3.14159265358979 0.084917930715728 -1.5707963267949" />
+      xyz="0.230000000000023 -0.544750000000063 -0.0837500000002836"
+      rpy="3.14159265358979 0 -1.56162994548732" />
     <parent
-      link="base_link" />
+      link="base_link_ack" />
     <child
-      link="Fr_Wheel_L" />
+      link="right_steering" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rear_right">
+    <inertial>
+      <origin
+        xyz="3.3534E-13 0.025722 -9.3148E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.2" />
+      <inertia
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/rear_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/rear_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.0370034448281129 -0.0159999999999995"
+      rpy="3.14159265358979 -1.55976234848309 0" />
+    <parent
+      link="right_steering" />
+    <child
+      link="rear_right" />
     <axis
       xyz="0 1 0" />
   </joint>
 
-    <gazebo>
-      <plugin name="gazebo_ros_ackermann_drive" filename="libgazebo_ros_ackermann_drive.so">
-        <ros>
-          <namespace>ackermann</namespace>
-          <remapping>cmd_vel:=cmd_vel</remapping>
-          <remapping>odom:=odom</remapping>
-          <remapping>distance:=distance</remapping>
-        </ros>
+ <gazebo>
+    <plugin name="gazebo_ros_ackermann_drive" filename="libgazebo_ros_ackermann_drive.so">
+      <ros>
+        <namespace>/ackermann</namespace>
+      </ros>
 
-        <update_rate>100.0</update_rate>
+      <update_rate>100.0</update_rate>
 
-        <!-- wheels -->
-        <front_left_joint>Fr_Wheel_R_joint</front_left_joint>
-        <front_right_joint>Fr_Wheel_R_joint</front_right_joint>
-        <rear_left_joint>Bk_Wheel_L_joint</rear_left_joint>
-        <rear_right_joint>Bk_Wheel_R_joint</rear_right_joint>
-        <left_steering_joint>Bk_Turn_L_joint</left_steering_joint>
-        <right_steering_joint>Bk_Turn_R_joint</right_steering_joint>
-        <!-- <steering_wheel_joint>steering_joint</steering_wheel_joint> -->
 
-        <!-- Max absolute steer angle for tyre in radians-->
-        <!-- Any cmd_vel angular z greater than this would be capped -->
-        <max_steer>0.6458</max_steer>
+      <wheel_base>0.65</wheel_base>
+      <wheel_separation>0.55</wheel_separation>
+      <wheel_radius>0.06</wheel_radius>
 
-        <!-- Max absolute steering angle of steering wheel -->
-        <max_steering_angle>7.85</max_steering_angle>
+      <!-- wheels -->
+      <front_left_joint>rear_right_joint</front_left_joint>
+      <front_right_joint>rear_left_joint</front_right_joint>
+      <rear_left_joint>front_right_joint</rear_left_joint>
+      <rear_right_joint>front_left_joint</rear_right_joint>
 
-        <!-- Max absolute linear speed in m/s -->
-        <max_speed>20</max_speed>
+      <!-- <front_left_joint>front_left_joint</front_left_joint>
+      <front_right_joint>front_right_joint</front_right_joint>
+      <rear_left_joint>rear_left_joint</rear_left_joint>
+      <rear_right_joint>rear_right_joint</rear_right_joint> -->
 
-        <!-- PID tuning -->
-        <left_steering_pid_gain>1500 0 1</left_steering_pid_gain>
-        <left_steering_i_range>0 0</left_steering_i_range>
-        <right_steering_pid_gain>1500 0 1</right_steering_pid_gain>
-        <right_steering_i_range>0 0</right_steering_i_range>
-        <linear_velocity_pid_gain>1000 0 1</linear_velocity_pid_gain>
-        <linear_velocity_i_range>0 0</linear_velocity_i_range>
+      <!-- steering joints -->
+      <left_steering_joint>left_steering_joint</left_steering_joint>
+      <right_steering_joint>right_steering_joint</right_steering_joint>
 
-        <!-- output -->
-        <publish_odom>true</publish_odom>
-        <publish_odom_tf>true</publish_odom_tf>
-        <publish_wheel_tf>true</publish_wheel_tf>
-        <publish_distance>true</publish_distance>
+      <!-- Max absolute steer angle for tyre in radians-->
+      <!-- Any cmd_vel angular z greater than this would be capped -->
+      <max_steer>0.6458</max_steer>
 
-        <odometry_frame>odom_demo</odometry_frame>
-        <robot_base_frame>base_link</robot_base_frame>
+      <!-- Max absolute steering angle of steering wheel -->
+      <max_steering_angle>7.85</max_steering_angle>
 
-      </plugin>
-    </gazebo>
+      <!-- Max absolute linear speed in m/s -->
+      <max_speed>20</max_speed>
 
+      <!-- PID tuning -->
+      <left_steering_pid_gain>1 0 1</left_steering_pid_gain>
+      <left_steering_i_range>0 0</left_steering_i_range>
+      <right_steering_pid_gain>1 0 1</right_steering_pid_gain>
+      <right_steering_i_range>0 0</right_steering_i_range>
+      <linear_velocity_pid_gain>1000 0 1</linear_velocity_pid_gain>
+      <linear_velocity_i_range>0 0</linear_velocity_i_range>
+
+      <!-- output -->
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <publish_distance>true</publish_distance>
+
+      <odometry_frame>odom_ack</odometry_frame>
+      <robot_base_frame>base_footprint_ack</robot_base_frame>
+    </plugin>
+  </gazebo>
 </robot>

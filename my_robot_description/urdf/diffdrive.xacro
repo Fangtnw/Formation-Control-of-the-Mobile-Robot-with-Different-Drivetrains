@@ -1,8 +1,12 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffdrive2" >
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="diffdrive" >
 <!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
      Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
      For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+  
+  <material name="wheel">
+    <color rgba="0 1 0 0.5" /> </material>
+    
   <link name="base_footprint"></link>
   <joint name="base_link_to_base_footprint" type="fixed">
     <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -81,7 +85,7 @@
     </collision>
   </link>
   <link
-    name="Wheel_left">
+    name="wheel_left">
     <inertial>
       <origin
         xyz="0 0.0257257525083612 -2.77555756156289E-17"
@@ -102,13 +106,9 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_left.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_left.STL" />
       </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
+      <material name="wheel" /> 
     </visual>
     <collision>
       <origin
@@ -116,7 +116,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_left.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_left.STL" />
       </geometry>
     </collision>
   </link>
@@ -129,12 +129,12 @@
     <parent
       link="base_link" />
     <child
-      link="Wheel_left" />
+      link="wheel_left" />
     <axis
       xyz="0 -1 0" />
   </joint>
   <link
-    name="Wheel_right">
+    name="wheel_right">
     <inertial>
       <origin
         xyz="5.55111512312578E-17 0.0257257525083612 5.55111512312578E-17"
@@ -153,15 +153,11 @@
       <origin
         xyz="0 0 0"
         rpy="0 0 0" />
-      <geometry>
+      <geometry>      
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_right.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_right.STL" />
       </geometry>
-      <material
-        name="">
-        <color
-          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
-      </material>
+      <material name="wheel" />     
     </visual>
     <collision>
       <origin
@@ -169,7 +165,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_right.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_right.STL" />
       </geometry>
     </collision>
   </link>
@@ -182,7 +178,7 @@
     <parent
       link="base_link" />
     <child
-      link="Wheel_right" />
+      link="wheel_right" />
     <axis
       xyz="0 1 0" />
   </joint>
@@ -220,7 +216,7 @@
 
         <sensor name="laser" type="ray">
             <pose> 0 0 0 0 0 0 </pose>
-            <visualize>true</visualize>
+            <visualize>false</visualize>
             <update_rate>10</update_rate>
             <ray>
                 <scan>
@@ -244,4 +240,6 @@
             </plugin>
         </sensor>
     </gazebo>
+
+
 </robot>

@@ -22,7 +22,6 @@
       <geometry>
         <mesh
           filename="package://my_robot_description/meshes/long_pallet.stl"> 
-          
         </mesh>
       </geometry>
       <material

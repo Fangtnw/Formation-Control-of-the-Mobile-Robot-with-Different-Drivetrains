@@ -78,7 +78,7 @@ def generate_launch_description():
     )
 
     slam_toolbox = ExecuteProcess(
-        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py' , 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py' ],
         output='screen',
     )
 
@@ -98,7 +98,7 @@ def generate_launch_description():
     )
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=mappy.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/workshop_4th.yaml'],
         output='screen',
     )
 

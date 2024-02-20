@@ -21,16 +21,15 @@ def generate_launch_description():
 
     )
 
-    xicro_delay = TimerAction(
-        period=5.0,  # 5 seconds delay
-        actions=[xicro]  # Launch xicro_node after 5 seconds
-    )
-
     xicro = ExecuteProcess(
         cmd=['ros2', 'run', 'xicro_pkg', 'xicro_node_diffdrive_ID_1_arduino.py'],
         output='screen',
     )
 
+    xicro_delay = TimerAction(
+        period=5.0,  # 5 seconds delay
+        actions=[xicro]  # Launch xicro_node after 5 seconds
+    )
 
     odom_compute = Node(
         package='coop_controller',

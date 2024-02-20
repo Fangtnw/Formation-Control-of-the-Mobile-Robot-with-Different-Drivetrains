@@ -1,16 +1,17 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mecanum" >
 
-  <link name="base_footprint"></link>
-  <joint name="base_link_to_base_footprint" type="fixed">
-    <origin xyz="0 0 0.11" rpy="0 0 1.57"/>
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
-    <dynamics damping="0" friction="0.00001"/>
+  <link name="base_footprint_mec">
+  </link>
+  <joint name="base_link_mec_to_base_footprint_mec" type="fixed">
+    <origin xyz="0 0 0.12" rpy="0 0 1.57"/>
+    <parent link="base_footprint_mec"/>
+    <child link="base_link_mec"/>
+   
     
   </joint>
 
-  <link name="laser_frame">
+  <link name="laser_mec">
     <visual>
       <geometry>
         <cylinder radius="0.05" length="0.04"/>
@@ -21,12 +22,12 @@
         <cylinder radius="0.05" length="0.04"/>
       </geometry>
     </collision>
-      <inertial>
+    <inertial>
       <origin
         xyz="0 0 0"
         rpy="0 0 0" />
       <mass
-        value="0.1" />
+        value="0.01" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -36,20 +37,20 @@
 
   <joint name="laser_joint" type="fixed">
     <origin xyz="0 0 0.02" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="laser_frame"/>
-    <dynamics damping="0" friction="0.00001"/>
+    <parent link="base_link_mec"/>
+    <child link="laser_mec"/>
+   
     
   </joint>
 
   <link
-    name="base_link">
+    name="base_link_mec">
     <inertial>
       <origin
         xyz="-1.14613076807046E-08 -4.91918539569092E-07 -0.0135289818533382"
         rpy="0 0 0" />
       <mass
-        value="2" />
+        value="1" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -113,8 +114,7 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_right.STL" />
+        <cylinder radius="0.07" length="0.04" />
       </geometry>
     </collision>
   </link>
@@ -125,12 +125,12 @@
       xyz="0.196431540449915 0.18250000000009 -0.0500000000000465"
       rpy="2.56826265176299 -0.701812030330357 2.7542816171153" />
     <parent
-      link="base_link" />
+      link="base_link_mec" />
     <child
       link="wheel_fr_right" />
     <axis
       xyz="0.707106781183754 -0.64156167526822 0.297319048886856" />
-    <dynamics damping="0" friction="0.00001"/>
+   
     
   </joint>
   <link
@@ -165,8 +165,7 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_right.STL" />
+        <cylinder radius="0.07" length="0.04" />
       </geometry>
     </collision>
   </link>
@@ -177,12 +176,12 @@
       xyz="0.196431540449915 -0.182499999999932 -0.0500000000000465"
       rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
     <parent
-      link="base_link" />
+      link="base_link_mec" />
     <child
       link="wheel_bk_right" />
     <axis
       xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
-    <dynamics damping="0" friction="0.00001"/>
+   
     
   </joint>
   <link
@@ -217,8 +216,7 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_left.STL" />
+        <cylinder radius="0.07" length="0.04" />
       </geometry>
     </collision>
   </link>
@@ -229,12 +227,12 @@
       xyz="-0.141459172223538 0.18250000000009 -0.0500000000000464"
       rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
     <parent
-      link="base_link" />
+      link="base_link_mec" />
     <child
       link="wheel_fr_left" />
     <axis
       xyz="0.707106781183754 -0.641561675268221 0.297319048886855" />
-    <dynamics damping="0" friction="0.00001"/>
+   
     
   </joint>
   <link
@@ -269,8 +267,7 @@
         xyz="0 0 0"
         rpy="0 0 0" />
       <geometry>
-        <mesh
-          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_left.STL" />
+        <cylinder radius="0.07" length="0.04" />
       </geometry>
     </collision>
   </link>
@@ -281,74 +278,78 @@
       xyz="-0.141459172223538 -0.182499999999932 -0.0500000000000464"
       rpy="2.56826265176298 -0.701812030330358 2.7542816171153" />
     <parent
-      link="base_link" />
+      link="base_link_mec" />
     <child
       link="wheel_bk_left" />
     <axis
       xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
-    <dynamics damping="0" friction="0.00001"/>
+   
 
   </joint>
 
 <gazebo>
-<plugin name="gazebo_ros_planar_move" filename="libgazebo_ros_planar_move.so">
+  <plugin name="gazebo_ros_planar_move" filename="libgazebo_ros_planar_move.so">
 
-  <ros>
+    <ros>
 
-    <!-- Add a namespace -->
-    <namespace>mec</namespace>
+      <!-- Add a namespace -->
+      <namespace>mec</namespace>
 
-    <!-- Remap the default topic -->
-    <remapping>cmd_vel:=cmd_vel</remapping>
-    <remapping>odom:=odom</remapping>
+      <!-- Remap the default topic -->
+      <remapping>/mec/cmd_vel:=/mec/cmd_vel</remapping>
+      <remapping>odom:=odom</remapping>
 
-  </ros>
+    </ros>
 
-  <update_rate>100</update_rate>
-  <publish_rate>10</publish_rate>
+    <update_rate>100</update_rate>
+    <publish_rate>10</publish_rate>
 
-  <!-- output -->
-  <publish_odom>true</publish_odom>
-  <publish_odom_tf>true</publish_odom_tf>
+    <!-- output -->
+    <publish_odom>true</publish_odom>
+    <publish_odom_tf>true</publish_odom_tf>
 
-  <odometry_frame>mec_odom</odometry_frame>
-  <robot_base_frame>base_footprint</robot_base_frame>
-  <publish_wheel_tf>true</publish_wheel_tf>
+    <odometry_frame>mec_odom</odometry_frame>
+    <robot_base_frame>base_footprint_mec</robot_base_frame>
+    <publish_wheel_tf>true</publish_wheel_tf>
 
-  <covariance_x>0.0001</covariance_x>
-  <covariance_y>0.0001</covariance_y>
-  <covariance_yaw>0.01</covariance_yaw>
+    <covariance_x>0.0001</covariance_x>
+    <covariance_y>0.0001</covariance_y>
+    <covariance_yaw>0.01</covariance_yaw>
 
-</plugin>
+  </plugin>
 </gazebo>
-    <gazebo reference="laser_frame">
-        <material>Gazebo/Red</material>
 
-        <sensor name="laser" type="ray">
-            <pose> 0 0 0 0 0 0 </pose>
-            <visualize>false</visualize>
-            <update_rate>10</update_rate>
-            <ray>
-                <scan>
-                    <horizontal>
-                        <samples>360</samples>
-                        <min_angle>-3.14</min_angle>
-                        <max_angle>3.14</max_angle>
-                    </horizontal>
-                </scan>
-                <range>
-                    <min>0.3</min>
-                    <max>12</max>
-                </range>
-            </ray>
-            <plugin name="laser_mec" filename="libgazebo_ros_ray_sensor.so">
-                <namespace>mec</namespace>
-                <ros>
-                    <argument>/out:=scan</argument>
-                </ros>
-                <output_type>sensor_msgs/LaserScan</output_type>
-                <frame_name>laser_frame</frame_name>
-            </plugin>
-        </sensor>
-    </gazebo>
+  <gazebo reference="laser_mec">
+    <material>Gazebo/Red</material>
+
+    <sensor name="laser" type="ray">
+      <namespace>mec</namespace>
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <min_angle>-3.14</min_angle>
+            <max_angle>3.14</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.3</min>
+          <max>12</max>
+        </range>
+      </ray>
+      <plugin name="laser_mec" filename="libgazebo_ros_ray_sensor.so">
+        <namespace>mec</namespace>
+        <ros>
+          <argument>/mec/out:=/scan_mec</argument>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>laser_mec</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
 </robot>    
