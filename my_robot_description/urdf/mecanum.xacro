@@ -4,11 +4,9 @@
   <link name="base_footprint_mec">
   </link>
   <joint name="base_link_mec_to_base_footprint_mec" type="fixed">
-    <origin xyz="0 0 0.12" rpy="0 0 1.57"/>
+    <origin xyz="0 0 0.12" rpy="0 0 -1.57"/>
     <parent link="base_footprint_mec"/>
     <child link="base_link_mec"/>
-   
-    
   </joint>
 
   <link name="laser_mec">
@@ -39,8 +37,6 @@
     <origin xyz="0 0 0.02" rpy="0 0 0"/>
     <parent link="base_link_mec"/>
     <child link="laser_mec"/>
-   
-    
   </joint>
 
   <link
@@ -50,7 +46,7 @@
         xyz="-1.14613076807046E-08 -4.91918539569092E-07 -0.0135289818533382"
         rpy="0 0 0" />
       <mass
-        value="1" />
+        value="0.5" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -181,9 +177,8 @@
       link="wheel_bk_right" />
     <axis
       xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
-   
-    
   </joint>
+
   <link
     name="wheel_fr_left">
     <inertial>
@@ -232,9 +227,8 @@
       link="wheel_fr_left" />
     <axis
       xyz="0.707106781183754 -0.641561675268221 0.297319048886855" />
-   
-    
   </joint>
+  
   <link
     name="wheel_bk_left">
     <inertial>
@@ -296,7 +290,7 @@
       <namespace>mec</namespace>
 
       <!-- Remap the default topic -->
-      <remapping>/mec/cmd_vel:=/mec/cmd_vel</remapping>
+      <remapping>/mec/cmd_vel:=/cmd_vel_follower</remapping>
       <remapping>odom:=odom</remapping>
 
     </ros>

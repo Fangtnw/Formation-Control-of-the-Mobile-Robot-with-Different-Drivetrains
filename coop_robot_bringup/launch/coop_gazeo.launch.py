@@ -97,16 +97,16 @@ def generate_launch_description():
             executable="static_transform_publisher",
             name="diff_to_mec_tf_publisher",
             output="screen",
-            arguments=["0.0", "2.0", "0.0", "0.0", "0.0", "0.0", "odom", "mec_odom"]
+            arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "mec_odom"]
         )
 
     return LaunchDescription([
         gazebo_server,
         gazebo_client,
         # joint_state_publisher_gui,
-        # spawn_diffdrive,
-        # spawn_mecanum,
-        # tf_diff_to_mec,
-        spawn_ackermann,
+        spawn_diffdrive,
+        spawn_mecanum,
+        tf_diff_to_mec,
+        # spawn_ackermann,
         rviz2,
     ])

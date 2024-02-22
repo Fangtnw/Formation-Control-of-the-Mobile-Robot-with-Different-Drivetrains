@@ -43,9 +43,9 @@ def generate_launch_description():
             "-topic", "/diffdrive/robot_description",
             "-entity", "diffdrive",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
-            "-y", "0.0",   # Example: Set y-coordinate to 2.0
+            "-y", "2.0",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","1.57",
+            "-Y","-1.57",
         ],
         namespace="diffdrive",
         output='screen'
