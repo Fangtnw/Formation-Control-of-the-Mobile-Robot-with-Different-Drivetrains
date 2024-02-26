@@ -13,9 +13,12 @@
     </include> -->
 
     <node pkg="gazebo_ros" exec="spawn_entity.py"
-          args="-topic robot_description -entity long_pallet" />
+          args="-topic robot_description -entity long_pallet -x 1.25 
+            -y 1.0  
+            -z 0.1
+            -Y 1.57" />
 
-    <node pkg="rviz2" exec="rviz2" output="screen" 
-          args="-d $(var rviz_config_path)" />
+    <!-- <node pkg="rviz2" exec="rviz2" output="screen" 
+          args="-d $(var rviz_config_path)" /> -->
 
 </launch>

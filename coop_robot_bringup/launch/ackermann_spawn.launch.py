@@ -39,7 +39,7 @@ def generate_launch_description():
             "-topic", "/ackermann/robot_description",
             "-entity", "ackermann",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
-            "-y", "2",   # Example: Set y-coordinate to 2.0
+            "-y", "1.8",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
             "-Y","-1.57",
         ],

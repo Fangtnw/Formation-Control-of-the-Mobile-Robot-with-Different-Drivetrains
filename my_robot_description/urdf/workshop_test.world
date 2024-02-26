@@ -178,4 +178,7 @@
       </camera>
     </gui>
   </world>
+  <gazebo reference="map_link_visual">
+      <material>Gazebo/Wood</material>
+  </gazebo>
 </sdf>

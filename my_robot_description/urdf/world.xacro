@@ -44,4 +44,7 @@
       </geometry>
     </collision>
   </link>
+  <gazebo reference="map_link">
+      <material>Gazebo/Black</material>
+  </gazebo>
 </robot>
