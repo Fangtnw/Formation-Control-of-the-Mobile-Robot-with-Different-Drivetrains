@@ -7,14 +7,14 @@
   <material name="wheel">
     <color rgba="0 1 0 0.5" /> </material>
     
-  <link name="base_footprint"></link>
-  <joint name="base_link_to_base_footprint" type="fixed">
-    <origin xyz="0 0 0" rpy="0 0 0"/>
-    <parent link="base_footprint"/>
-    <child link="base_link"/>
+  <link name="base_footprint_diff"></link>
+  <joint name="base_link_diff_to_base_footprint_diff" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 3.14159265"/>
+    <parent link="base_footprint_diff"/>
+    <child link="base_link_diff"/>
   </joint>
 
-  <link name="laser_frame">
+  <link name="laser_frame_diff">
     <visual>
       <geometry>
         <cylinder radius="0.05" length="0.04"/>
@@ -39,13 +39,13 @@
   </link>
 
   <joint name="laser_joint" type="fixed">
-    <origin xyz="0 0 0.12" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="laser_frame"/>
+    <origin xyz="0 0 0.22" rpy="0 0 0"/>
+    <parent link="base_link_diff"/>
+    <child link="laser_frame_diff"/>
   </joint>
 
   <link
-    name="base_link">
+    name="base_link_diff">
     <inertial>
       <origin
         xyz="-0.00843797932248264 7.91524717263514E-05 0.0510944704707574"
@@ -121,17 +121,17 @@
     </collision>
   </link>
   <joint
-    name="right_wheel_joint"
+    name="left_wheel_joint"
     type="continuous">
     <origin
       xyz="-0.000999999999839296 -0.249999999999933 0.0305000000006919"
       rpy="0 0.774914173734372 3.14159265358979" />
     <parent
-      link="base_link" />
+      link="base_link_diff" />
     <child
       link="wheel_left" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 1 0" />
   </joint>
   <link
     name="wheel_right">
@@ -170,17 +170,17 @@
     </collision>
   </link>
   <joint
-    name="left_wheel_joint"
+    name="right_wheel_joint"
     type="continuous">
     <origin
       xyz="-0.000999999999862333 0.250000000000088 0.0305000000006919"
       rpy="3.14159265358979 -0.53712555837446 3.14159265358979" />
     <parent
-      link="base_link" />
+      link="base_link_diff" />
     <child
       link="wheel_right" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
   </joint>
 
     <gazebo>
@@ -188,7 +188,8 @@
             <!-- Update rate in Hz -->
             <ros>
             <!-- Add a namespace -->
-            <namespace></namespace>
+            <namespace>diff</namespace>
+             <remapping>/diff/cmd_vel:=/cmd_vel_follower</remapping>
             </ros>
             <update_rate>50</update_rate>
             <!-- wheels -->
@@ -198,7 +199,7 @@
             <wheel_separation>0.5</wheel_separation>
             <wheel_diameter>0.12</wheel_diameter>
             <!-- input -->
-            <command_topic>cmd_vel</command_topic>
+            <command_topic>cmd_vel_follower</command_topic>
             <!-- output -->
             <publish_odom>true</publish_odom>
             <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
@@ -206,12 +207,12 @@
             <publish_odom_tf>true</publish_odom_tf>
             <publish_wheel_tf>true</publish_wheel_tf>
             <odometry_topic>diffdrive/odom</odometry_topic>
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>base_footprint</robot_base_frame>
+            <odometry_frame>diff_odom</odometry_frame>
+            <robot_base_frame>base_footprint_diff</robot_base_frame>
         </plugin>
     </gazebo>
 
-    <gazebo reference="laser_frame">
+    <gazebo reference="laser_frame_diff">
         <material>Gazebo/Red</material>
 
         <sensor name="laser" type="ray">
@@ -231,12 +232,12 @@
                     <max>12</max>
                 </range>
             </ray>
-            <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
+            <plugin name="laser_controller_diff" filename="libgazebo_ros_ray_sensor.so">
                 <ros>
-                    <argument>~/out:=scan</argument>
+                    <argument>~/out:=scan_diff</argument>
                 </ros>
                 <output_type>sensor_msgs/LaserScan</output_type>
-                <frame_name>laser_frame</frame_name>
+                <frame_name>laser_frame_diff</frame_name>
             </plugin>
         </sensor>
     </gazebo>

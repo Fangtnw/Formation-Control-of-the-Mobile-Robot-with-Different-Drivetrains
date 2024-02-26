@@ -99,14 +99,23 @@ def generate_launch_description():
             output="screen",
             arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "mec_odom"]
         )
+    
+    tf_ack_to_mec= Node(
+            package="tf2_ros",
+            executable="static_transform_publisher",
+            name="ack_to_mec_tf_publisher",
+            output="screen",
+            arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "diff_odom"]
+        )
 
     return LaunchDescription([
         gazebo_server,
         gazebo_client,
         # joint_state_publisher_gui,
         spawn_diffdrive,
-        spawn_mecanum,
-        tf_diff_to_mec,
-        # spawn_ackermann,
+        # spawn_mecanum,
+        # tf_diff_to_mec,
+        spawn_ackermann,
+        tf_ack_to_mec,
         rviz2,
     ])

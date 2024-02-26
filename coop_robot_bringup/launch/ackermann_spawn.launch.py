@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','ackermann.xacro')
+                           'urdf','ackermann_basic.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -41,7 +41,7 @@ def generate_launch_description():
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
             "-y", "2",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","1.57",
+            "-Y","-1.57",
         ],
         namespace="ackermann",
         output='screen'
