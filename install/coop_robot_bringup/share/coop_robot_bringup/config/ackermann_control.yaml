@@ -1,0 +1,34 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50
+
+    use_sim_time: true
+
+    joint_state_controller:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    ackermann_steering_controller:
+      type: ackermann_steering_controller/AckermannSteeringController
+
+ackermann_steering_controller:
+  ros__parameters:
+
+    reference_timeout: 2.0
+    front_steering: true
+    open_loop: false
+    velocity_rolling_window_size: 10
+    position_feedback: true
+    use_stamped_vel: true   # Use true to make controller topic /ackermann_steering_controller/reference listen to TwistStamped type data
+                            # Use false ro make controller topic /ackermann_steering_controller/reference_unstamped listen to Twist type data
+    rear_wheels_names: [rear_right_joint, rear_left_joint]
+    front_wheels_names: [right_steering_joint, left_steering_joint]
+
+    wheelbase: 0.65               # Distance between front and rear wheel axes
+    front_wheel_track: 0.605      # Distance between front wheels
+    rear_wheel_track: 0.605       # Distance between rear wheels
+    front_wheels_radius: 0.165
+    rear_wheels_radius: 0.165
+
+joint_state_controller:
+  ros__parameters:
+    type: joint_state_controller/JointStateController

@@ -1,0 +1,33 @@
+[0.893s] Invoking command in '/home/fang/coop_ws/src/coop_keyboard_teleop': PYTHONPATH=/home/fang/coop_ws/src/build/coop_keyboard_teleop/prefix_override:/home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../build/coop_keyboard_teleop build --build-base /home/fang/coop_ws/src/build/coop_keyboard_teleop/build install --record /home/fang/coop_ws/src/build/coop_keyboard_teleop/install.log --single-version-externally-managed
+[1.053s] running egg_info
+[1.053s] creating ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info
+[1.053s] writing ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/PKG-INFO
+[1.053s] writing dependency_links to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/dependency_links.txt
+[1.054s] writing entry points to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/entry_points.txt
+[1.054s] writing requirements to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/requires.txt
+[1.054s] writing top-level names to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/top_level.txt
+[1.054s] writing manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+[1.054s] reading manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+[1.054s] writing manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+[1.055s] running build
+[1.055s] running build_py
+[1.055s] creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build
+[1.055s] creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib
+[1.055s] creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+[1.055s] copying coop_keyboard_teleop/coop_keyboard_teleop.py -> /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+[1.055s] copying coop_keyboard_teleop/__init__.py -> /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+[1.055s] running install
+[1.055s] running install_lib
+[1.056s] creating /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+[1.056s] copying /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop/coop_keyboard_teleop.py -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+[1.057s] copying /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop/__init__.py -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+[1.058s] byte-compiling /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop/coop_keyboard_teleop.py to coop_keyboard_teleop.cpython-310.pyc
+[1.058s] byte-compiling /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop/__init__.py to __init__.cpython-310.pyc
+[1.058s] running install_data
+[1.058s] copying package.xml -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/share/coop_keyboard_teleop
+[1.059s] running install_egg_info
+[1.059s] Copying ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info to /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop-0.0.0-py3.10.egg-info
+[1.060s] running install_scripts
+[1.076s] Installing coop_keyboard_teleop script to /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/coop_keyboard_teleop
+[1.076s] writing list of installed files to '/home/fang/coop_ws/src/build/coop_keyboard_teleop/install.log'
+[1.097s] Invoked command in '/home/fang/coop_ws/src/coop_keyboard_teleop' returned '0': PYTHONPATH=/home/fang/coop_ws/src/build/coop_keyboard_teleop/prefix_override:/home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../build/coop_keyboard_teleop build --build-base /home/fang/coop_ws/src/build/coop_keyboard_teleop/build install --record /home/fang/coop_ws/src/build/coop_keyboard_teleop/install.log --single-version-externally-managed

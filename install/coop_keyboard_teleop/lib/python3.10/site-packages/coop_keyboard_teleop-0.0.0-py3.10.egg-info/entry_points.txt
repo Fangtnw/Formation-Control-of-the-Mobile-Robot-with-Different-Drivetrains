@@ -1,0 +1,3 @@
+[console_scripts]
+coop_keyboard_teleop = coop_keyboard_teleop.coop_keyboard_teleop:main
+

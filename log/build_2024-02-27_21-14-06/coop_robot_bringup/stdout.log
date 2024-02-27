@@ -1,0 +1,60 @@
+-- The C compiler identification is GNU 12.3.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found ament_cmake: 1.3.8 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/fang/coop_ws/src/build/coop_robot_bringup
+-- Install configuration: ""
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/pi_diff.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/car_gazebo.launch.xml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/mec.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/leader.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/mecanum_spawn.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/coop_gazeo.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/my_robot_gazebo.launch.xml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/spawn_long_pallet.xml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/pi_mec.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/diffdrive_spawn.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//launch/ackermann_spawn.launch.py
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//rviz
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//rviz/urdf_config.rviz
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/test_world.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/coop.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/car.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/coop_test.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/coop_test3.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//worlds/coop_test2.world
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config/mapper_params_online_async.yaml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config/ekf_mec.yaml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config/nav2_params.yaml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config/ackermann_control.yaml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup//config/ekf.yaml
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/ament_index/resource_index/package_run_dependencies/coop_robot_bringup
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/ament_index/resource_index/parent_prefix_path/coop_robot_bringup
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/environment/ament_prefix_path.sh
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/environment/ament_prefix_path.dsv
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/environment/path.sh
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/environment/path.dsv
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/local_setup.bash
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/local_setup.sh
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/local_setup.zsh
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/local_setup.dsv
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/package.dsv
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/ament_index/resource_index/packages/coop_robot_bringup
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/cmake/coop_robot_bringupConfig.cmake
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/cmake/coop_robot_bringupConfig-version.cmake
+-- Installing: /home/fang/coop_ws/src/install/coop_robot_bringup/share/coop_robot_bringup/package.xml

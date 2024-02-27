@@ -1,0 +1,70 @@
+[0.445s] Invoking command in '/home/fang/coop_ws/src/build/xicro_pkg': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake /home/fang/coop_ws/src/Xicro/xicro_pkg -DCMAKE_INSTALL_PREFIX=/home/fang/coop_ws/src/install/xicro_pkg
+[0.478s] -- The C compiler identification is GNU 12.3.0
+[0.513s] -- The CXX compiler identification is GNU 11.4.0
+[0.518s] -- Detecting C compiler ABI info
+[0.559s] -- Detecting C compiler ABI info - done
+[0.563s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.563s] -- Detecting C compile features
+[0.563s] -- Detecting C compile features - done
+[0.565s] -- Detecting CXX compiler ABI info
+[0.613s] -- Detecting CXX compiler ABI info - done
+[0.618s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.618s] -- Detecting CXX compile features
+[0.618s] -- Detecting CXX compile features - done
+[0.620s] -- Found ament_cmake: 1.3.8 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.741s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.803s] -- Found rclcpp: 16.0.8 (/opt/ros/humble/share/rclcpp/cmake)
+[0.835s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.838s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.845s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.854s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.868s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.920s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.922s] -- Found rmw_cyclonedds_cpp: 1.3.4 (/opt/ros/humble/share/rmw_cyclonedds_cpp/cmake)
+[0.954s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[0.962s] -- Looking for pthread.h
+[1.007s] -- Looking for pthread.h - found
+[1.007s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.056s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[1.056s] -- Found Threads: TRUE  
+[1.159s] -- Found rclpy: 3.3.12 (/opt/ros/humble/share/rclpy/cmake)
+[1.254s] -- Configuring done
+[1.256s] -- Generating done
+[1.257s] -- Build files have been written to: /home/fang/coop_ws/src/build/xicro_pkg
+[1.263s] Invoked command in '/home/fang/coop_ws/src/build/xicro_pkg' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake /home/fang/coop_ws/src/Xicro/xicro_pkg -DCMAKE_INSTALL_PREFIX=/home/fang/coop_ws/src/install/xicro_pkg
+[1.263s] Invoking command in '/home/fang/coop_ws/src/build/xicro_pkg': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake --build /home/fang/coop_ws/src/build/xicro_pkg -- -j16 -l16
+[1.296s] Built target ament_cmake_python_copy_xicro_pkg
+[1.443s] running egg_info
+[1.444s] creating xicro_pkg.egg-info
+[1.444s] writing xicro_pkg.egg-info/PKG-INFO
+[1.444s] writing dependency_links to xicro_pkg.egg-info/dependency_links.txt
+[1.444s] writing top-level names to xicro_pkg.egg-info/top_level.txt
+[1.444s] writing manifest file 'xicro_pkg.egg-info/SOURCES.txt'
+[1.445s] reading manifest file 'xicro_pkg.egg-info/SOURCES.txt'
+[1.446s] writing manifest file 'xicro_pkg.egg-info/SOURCES.txt'
+[1.462s] Built target ament_cmake_python_build_xicro_pkg_egg
+[1.469s] Invoked command in '/home/fang/coop_ws/src/build/xicro_pkg' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake --build /home/fang/coop_ws/src/build/xicro_pkg -- -j16 -l16
+[1.482s] Invoking command in '/home/fang/coop_ws/src/build/xicro_pkg': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake --install /home/fang/coop_ws/src/build/xicro_pkg
+[1.486s] -- Install configuration: ""
+[1.486s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/share/xicro_pkg/environment/pythonpath.sh
+[1.486s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/share/xicro_pkg/environment/pythonpath.dsv
+[1.486s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg-0.0.0-py3.10.egg-info
+[1.486s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg-0.0.0-py3.10.egg-info/SOURCES.txt
+[1.486s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg-0.0.0-py3.10.egg-info/PKG-INFO
+[1.487s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg-0.0.0-py3.10.egg-info/top_level.txt
+[1.487s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg-0.0.0-py3.10.egg-info/dependency_links.txt
+[1.487s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg
+[1.487s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg/__init__.py
+[1.509s] Listing '/home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg'...
+[1.509s] Compiling '/home/fang/coop_ws/src/install/xicro_pkg/local/lib/python3.10/dist-packages/xicro_pkg/__init__.py'...
+[1.512s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/lib/xicro_pkg/generate_library.py
+[1.512s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/lib/xicro_pkg/generate_xicro_node.py
+[1.512s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/lib/xicro_pkg/xicro_node_ack_xicro_ID_2_arduino.py
+[1.512s] -- Installing: /home/fang/coop_ws/src/install/xicro_pkg/lib/xicro_pkg/xicro_node_diffdrive_ID_1_arduino.py
+[1.512s] [31mCMake Error at cmake_install.cmake:70 (file):
+[1.512s]   file INSTALL cannot find
+[1.512s]   "/home/fang/coop_ws/src/Xicro/xicro_pkg/scripts/xicro_node_mec_xicro_ID_3_arduino.py":
+[1.512s]   No such file or directory.
+[1.513s] 
+[1.513s] [0m
+[1.514s] Invoked command in '/home/fang/coop_ws/src/build/xicro_pkg' returned '1': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake --install /home/fang/coop_ws/src/build/xicro_pkg

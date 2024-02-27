@@ -1,0 +1,83 @@
+[0.413s] Invoking command in '/home/fang/coop_ws/src/build/ydlidar_ros2_driver': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake /home/fang/coop_ws/src/ydlidar_ros2_driver -DCMAKE_INSTALL_PREFIX=/home/fang/coop_ws/src/install/ydlidar_ros2_driver
+[0.445s] -- The C compiler identification is GNU 12.3.0
+[0.479s] -- The CXX compiler identification is GNU 11.4.0
+[0.483s] -- Detecting C compiler ABI info
+[0.525s] -- Detecting C compiler ABI info - done
+[0.531s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.531s] -- Detecting C compile features
+[0.531s] -- Detecting C compile features - done
+[0.533s] -- Detecting CXX compiler ABI info
+[0.580s] -- Detecting CXX compiler ABI info - done
+[0.585s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.585s] -- Detecting CXX compile features
+[0.585s] -- Detecting CXX compile features - done
+[0.587s] -- Found ament_cmake: 1.3.8 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.705s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[0.778s] -- Found rclcpp: 16.0.8 (/opt/ros/humble/share/rclcpp/cmake)
+[0.811s] -- Found rosidl_generator_c: 3.1.5 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.815s] -- Found rosidl_adapter: 3.1.5 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.821s] -- Found rosidl_generator_cpp: 3.1.5 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.831s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.852s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.914s] -- Found rmw_implementation_cmake: 6.1.1 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.916s] -- Found rmw_cyclonedds_cpp: 1.3.4 (/opt/ros/humble/share/rmw_cyclonedds_cpp/cmake)
+[0.940s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[0.947s] -- Looking for pthread.h
+[0.996s] -- Looking for pthread.h - found
+[0.996s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[1.045s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[1.046s] -- Found Threads: TRUE  
+[1.147s] -- Found sensor_msgs: 4.2.3 (/opt/ros/humble/share/sensor_msgs/cmake)
+[1.225s] -- Found visualization_msgs: 4.2.3 (/opt/ros/humble/share/visualization_msgs/cmake)
+[1.302s] -- Found std_srvs: 4.2.3 (/opt/ros/humble/share/std_srvs/cmake)
+[1.317s] -- Found ament_lint_auto: 0.12.10 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[1.373s] -- Added test 'copyright' to check source files copyright and LICENSE
+[1.374s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[1.374s] -- Configured cppcheck include dirs: /home/fang/coop_ws/src/ydlidar_ros2_driver/src
+[1.374s] -- Configured cppcheck exclude dirs and/or files: 
+[1.375s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[1.375s] -- Configured cpplint exclude dirs and/or files: 
+[1.375s] -- Added test 'flake8' to check Python code syntax and style conventions
+[1.376s] -- Added test 'lint_cmake' to check CMake code style
+[1.376s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[1.377s] -- Added test 'uncrustify' to check C / C++ code style
+[1.377s] -- Configured uncrustify additional arguments: 
+[1.377s] -- Added test 'xmllint' to check XML markup files
+[1.378s] -- Configuring done
+[1.385s] -- Generating done
+[1.387s] -- Build files have been written to: /home/fang/coop_ws/src/build/ydlidar_ros2_driver
+[1.393s] Invoked command in '/home/fang/coop_ws/src/build/ydlidar_ros2_driver' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake /home/fang/coop_ws/src/ydlidar_ros2_driver -DCMAKE_INSTALL_PREFIX=/home/fang/coop_ws/src/install/ydlidar_ros2_driver
+[1.393s] Invoking command in '/home/fang/coop_ws/src/build/ydlidar_ros2_driver': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/home/fang/coop_ws/install/coop_keyboard_teleop:/home/fang/coop_ws/install/coop_controller:/home/fang/ros2_ws/install/my_py_pkg:/home/fang/ros2_ws/install/coop_keyboard_teleop:/opt/ros/humble /usr/bin/cmake --build /home/fang/coop_ws/src/build/ydlidar_ros2_driver -- -j16 -l16
+[1.423s] [ 50%] [32mBuilding CXX object CMakeFiles/ydlidar_ros2_driver_client.dir/src/ydlidar_ros2_driver_client.cpp.o[0m
+[1.423s] [ 50%] [32mBuilding CXX object CMakeFiles/ydlidar_ros2_driver_node.dir/src/ydlidar_ros2_driver_node.cpp.o[0m
+[2.807s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:[m[K In lambda function:
+[2.807s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:169:54:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Krequest_header[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.807s]   169 | [01;35m[K std::shared_ptr<rmw_request_id_t> request_header[m[K,
+[2.807s]       |  [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~[m[K
+[2.807s] 
+[2.807s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:170:56:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kreq[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.807s]   170 | [01;35m[Kshared_ptr<std_srvs::srv::Empty::Request> req[m[K,
+[2.807s]       | [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~[m[K
+[2.807s] 
+[2.807s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:171:51:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kresponse[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.807s]   171 | [01;35m[Ktr<std_srvs::srv::Empty::Response> response[m[K) -> bool
+[2.807s]       | [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~[m[K
+[2.807s] 
+[2.815s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:[m[K In lambda function:
+[2.815s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:179:54:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Krequest_header[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.815s]   179 | [01;35m[K std::shared_ptr<rmw_request_id_t> request_header[m[K,
+[2.815s]       |  [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~[m[K
+[2.815s] 
+[2.815s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:180:56:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kreq[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.815s]   180 | [01;35m[Kshared_ptr<std_srvs::srv::Empty::Request> req[m[K,
+[2.815s]       | [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~[m[K
+[2.815s] 
+[2.815s] [01m[K/home/fang/coop_ws/src/ydlidar_ros2_driver/src/ydlidar_ros2_driver_node.cpp:181:51:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kresponse[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-parameter-Wunused-parameter]8;;[m[K]
+[2.815s]   181 | [01;35m[Ktr<std_srvs::srv::Empty::Response> response[m[K) -> bool
+[2.815s]       | [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~[m[K
+[2.815s] 
+[3.609s] gmake[2]: *** [CMakeFiles/ydlidar_ros2_driver_node.dir/build.make:76: CMakeFiles/ydlidar_ros2_driver_node.dir/src/ydlidar_ros2_driver_node.cpp.o] Interrupt
+[3.609s] gmake[2]: *** [CMakeFiles/ydlidar_ros2_driver_client.dir/build.make:76: CMakeFiles/ydlidar_ros2_driver_client.dir/src/ydlidar_ros2_driver_client.cpp.o] Interrupt
+[3.609s] gmake[1]: *** [CMakeFiles/Makefile2:139: CMakeFiles/ydlidar_ros2_driver_node.dir/all] Interrupt
+[3.610s] gmake[1]: *** [CMakeFiles/Makefile2:165: CMakeFiles/ydlidar_ros2_driver_client.dir/all] Interrupt
+[3.610s] gmake: *** [Makefile:146: all] Interrupt

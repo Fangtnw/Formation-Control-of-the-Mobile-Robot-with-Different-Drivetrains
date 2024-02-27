@@ -1,0 +1,31 @@
+running egg_info
+creating ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info
+writing ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/PKG-INFO
+writing dependency_links to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/dependency_links.txt
+writing entry points to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/entry_points.txt
+writing requirements to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/requires.txt
+writing top-level names to ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/top_level.txt
+writing manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+reading manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+writing manifest file '../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build
+creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib
+creating /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+copying coop_keyboard_teleop/coop_keyboard_teleop.py -> /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+copying coop_keyboard_teleop/__init__.py -> /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop
+running install
+running install_lib
+creating /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+copying /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop/coop_keyboard_teleop.py -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+copying /home/fang/coop_ws/src/build/coop_keyboard_teleop/build/lib/coop_keyboard_teleop/__init__.py -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop
+byte-compiling /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop/coop_keyboard_teleop.py to coop_keyboard_teleop.cpython-310.pyc
+byte-compiling /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop/__init__.py to __init__.cpython-310.pyc
+running install_data
+copying package.xml -> /home/fang/coop_ws/src/install/coop_keyboard_teleop/share/coop_keyboard_teleop
+running install_egg_info
+Copying ../build/coop_keyboard_teleop/coop_keyboard_teleop.egg-info to /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/python3.10/site-packages/coop_keyboard_teleop-0.0.0-py3.10.egg-info
+running install_scripts
+Installing coop_keyboard_teleop script to /home/fang/coop_ws/src/install/coop_keyboard_teleop/lib/coop_keyboard_teleop
+writing list of installed files to '/home/fang/coop_ws/src/build/coop_keyboard_teleop/install.log'
