@@ -66,7 +66,7 @@ class OdometryNode(Node):
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
-        odom_msg.child_frame_id = "base_footprint"
+        odom_msg.child_frame_id = "base_footprint_diff"
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
