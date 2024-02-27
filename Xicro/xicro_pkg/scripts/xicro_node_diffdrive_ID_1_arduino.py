@@ -478,9 +478,9 @@ class Subscriber_node(Node):
         time.sleep(1)
 
         # gen sub
-        #gen        self.subscription_cmd_vel = self.create_subscription(Twist,'cmd_vel',self.callback_cmd_vel,10)        self.callback_cmd_vel
+        #gen        self.subscription_cmd_vel_follower = self.create_subscription(Twist,'cmd_vel_follower',self.callback_cmd_vel_follower,10)        self.callback_cmd_vel_follower
     # gen callback sub
-    # gen callback Sub    def callback_cmd_vel(self,msg):        self.xicro_instruction._Reset_Buff()        self.xicro_instruction._Reset_CRC()        self.xicro_instruction._SendStart()        self.xicro_instruction._SendSignature(1,2)        self.xicro_instruction._SendIdtopic(1)        self.xicro_instruction._SendFloat32(msg.linear.x,1)
+    # gen callback Sub    def callback_cmd_vel_follower(self,msg):        self.xicro_instruction._Reset_Buff()        self.xicro_instruction._Reset_CRC()        self.xicro_instruction._SendStart()        self.xicro_instruction._SendSignature(1,2)        self.xicro_instruction._SendIdtopic(1)        self.xicro_instruction._SendFloat32(msg.linear.x,1)
         self.xicro_instruction._SendContinue()        self.xicro_instruction._SendFloat32(msg.linear.y,1)
         self.xicro_instruction._SendContinue()        self.xicro_instruction._SendFloat32(msg.linear.z,1)
         self.xicro_instruction._SendContinue()        self.xicro_instruction._SendFloat32(msg.angular.x,1)

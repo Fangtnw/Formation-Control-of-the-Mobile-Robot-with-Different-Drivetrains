@@ -82,22 +82,14 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                # linear_vel_x =  ty * 5  
-                # if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                #     self.direction = -1.0 
-                # elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                #     self.direction = 1.0
-                # angular_vel = ty * 5  * self.direction
-                    
-                # if abs(ty) < 0.2:
-                #     if self.direction == 1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
-                #         self.direction = -1.0 
-                #     elif self.direction == -1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
-                #         self.direction = 1.0
-                #     angular_vel = (abs(rz) - 1) * 50  * self.direction  
-                
                 linear_vel_x = (tx-1.5) * 5  
-                if abs(tx - 1.5) < 0.2 :
+                if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
+                    self.direction = -1.0 
+                elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
+                    self.direction = 1.0
+                angular_vel = ty * 5  * self.direction
+                    
+                if abs(tx - 1.5) < 0.2 and ty < 0.2:
                     if self.direction == 1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
                         self.direction = -1.0 
                     elif self.direction == -1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction

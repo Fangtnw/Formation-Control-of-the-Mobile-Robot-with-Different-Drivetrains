@@ -36,7 +36,7 @@ def generate_launch_description():
                 'gzserver.launch.py'
             ])
         ]),
-        launch_arguments={'world': get_package_share_directory('my_robot_description') + '/urdf/workshop_test.world','verbose': 'false'}.items(),
+        launch_arguments={'world': get_package_share_directory('my_robot_description') + '/urdf/workshop_test.world','verbose': 'true'}.items(),
     )   
 
     gazebo_client = IncludeLaunchDescription(
@@ -92,7 +92,7 @@ def generate_launch_description():
     )   
 
         
-    tf_diff_to_mec= Node(
+    tf_ack_to_mec= Node(
             package="tf2_ros",
             executable="static_transform_publisher",
             name="diff_to_mec_tf_publisher",
@@ -100,7 +100,7 @@ def generate_launch_description():
             arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "mec_odom"]
         )
     
-    tf_ack_to_mec= Node(
+    tf_ack_to_diff= Node(
             package="tf2_ros",
             executable="static_transform_publisher",
             name="ack_to_mec_tf_publisher",
@@ -112,10 +112,12 @@ def generate_launch_description():
         gazebo_server,
         gazebo_client,
         # joint_state_publisher_gui,
-        # spawn_diffdrive,
-        spawn_mecanum,
-        tf_diff_to_mec,
         spawn_ackermann,
-        tf_ack_to_mec,
+   
+        # spawn_diffdrive,
+        # spawn_mecanum,
+        # tf_ack_to_mec,
+
+        tf_ack_to_diff,
         rviz2,
     ])

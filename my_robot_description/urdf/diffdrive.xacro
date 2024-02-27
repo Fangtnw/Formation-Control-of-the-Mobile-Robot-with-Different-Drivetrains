@@ -83,10 +83,23 @@
           filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/base_link.STL" />
       </geometry>
       <surface>
+        <contact>
+          <poissons_ratio>0.347</poissons_ratio>
+          <elastic_modulus>8.8e+09</elastic_modulus>
+          <ode>
+            <soft_cfm>0.0</soft_cfm>
+            <soft_erp>0.2</soft_erp>
+            <kp>1e25</kp>
+            <kd>1e13</kd>
+            <max_vel>0.01</max_vel>
+            <min_depth>0.0001</min_depth>
+          </ode>
+        </contact>
         <friction>
           <ode>
-            <mu>0.001</mu>
-            <mu2>0.001</mu2>
+            <mu>0.1</mu>
+            <mu2>0.1</mu2>
+        <fdir1>1 0 0</fdir1>
           </ode>
         </friction>
       </surface>

@@ -46,11 +46,14 @@
         xyz="-1.14613076807046E-08 -4.91918539569092E-07 -0.0135289818533382"
         rpy="0 0 0" />
       <mass
-        value="0.5" />
+        value="5" />
       <inertia
-        ixx="0.01" ixy="0.0" ixz="0.0"
-        iyy="0.01" iyz="0.0"
-        izz="0.01"/>
+        ixx="0.0576995775576278"
+        ixy="5.10236521313111E-19"
+        ixz="-5.64437487412692E-14"
+        iyy="0.0133526650283985"
+        iyz="-4.8820083846232E-08"
+        izz="0.0706132037943649" />
     </inertial>
     <visual>
       <origin
@@ -85,7 +88,7 @@
         xyz="0.0194370630585373 -0.0176353488184189 0.00817275304865103"
         rpy="0 0 0" />
       <mass
-        value="0.0002" />
+        value="2.1" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -118,17 +121,16 @@
     name="joint_fr_right"
     type="fixed">
     <origin
-      xyz="0.196431540449915 0.18250000000009 -0.0500000000000465"
-      rpy="2.56826265176299 -0.701812030330357 2.7542816171153" />
+      xyz="0.195390712673452 0.172500000000024 -0.0850000000000468"
+      rpy="1.5707963267949 0 1.5707963267949" />
     <parent
       link="base_link_mec" />
     <child
       link="wheel_fr_right" />
     <axis
-      xyz="0.707106781183754 -0.64156167526822 0.297319048886856" />
-   
-    
+      xyz="0 0 -1" />
   </joint>
+
   <link
     name="wheel_bk_right">
     <inertial>
@@ -136,7 +138,7 @@
         xyz="0.0194370630585368 -0.017635348818419 0.00817275304865139"
         rpy="0 0 0" />
       <mass
-        value="0.0002" />
+        value="2.1" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -169,14 +171,14 @@
     name="joint_bk_right"
     type="fixed">
     <origin
-      xyz="0.196431540449915 -0.182499999999932 -0.0500000000000465"
-      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
+      xyz="0.195390712673452 -0.192499999999931 -0.0850000000000466"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
     <parent
       link="base_link_mec" />
     <child
       link="wheel_bk_right" />
     <axis
-      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
+      xyz="0 0 -1" />
   </joint>
 
   <link
@@ -186,7 +188,7 @@
         xyz="0.0194370630585371 -0.0176353488184191 0.00817275304865112"
         rpy="0 0 0" />
       <mass
-        value="0.0002" />
+        value="2.1" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -219,14 +221,14 @@
     name="joint_fr_left"
     type="fixed">
     <origin
-      xyz="-0.141459172223538 0.18250000000009 -0.0500000000000464"
-      rpy="2.56826265176299 -0.701812030330358 2.7542816171153" />
+      xyz="-0.195390712673501 0.172500000000024 -0.085000000000046"
+      rpy="1.5707963267949 0 -1.5707963267949" />
     <parent
       link="base_link_mec" />
     <child
       link="wheel_fr_left" />
     <axis
-      xyz="0.707106781183754 -0.641561675268221 0.297319048886855" />
+      xyz="0 0 1" />
   </joint>
   
   <link
@@ -236,7 +238,7 @@
         xyz="0.019437063058537 -0.0176353488184191 0.00817275304865073"
         rpy="0 0 0" />
       <mass
-        value="0.0002" />
+        value="2.1" />
       <inertia
         ixx="0.01" ixy="0.0" ixz="0.0"
         iyy="0.01" iyz="0.0"
@@ -269,17 +271,32 @@
     name="joint_bk_left"
     type="fixed">
     <origin
-      xyz="-0.141459172223538 -0.182499999999932 -0.0500000000000464"
-      rpy="2.56826265176298 -0.701812030330358 2.7542816171153" />
+      xyz="-0.195390712673501 -0.192499999999931 -0.085000000000046"
+      rpy="1.5707963267949 0 -1.5707963267949" />
     <parent
       link="base_link_mec" />
     <child
       link="wheel_bk_left" />
     <axis
-      xyz="0.707106781183753 -0.641561675268222 0.297319048886854" />
-   
-
+      xyz="0 0 1" />
   </joint>
+
+    <gazebo reference="wheel_fr_left">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_fr_right">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_bk_left">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_bk_right">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
 
 <gazebo>
   <plugin name="gazebo_ros_planar_move" filename="libgazebo_ros_planar_move.so">

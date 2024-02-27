@@ -62,8 +62,8 @@ int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
                                                       
 // PID Parameters
-const double PID_left_param[] = { 0.3, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
-const double PID_right_param[] = { 0.3 , 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
+const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_right_param[] = { 1 , 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -109,9 +109,9 @@ class motor{
 void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
   
-  speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
+  speed_req = xicro.Subscription_cmd_vel_follower.message.linear.x;          //Extract the commanded linear speed from the message
 
-  angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
+  angular_speed_req = xicro.Subscription_cmd_vel_follower.message.angular.z; //Extract the commanded angular speed from the message
   
   speed_req_left = speed_req - angular_speed_req*(wheelbase/2);     //Calculate the required speed for the left motor to comply with commanded linear and angular speeds
   speed_req_right = speed_req + angular_speed_req*(wheelbase/2);    //Calculate the required speed for the right motor to comply with commanded linear and angular speeds

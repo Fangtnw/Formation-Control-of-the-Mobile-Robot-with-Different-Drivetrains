@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             "diffdrive_odom = coop_controller.diffdrive_odom:main",
             "mec_odom = coop_controller.mec_odom:main",
-            "formation_controller = coop_controller.formation_controller:main"
+            "formation_controller = coop_controller.formation_controller:main",
+            "odom_test = coop_controller.odom_test:main"
         ],
     },
 )

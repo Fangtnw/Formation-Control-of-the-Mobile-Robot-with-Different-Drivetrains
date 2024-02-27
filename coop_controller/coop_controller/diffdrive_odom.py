@@ -32,7 +32,7 @@ class OdometryNode(Node):
         self.Robot_Yaw = 0.0
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
-        self.odom_pub = self.create_publisher(Odometry, 'diff_odom_raw', 100)
+        self.odom_pub = self.create_publisher(Odometry, 'diff_odom_raw', 1)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'diff_encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
@@ -41,7 +41,7 @@ class OdometryNode(Node):
         #     Vector3Stamped, 'diff_imu', self.imu_callback, 1)
 
         self.tf_broadcaster = TransformBroadcaster(self)
-        self.timer = self.create_timer(0.05, self.publish_odometry)
+        self.timer = self.create_timer(0.1, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
         self.right_encoder_ticks = msg.vector.x
@@ -70,7 +70,7 @@ class OdometryNode(Node):
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.05
+        time_step = 0.1
         self.forward_kinematic()
         self.odom_compute(time_step)
 
@@ -100,10 +100,10 @@ class OdometryNode(Node):
         # Publish odometry message
         self.odom_pub.publish(odom_msg)
 
-        # map_to_odom_transform = TransformStamped()
-        # map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
-        # map_to_odom_transform.header.frame_id = 'map'
-        # map_to_odom_transform.child_frame_id = 'odom'
+        map_to_odom_transform = TransformStamped()
+        map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
+        map_to_odom_transform.header.frame_id = 'map'
+        map_to_odom_transform.child_frame_id = 'odom_diff'
         # map_to_odom_transform.transform.translation.x = self.Robot_X
         # map_to_odom_transform.transform.translation.y = self.Robot_Y
         # map_to_odom_transform.transform.translation.z = 0.0
@@ -115,30 +115,27 @@ class OdometryNode(Node):
         transform = TransformStamped()
         transform.header = Header()
         transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = 'odom'
-        transform.child_frame_id = 'base_link'
+        transform.header.frame_id = 'odom_diff'
+        transform.child_frame_id = 'base_footprint_diff'
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0
         quaternion = tf_transformations.quaternion_from_euler(0.0, 0.0, self.Robot_Yaw)
-        transform.transform.rotation.x = quaternion[0]
-        transform.transform.rotation.y = quaternion[1]
-        transform.transform.rotation.z = quaternion[2]
-        transform.transform.rotation.w = quaternion[3]
-
-        # self.tf_broadcaster.sendTransform(transform)
+        transform.transform.rotation.z = sin(self.Robot_Yaw / 2)
+        transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
+        self.tf_broadcaster.sendTransform(transform)
 
         # Publish TF transform from 'base_link' to 'base_footprint'
         transform_base_link_to_base_footprint = TransformStamped()
         transform_base_link_to_base_footprint.header.stamp = self.get_clock().now().to_msg()
-        transform_base_link_to_base_footprint.header.frame_id = 'base_footprint'
-        transform_base_link_to_base_footprint.child_frame_id = 'base_link'
+        transform_base_link_to_base_footprint.header.frame_id = 'base_footprint_diff'
+        transform_base_link_to_base_footprint.child_frame_id = 'base_link_diff'
         transform_base_link_to_base_footprint.transform.translation.x = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.translation.y = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.translation.z = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.rotation.z = 0.0  # Adjust as needed
         transform_base_link_to_base_footprint.transform.rotation.w = 1.0  # Adjust as needed
-        self.tf_broadcaster.sendTransform(transform_base_link_to_base_footprint)
+        # self.tf_broadcaster.sendTransform(transform_base_link_to_base_footprint)
 
     def forward_kinematic(self):
         self.Robot_LinVel = (self.right_vel + self.left_vel) * 0.5
