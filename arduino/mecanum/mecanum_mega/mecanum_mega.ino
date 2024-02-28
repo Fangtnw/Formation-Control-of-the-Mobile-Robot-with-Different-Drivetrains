@@ -31,7 +31,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 // Other encoder output to Arduino to keep track of wheel direction
 // Tracks the direction of rotation.
 #define encoder_encoder1B 22
-#define encoder_encoder2B 24
+#define encoder_encoder2B 2
 #define encoder_encoder3B 26
 #define encoder_encoder4B 28
 
