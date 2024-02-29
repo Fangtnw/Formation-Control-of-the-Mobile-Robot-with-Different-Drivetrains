@@ -9,8 +9,8 @@ from math import sin, cos, tan
 import tf2_ros
 from tf2_ros import TransformBroadcaster
 
-wheel_distance = 0.55
-length = 0.55
+wheel_distance = 0.5
+length = 0.47
 
 class OdometryNode(Node):
     def __init__(self):
@@ -23,6 +23,8 @@ class OdometryNode(Node):
         self.left_vel = 0.0
         self.right_vel = 0.0
         self.angular_velocity = 0.0
+        self.avg_vel = 0.0
+        self.steering_angle = 0.0
 
         # Initialize the robot state variables
         self.Robot_X = 0.0
@@ -40,7 +42,7 @@ class OdometryNode(Node):
             Vector3Stamped, 'ack_IMU', self.imu_callback, 1)
 
         self.tf_broadcaster = TransformBroadcaster(self)
-        self.timer = self.create_timer(0.05, self.publish_odometry)
+        self.timer = self.create_timer(0.1, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
         self.left_encoder_ticks = msg.vector.x
@@ -49,7 +51,8 @@ class OdometryNode(Node):
     def encoder_vel_callback(self, msg):
         self.left_vel = msg.vector.x
         self.right_vel = msg.vector.y
-        self.steering_angle = msg.vector.z
+        #self.steering_angle = msg.vector.z
+        self.steering_angle = 0.0
         self.avg_vel = (self.left_vel+self.right_vel)/2
 
     def imu_callback(self, msg):
@@ -60,15 +63,15 @@ class OdometryNode(Node):
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
-        odom_msg.header.frame_id = 'map'
+        odom_msg.header.frame_id = 'ack_odom'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
-        odom_msg.child_frame_id = "base_link"
+        odom_msg.child_frame_id = "ack_base_footprint"
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.05  # replace with your actual time step
+        time_step = 0.1  # replace with your actual time step
         self.forward_kinematic()
         self.odom_compute(time_step)
 
@@ -100,7 +103,7 @@ class OdometryNode(Node):
         transform.header = Header()
         transform.header.stamp = self.get_clock().now().to_msg()
         transform.header.frame_id = 'ack_odom'
-        transform.child_frame_id = 'ack_base_link'
+        transform.child_frame_id = 'ack_base_footprint'
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0
@@ -109,7 +112,7 @@ class OdometryNode(Node):
         self.tf_broadcaster.sendTransform(transform)
 
     def forward_kinematic(self):
-        self.Robot_LinVel = self.avg_vel
+        self.Robot_LinVel = (self.left_vel + self.right_vel) /2
         self.Robot_AngVel = self.avg_vel * tan(self.steering_angle) / length
 
     def odom_compute(self, time_step):

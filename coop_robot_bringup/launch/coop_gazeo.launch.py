@@ -115,9 +115,9 @@ def generate_launch_description():
         spawn_ackermann,
    
         # spawn_diffdrive,
-        # spawn_mecanum,
-        # tf_ack_to_mec,
+        spawn_mecanum,
+        tf_ack_to_mec,
 
-        tf_ack_to_diff,
+        # tf_ack_to_diff,
         rviz2,
     ])

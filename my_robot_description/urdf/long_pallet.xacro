@@ -53,21 +53,22 @@
           <elastic_modulus>8.8e+09</elastic_modulus>
           <ode>
             <soft_cfm>0.0</soft_cfm>
-            <soft_erp>0.2</soft_erp>
-            <kp>1e25</kp>
+            <soft_erp>2e25</soft_erp>
+            <kp>1e15</kp>
             <kd>1e13</kd>
             <max_vel>0.01</max_vel>
-            <min_depth>0.0001</min_depth>
+            <min_depth>100</min_depth>
           </ode>
         </contact>
         <friction>
-          <ode>
-            <mu>1000</mu>
-            <mu2>1000</mu2>
-        <fdir1>1 0 0</fdir1>
-          </ode>
+            <fdir1>0 0 0</fdir1>
+            <mu>1</mu>
+            <slip2>0</slip2>
+            <mu2>1</mu2>
+            <slip1>0</slip1>
         </friction>
       </surface>
+      <contact_coefficients mu ="1" kp="1e15" kd="1"/> 
     </collision>
   </link>
   
