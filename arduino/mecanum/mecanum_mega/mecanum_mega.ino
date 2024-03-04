@@ -426,7 +426,7 @@ void IMUbringup(){
     xicro.Publisher_mec_imu.message.linear.x = mpu.getAngleX();
     xicro.Publisher_mec_imu.message.linear.y = mpu.getAngleY();
     xicro.Publisher_mec_imu.message.angular.z = mpu.getAngleZ();
-    xicro.Publisher_mec_imu_raw.message.header.frame_id = "Imu";
+    xicro.Publisher_mec_imu_raw.message.header.frame_id = "Imu_mec";
 
     xicro.Publisher_mec_imu_raw.message.linear_acceleration.x = mpu.getAccX();
     xicro.Publisher_mec_imu_raw.message.linear_acceleration.y = mpu.getAccY();

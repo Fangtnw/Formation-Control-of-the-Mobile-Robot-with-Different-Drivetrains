@@ -36,7 +36,7 @@ def generate_launch_description():
                 'gzserver.launch.py'
             ])
         ]),
-        launch_arguments={'world': get_package_share_directory('my_robot_description') + '/urdf/workshop_test.world','verbose': 'true'}.items(),
+        launch_arguments={'world': get_package_share_directory('my_robot_description') + '/urdf/workshop_test.world','verbose': 'false'}.items(),
     )   
 
     gazebo_client = IncludeLaunchDescription(
@@ -112,11 +112,11 @@ def generate_launch_description():
         gazebo_server,
         gazebo_client,
         # joint_state_publisher_gui,
-        spawn_ackermann,
+        # spawn_ackermann,
    
-        # spawn_diffdrive,
-        spawn_mecanum,
-        tf_ack_to_mec,
+        spawn_diffdrive,
+        # spawn_mecanum,
+        # tf_ack_to_mec,
 
         # tf_ack_to_diff,
         rviz2,

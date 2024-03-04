@@ -4,7 +4,7 @@
 #include <Servo.h>
 #include <MPU6050_light.h>
 
- MPU6050 mpu(Wire);
+MPU6050 mpu(Wire);
 Servo myservo; 
 Xicro xicro;
 
@@ -268,10 +268,10 @@ void publishSpeed(double time) {
     xicro.Publisher_diff_encoder_vel.message.vector.x = speed_act_right;
     xicro.Publisher_diff_encoder_vel.message.vector.y = speed_act_left;
     xicro.Publisher_diff_encoder_vel.message.vector.z = 1000;
-  xicro.publish_diff_encoder_vel();
-  xicro.publish_diff_encoder_tick();
-  xicro.publish_diff_imu();
-  xicro.publish_diff_imu_raw();
+    xicro.publish_diff_encoder_vel();
+    xicro.publish_diff_encoder_tick();
+    xicro.publish_diff_imu();
+    xicro.publish_diff_imu_raw();
   
   xicro.Publisher_diff_speed_req.message.vector.x = speed_req_right;
   xicro.Publisher_diff_speed_req.message.vector.y = speed_req_left;

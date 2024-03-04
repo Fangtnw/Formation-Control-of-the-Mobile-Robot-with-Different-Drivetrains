@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_diff=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','diffdrive.xacro')
+                           'urdf','diffdrive_control.xacro')
 
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -66,9 +66,39 @@ def generate_launch_description():
         output='screen'
     )
 
+    load_joint_state_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="diffdrive",
+        arguments=["joint_state_broadcaster", "--controller-manager", "/diffdrive/controller_manager"]
+    )
+    
+    load_diff_drive_base_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="diffdrive",
+        arguments=["diff_drive_controller", "--controller-manager", "/diffdrive/controller_manager"]
+    )
+
+    # load_joint_state_broadcaster = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+    #          'joint_state_broadcaster'],
+    #     output='screen'
+    # )
+
+    # load_diff_drive_base_controller = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+    #          'diff_drive_base_controller'],
+    #     output='screen'
+    # )
+
 
     return LaunchDescription([
-        spawn_follow_diffdrive,
+
         # spawn_diffdrive,
+
         diff_state_publisher,
+        spawn_follow_diffdrive,
+        load_joint_state_broadcaster,
+        load_diff_drive_base_controller,
     ])

@@ -10,16 +10,16 @@ slam_toolbox:
     ceres_loss_function: None
 
     # ROS Parameters
-    odom_frame: odom
+    odom_frame: odom_diff
     map_frame: map
-    base_frame: base_footprint
+    base_frame: base_footprint_diff
     scan_topic: /scan
-    mode: localization
+    mode: mapping
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
-    map_file_name: /home/fang/mappy.yaml
+    # map_file_name: /home/fang/mappy.yaml
     # # map_start_pose: [0.0, 0.0, 0.0]
     # map_start_at_dock: False
 

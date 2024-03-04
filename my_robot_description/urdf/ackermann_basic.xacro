@@ -76,27 +76,7 @@
         <mesh
           filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/base_link.STL" />
       </geometry>
-      <surface>
-        <contact>
-          <poissons_ratio>0.347</poissons_ratio>
-          <elastic_modulus>8.8e+09</elastic_modulus>
-          <ode>
-            <soft_cfm>0.0</soft_cfm>
-            <soft_erp>0.2</soft_erp>
-            <kp>1e25</kp>
-            <kd>1e13</kd>
-            <max_vel>0.01</max_vel>
-            <min_depth>0.0001</min_depth>
-          </ode>
-        </contact>
-        <friction>
-          <ode>
-            <mu>0.1</mu>
-            <mu2>0.1</mu2>
-        <fdir1>1 0 0</fdir1>
-          </ode>
-        </friction>
-      </surface>
+
     </collision>
   </link>
   <link
@@ -212,7 +192,7 @@
         xyz="0.0121532099874294 -0.0166916241895938 -0.0211847288398316"
         rpy="0 0 0" />
       <mass
-        value="4" />
+        value="2" />
       <inertia
         ixx="1.43958495481578E-05"
         ixy="-1.73339990683825E-06"
@@ -318,7 +298,7 @@
         xyz="-0.0138648104691156 -0.0152975676601856 -0.021184728839829"
         rpy="0 0 0" />
       <mass
-        value="4" />
+        value="2" />
       <inertia
         ixx="1.49389187707206E-05"
         ixy="3.30295116006257E-06"

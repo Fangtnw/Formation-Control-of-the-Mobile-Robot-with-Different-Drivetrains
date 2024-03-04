@@ -16,7 +16,7 @@
         xyz="2.22044604925031E-16 2.22044604925031E-16 0.0802779743476336"
         rpy="0 0 0" />
       <mass
-        value="0.1" />
+        value="1" />
       <inertia
         ixx="0.05011773"
         ixy="3.14732432919024E-18"
@@ -48,23 +48,23 @@
           filename="file:///$(find my_robot_description)/meshes/pallet/base_link.STL" />
       </geometry>
       <surface>
-        <contact>
-          <poissons_ratio>0.347</poissons_ratio>
-          <elastic_modulus>8.8e+09</elastic_modulus>
-          <ode>
-            <soft_cfm>0.0</soft_cfm>
-            <soft_erp>2e25</soft_erp>
-            <kp>1e15</kp>
-            <kd>1e13</kd>
-            <max_vel>0.01</max_vel>
-            <min_depth>100</min_depth>
-          </ode>
+        <contact friction="0.01"> 
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+20</soft_erp>
+          <kp>1</kp>
+          <kd>10</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1</min_depth>
+        </ode>
         </contact>
         <friction>
             <fdir1>0 0 0</fdir1>
-            <mu>1</mu>
+            <mu>0.5</mu>
             <slip2>0</slip2>
-            <mu2>1</mu2>
+            <mu2>0.5</mu2>
             <slip1>0</slip1>
         </friction>
       </surface>

@@ -183,34 +183,47 @@
       xyz="0 -1 0" />
   </joint>
 
-    <gazebo>
-        <plugin name="gazebo_ros_diff_drive" filename="libgazebo_ros_diff_drive.so">
-            <!-- Update rate in Hz -->
-            <ros>
-            <!-- Add a namespace -->
-            <namespace>diff</namespace>
-             <remapping>/diff/cmd_vel:=/cmd_vel_follower</remapping>
-            </ros>
-            <update_rate>50</update_rate>
-            <!-- wheels -->
-            <left_joint>left_wheel_joint</left_joint>
-            <right_joint>right_wheel_joint</right_joint>
-            <!-- kinematics -->
-            <wheel_separation>0.5</wheel_separation>
-            <wheel_diameter>0.12</wheel_diameter>
-            <!-- input -->
-            <command_topic>cmd_vel_follower</command_topic>
-            <!-- output -->
-            <publish_odom>true</publish_odom>
-            <!-- Odometry source, 0 for ENCODER, 1 for WORLD, defaults to WORLD -->
-            <odometrySource>1</odometrySource>
-            <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-            <odometry_topic>diffdrive/odom</odometry_topic>
-            <odometry_frame>diff_odom</odometry_frame>
-            <robot_base_frame>base_footprint_diff</robot_base_frame>
-        </plugin>
-    </gazebo>
+  <gazebo>
+      <plugin name="gazebo_ros_joint_state_publisher"
+          filename="libgazebo_ros_joint_state_publisher.so">
+          <update_rate>20</update_rate>
+          <joint_name>left_wheel_joint</joint_name>
+          <joint_name>right_wheel_joint</joint_name>
+      </plugin>
+  </gazebo>
+
+  <gazebo>
+      <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+        <namespace>diffdrive</namespace>
+        <robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+        <parameters>$(find coop_robot_bringup)/config/diff_controller.yaml</parameters>
+        <controller_manager_name>controller_manager</controller_manager_name>
+      </plugin>
+  </gazebo>
+
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="left_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-0.5</param>
+        <param name="max">0.5</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="right_wheel_joint">
+      <command_interface name="velocity">
+        <param name="min">-0.5</param>
+        <param name="max">0.5</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
 
     <gazebo reference="wheel_right">
       <material>Gazebo/Green</material>

@@ -26,7 +26,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    odom_compute = Node(
+    diff_odom_compute = Node(
         package='coop_controller',
         executable='diffdrive_odom',
         output='screen',
@@ -67,19 +67,6 @@ def generate_launch_description():
                     arguments=['0.2', '0', '0.02','0', '0', '0', '1','base_footprint_diff','laser_frame'],
                     )
 
-    
-    # robot_localization_odom = Node(
-    #     package="robot_localization",
-    #     executable="ekf_node",
-    #     name="ekf_localization_odom",
-    #     output="screen",
-    #     parameters=[
-    #         os.path.join(diffbot_bringup_dir, "config", "ekf.yaml"),
-    #     ],
-    #     remappings=[('odometry/filtered', 'odom')],
-    #     arguments=['--ros-args', '--params-file', os.path.join(diffbot_bringup_dir, "config", "ekf.yaml")],
-    # )
-
     rviz = ExecuteProcess(
         cmd=['ros2', 'run', 'rviz2', 'rviz2', '-d', '/opt/ros/humble/share/nav2_bringup/rviz/nav2_default_view.rviz'],
         output='screen',
@@ -92,9 +79,10 @@ def generate_launch_description():
 
     slam_toolbox_diff = ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
-             '--remap','odom:=odom_diff', 'base_footprint:=base_footprint_diff'],
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/diff_mapper_params_online_async.yaml'],
         output='screen',
     )
+    
 
     # slam_toolbox_localize = ExecuteProcess(
     #     cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py' , 'params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml'],
@@ -112,9 +100,10 @@ def generate_launch_description():
     )
 
     nav2_diff= ExecuteProcess(
-        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_diff_params.yaml' ,'use_sim_time:=true'],
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_diff_params.yaml', 'use_sim_time:=false', 'remappings:=/cmd_vel:=/cmd_vel_follower'],
         output='screen',
     )
+
 
     map_server = ExecuteProcess(
         cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/workshop_4th.yaml'],
@@ -139,21 +128,21 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    # ld.add_action(ydliar)
-    # ld.add_action(xicro)
-    # ld.add_action(diff_laser_to_base_footprint_tf)
-    # ld.add_action(odom_compute)
+    ld.add_action(ydliar)
+    ld.add_action(xicro)
+    ld.add_action(diff_laser_to_base_footprint_tf)
+    ld.add_action(diff_odom_compute)
     # ld.add_action(imu_to_base_link_tf)
-    # ld.add_action(diff_robot_localization_odom)
+    ld.add_action(diff_robot_localization_odom)
     ld.add_action(rviz)
 
 
     # ld.add_action(nav2_default)
-    # ld.add_action(slam_toolbox_diff)
-    # ld.add_action(nav2_diff)
+    ld.add_action(slam_toolbox_diff)
+    ld.add_action(nav2_diff)
 
-    ld.add_action(slam_toolbox)
-    ld.add_action(nav2)
+    # ld.add_action(slam_toolbox)
+    # ld.add_action(nav2)
 
     # ld.add_action(map_server)
     # ld.add_action(lifecycle_map_server)

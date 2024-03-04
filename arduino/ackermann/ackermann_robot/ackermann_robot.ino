@@ -36,7 +36,7 @@ const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
-const double speed_to_pwm_ratio = 0.00235;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
+const double speed_to_pwm_ratio = 0.00383;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
 //Set Value to Zero
@@ -336,33 +336,96 @@ void loop() {
 }
 void publishSpeed(double time) {
     xicro.Spin_node();
-    xicro.Publisher_ack_encoder_vel.message.vector.x = servo_left_calculated;
-    xicro.Publisher_ack_encoder_vel.message.vector.y = servo_right_calculated;
-    xicro.Publisher_ack_encoder_vel.message.vector.z = pos_ack;
+    xicro.Publisher_ack_encoder_vel.message.angular.x = servo_left_calculated;
+    xicro.Publisher_ack_encoder_vel.message.angular.y = servo_right_calculated;
+    xicro.Publisher_ack_encoder_vel.message.angular.z = pos_ack;
+    xicro.Publisher_ack_encoder_vel.message.linear.x = speed_act_left;
+    xicro.Publisher_ack_encoder_vel.message.linear.y = speed_act_right;
     xicro.publish_ack_encoder_vel();
-    xicro.Publisher_ack_encoder_tick.message.vector.x = pos_right;
-    xicro.Publisher_ack_encoder_tick.message.vector.y = pos_left;
+    xicro.Publisher_ack_encoder_tick.message.linear.x = pos_right;
+    xicro.Publisher_ack_encoder_tick.message.linear.y = pos_left;
+    xicro.Publisher_ack_encoder_tick.message.angular.x = pos_servo_left;
+    xicro.Publisher_ack_encoder_tick.message.angular.y = pos_servo_right;
     xicro.publish_ack_encoder_tick();
-    xicro.Publisher_ack_imu.message.vector.x = mpu.getAngleX();
-    xicro.Publisher_ack_imu.message.vector.y = mpu.getAngleY();
-    xicro.Publisher_ack_imu.message.vector.z = mpu.getAngleZ();
+    xicro.Publisher_ack_imu.message.linear.x = mpu.getAngleX();
+    xicro.Publisher_ack_imu.message.linear.y = mpu.getAngleY();
+    xicro.Publisher_ack_imu.message.linear.z = mpu.getAngleZ();
     xicro.publish_ack_imu();
-    xicro.Publisher_ack_speed_req.message.vector.x = speed_req_left;
-    xicro.Publisher_ack_speed_req.message.vector.y = speed_req_right;
-    xicro.Publisher_ack_speed_req.message.vector.z = ang_req_servo;
+    xicro.Publisher_ack_speed_req.message.linear.x = speed_req_left;
+    xicro.Publisher_ack_speed_req.message.linear.y = speed_req_right;
+    xicro.Publisher_ack_speed_req.message.linear.z = ang_req_servo;
     xicro.publish_ack_speed_req();
-    xicro.Publisher_ack_speed_cmd.message.vector.x = speed_cmd_left;
-    xicro.Publisher_ack_speed_cmd.message.vector.y = speed_cmd_right;
-    xicro.Publisher_ack_speed_cmd.message.vector.z = servo_cmd;
+    xicro.Publisher_ack_speed_cmd.message.linear.x = speed_cmd_left;
+    xicro.Publisher_ack_speed_cmd.message.linear.y = speed_cmd_right;
+    xicro.Publisher_ack_speed_cmd.message.linear.z = servo_cmd;
     xicro.publish_ack_speed_cmd();
   
-    xicro.Publisher_ack_PWM_cmd.message.vector.x = PWM_leftMotor;
-    xicro.Publisher_ack_PWM_cmd.message.vector.y = PWM_rightMotor;
+    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
+    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
           
     xicro.publish_ack_PWM_cmd();
 //  xicro.loginfo("Publishing odometry");
 }
 
+void eulerToQuaternion(float roll, float pitch, float yaw, float& w, float& x, float& y, float& z) {
+    
+    // Convert Euler angles to radians
+    roll = roll * M_PI / 180.0;
+    pitch = pitch * M_PI / 180.0;
+    yaw = yaw * M_PI / 180.0;
+
+    // Calculate the quaternion components
+    double cy = cos(yaw * 0.5);
+    double sy = sin(yaw * 0.5);
+    double cp = cos(pitch * 0.5);
+    double sp = sin(pitch * 0.5);
+    double cr = cos(roll * 0.5);
+    double sr = sin(roll * 0.5);
+
+    w = cy * cp * cr + sy * sp * sr;
+    x = cy * cp * sr - sy * sp * cr;
+    y = sy * cp * sr + cy * sp * cr;
+    z = sy * cp * cr - cy * sp * sr;
+}
+
+void IMUbringup(){
+    mpu.update(); 
+    xicro.Publisher_ack_imu.message.linear.x = mpu.getAngleX();
+    xicro.Publisher_ack_imu.message.linear.y = mpu.getAngleY();
+    xicro.Publisher_ack_imu.message.angular.z = mpu.getAngleZ();
+    xicro.Publisher_ack_imu_raw.message.header.frame_id = "Imu_ack";
+
+    xicro.Publisher_ack_imu_raw.message.linear_acceleration.x = mpu.getAccX();
+    xicro.Publisher_ack_imu_raw.message.linear_acceleration.y = mpu.getAccY();
+    xicro.Publisher_ack_imu_raw.message.linear_acceleration.z = mpu.getAccZ();
+    xicro.Publisher_ack_imu_raw.message.angular_velocity.x = mpu.getGyroX();
+    xicro.Publisher_ack_imu_raw.message.angular_velocity.y = mpu.getGyroY();
+    xicro.Publisher_ack_imu_raw.message.angular_velocity.z = mpu.getGyroZ();
+//    xicro.Publisher_ack_imu_raw.message.orientation_covariance[0] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.orientation_covariance[4] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.orientation_covariance[8] = 0.01;
+//    
+//    xicro.Publisher_ack_imu_raw.message.linear_acceleration_covariance[0] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.linear_acceleration_covariance[4] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.linear_acceleration_covariance[8] = 0.01;
+//    
+//    xicro.Publisher_ack_imu_raw.message.angular_velocity_covariance[0] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.angular_velocity_covariance[4] = 0.01;
+//    xicro.Publisher_ack_imu_raw.message.angular_velocity_covariance[8] = 0.01;
+
+    float roll = mpu.getAngleX();
+    float pitch = mpu.getAngleY();
+    float yaw = mpu.getAngleZ();
+    float w, x, y, z;
+    eulerToQuaternion(roll, pitch, yaw, w, x, y, z);
+    
+    xicro.Publisher_ack_imu_raw.message.orientation.w = w;
+    xicro.Publisher_ack_imu_raw.message.orientation.x = x;
+    xicro.Publisher_ack_imu_raw.message.orientation.y = y;
+    xicro.Publisher_ack_imu_raw.message.orientation.z = z;
+  
+  }
+  
 void encoderLeftMotor() {
   if (digitalRead(PIN_ENCOD_A_MOTOR_LEFT) == digitalRead(PIN_ENCOD_B_MOTOR_LEFT)) pos_left--;
   else pos_left++;
@@ -370,8 +433,8 @@ void encoderLeftMotor() {
 
 //Right motor encoder counter
 void encoderRightMotor() {
-  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right++;
-  else pos_right--;
+  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right--;
+  else pos_right++;
 }
 
 void encoderRightServo() {

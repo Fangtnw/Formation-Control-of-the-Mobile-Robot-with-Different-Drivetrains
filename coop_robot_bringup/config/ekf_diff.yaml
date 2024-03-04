@@ -26,10 +26,7 @@ ekf_filter_node:
 # unspecified.
         transform_time_offset: 0.0
 
-# Use this parameter to provide specify how long the tf listener should wait for a transform to become available. 
-# Defaults to 0.0 if unspecified.
-        transform_timeout: 0.0
-
+# Use this parametams.yaml' ,'use_sim_time:=true'],
 # If you're having trouble, try setting this to true, and then echo the /diagnostics_agg topic to see if the node is
 # unhappy with any settings or data.
         print_diagnostics: true
@@ -71,9 +68,9 @@ ekf_filter_node:
 #     3b. MAKE SURE something else is generating the odom->base_link transform. Note that this can even be another state
 #         estimation node from robot_localization! However, that instance should *not* fuse the global data.
         map_frame: map                   # Defaults to "map" if unspecified
-        odom_frame: odom                 # Defaults to "odom" if unspecified
+        odom_frame: odom_diff                 # Defaults to "odom" if unspecified
         base_link_frame: base_footprint_diff  # Defaults to "base_link" if unspecified
-        world_frame: odom           # Defaults to the value of odom_frame if unspecified
+        world_frame: odom_diff           # Defaults to the value of odom_frame if unspecified
 
 # The filter accepts an arbitrary number of inputs from each input message type (nav_msgs/Odometry,
 # geometry_msgs/PoseWithCovarianceStamped, geometry_msgs/TwistWithCovarianceStamped,
