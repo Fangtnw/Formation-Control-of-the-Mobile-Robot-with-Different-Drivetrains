@@ -382,102 +382,139 @@ void Xicro::Test(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
     _SendIdTopic(1);
-    _SendInt32((int32_t*)&Publisher_ack_encoder_tick.message.header.stamp.sec,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_encoder_tick.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_encoder_tick.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_tick.message.angular.z,1);
     _Sendstop();
     _Sendcrc();}
 void Xicro::publish_ack_speed_req(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
     _SendIdTopic(2);
-    _SendInt32((int32_t*)&Publisher_ack_speed_req.message.header.stamp.sec,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_speed_req.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_speed_req.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_req.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_req.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_req.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_speed_req.message.angular.z,1);
     _Sendstop();
     _Sendcrc();}
 void Xicro::publish_ack_PWM_cmd(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
     _SendIdTopic(3);
-    _SendInt32((int32_t*)&Publisher_ack_PWM_cmd.message.header.stamp.sec,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_PWM_cmd.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_PWM_cmd.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_PWM_cmd.message.angular.z,1);
     _Sendstop();
     _Sendcrc();}
 void Xicro::publish_ack_speed_cmd(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
     _SendIdTopic(4);
-    _SendInt32((int32_t*)&Publisher_ack_speed_cmd.message.header.stamp.sec,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_speed_cmd.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_speed_cmd.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_speed_cmd.message.angular.z,1);
     _Sendstop();
     _Sendcrc();}
 void Xicro::publish_ack_imu(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
     _SendIdTopic(5);
-    _SendInt32((int32_t*)&Publisher_ack_imu.message.header.stamp.sec,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_imu.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_imu.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_imu.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_imu.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_imu.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_imu.message.angular.z,1);
+    _Sendstop();
+    _Sendcrc();}
+void Xicro::publish_ack_imu_raw(){
+    _crc=0;    _Sendstart();
+    _SendSignature(2,4);
+    _SendIdTopic(6);
+    _SendInt32((int32_t*)&Publisher_ack_imu_raw.message.header.stamp.sec,1);
+    _Sendcontinue();
+    _SendUint32((uint32_t*)&Publisher_ack_imu_raw.message.header.stamp.nanosec,1);
+    _Sendcontinue();
+    _SendString(&Publisher_ack_imu_raw.message.header.frame_id,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.orientation.x,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.orientation.y,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.orientation.z,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.orientation.w,1);
+    _Sendcontinue();
+    _SendFloat32(Publisher_ack_imu_raw.message.orientation_covariance,9);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.angular_velocity.x,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.angular_velocity.y,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.angular_velocity.z,1);
+    _Sendcontinue();
+    _SendFloat32(Publisher_ack_imu_raw.message.angular_velocity_covariance,9);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.linear_acceleration.x,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.linear_acceleration.y,1);
+    _Sendcontinue();
+    _SendFloat32((float*)&Publisher_ack_imu_raw.message.linear_acceleration.z,1);
+    _Sendcontinue();
+    _SendFloat32(Publisher_ack_imu_raw.message.linear_acceleration_covariance,9);
     _Sendstop();
     _Sendcrc();}
 void Xicro::publish_ack_encoder_vel(){
     _crc=0;    _Sendstart();
     _SendSignature(2,4);
-    _SendIdTopic(6);
-    _SendInt32((int32_t*)&Publisher_ack_encoder_vel.message.header.stamp.sec,1);
+    _SendIdTopic(7);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.linear.x,1);
     _Sendcontinue();
-    _SendUint32((uint32_t*)&Publisher_ack_encoder_vel.message.header.stamp.nanosec,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.linear.y,1);
     _Sendcontinue();
-    _SendString(&Publisher_ack_encoder_vel.message.header.frame_id,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.linear.z,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.vector.x,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.angular.x,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.vector.y,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.angular.y,1);
     _Sendcontinue();
-    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.vector.z,1);
+    _SendFloat32((float*)&Publisher_ack_encoder_vel.message.angular.z,1);
     _Sendstop();
     _Sendcrc();}
 // gen service client call void// gen void begin srv server// gen service server callback void// gen action client call void// gen void begin action server// gen action server feedback void// gen action server response void

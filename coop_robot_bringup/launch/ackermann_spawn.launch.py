@@ -28,7 +28,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         parameters=[{'robot_description':ack_description} , {'use_sim_time': True}],
         # remappings=[('/robot_description', '/ackermann_description')]
-        namespace="ackermann",
+        # namespace="ackermann",
         output='screen'
     )
 
@@ -36,14 +36,14 @@ def generate_launch_description():
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
-            "-topic", "/ackermann/robot_description",
+            "-topic", "/robot_description",
             "-entity", "ackermann",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
             "-y", "1.8",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
             "-Y","-1.57",
         ],
-        namespace="ackermann",
+        # namespace="ackermann",
         output='screen'
     )
 

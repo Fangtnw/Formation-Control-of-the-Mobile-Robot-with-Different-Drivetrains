@@ -184,17 +184,7 @@
   </joint>
 
   <gazebo>
-      <plugin name="gazebo_ros_joint_state_publisher"
-          filename="libgazebo_ros_joint_state_publisher.so">
-          <update_rate>20</update_rate>
-          <joint_name>left_wheel_joint</joint_name>
-          <joint_name>right_wheel_joint</joint_name>
-      </plugin>
-  </gazebo>
-
-  <gazebo>
       <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-        <namespace>diffdrive</namespace>
         <robot_param>robot_description</robot_param>
         <robot_param_node>robot_state_publisher</robot_param_node>
         <parameters>$(find coop_robot_bringup)/config/diff_controller.yaml</parameters>

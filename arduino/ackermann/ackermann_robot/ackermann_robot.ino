@@ -15,8 +15,8 @@ unsigned long lastMilli = 0;
 
 //Servo Angle 
 int servo_cmd = 90;
-const double max_angle = 135;                 //Max angle (degree)
-const double min_angle = 45;                 //Min angle (degree)
+const double max_angle = 180;                 //Max angle (degree)
+const double min_angle = 0;                 //Min angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -440,19 +440,11 @@ void encoderRightMotor() {
 void encoderRightServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_RIGHT) == digitalRead(PIN_ENCOD_B_SERVO_RIGHT)) pos_servo_right--;
   else pos_servo_right++;
-
-  if (abs(pos_servo_right) < 10) {
-    pos_servo_right = 0;
-   }
 }
 
 void encoderLeftServo() {
   if (digitalRead(PIN_ENCOD_A_SERVO_LEFT) == digitalRead(PIN_ENCOD_B_SERVO_LEFT)) pos_servo_left--;
   else pos_servo_left++;
-
-  if (abs(pos_servo_left) < 10)  {
-    pos_servo_left = 0;
-  }
 }
   
 template <typename T> int sgn(T val) {

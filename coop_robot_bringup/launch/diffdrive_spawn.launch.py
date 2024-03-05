@@ -26,7 +26,7 @@ def generate_launch_description():
         package="robot_state_publisher",
         executable="robot_state_publisher",
         parameters=[{'robot_description':diff_description} , {'use_sim_time': True}],
-        namespace="diffdrive",
+        # namespace="diffdrive",
         output='screen',
     )
  
@@ -40,14 +40,14 @@ def generate_launch_description():
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
-            "-topic", "/diffdrive/robot_description",
+            "-topic", "robot_description",
             "-entity", "diffdrive",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
             "-y", "2.0",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
             "-Y","-1.57",
         ],
-        namespace="diffdrive",
+        # namespace="diffdrive",
         output='screen'
     )
 
@@ -55,29 +55,29 @@ def generate_launch_description():
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
-            "-topic", "/diffdrive/robot_description",
+            "-topic", "/robot_description",
             "-entity", "diffdrive",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
             "-y", "0.1",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
             "-Y","1.57",
         ],
-        namespace="diffdrive",
+        # namespace="diffdrive",
         output='screen'
     )
 
     load_joint_state_broadcaster = Node(
         package="controller_manager",
         executable="spawner",
-        namespace="diffdrive",
-        arguments=["joint_state_broadcaster", "--controller-manager", "/diffdrive/controller_manager"]
+        # namespace="diffdrive",
+        arguments=["joint_state_broadcaster", "--controller-manager", "controller_manager"]
     )
     
     load_diff_drive_base_controller = Node(
         package="controller_manager",
         executable="spawner",
-        namespace="diffdrive",
-        arguments=["diff_drive_controller", "--controller-manager", "/diffdrive/controller_manager"]
+        # namespace="diffdrive",
+        arguments=["diff_drive_base_controller", "--controller-manager", "controller_manager"]
     )
 
     # load_joint_state_broadcaster = ExecuteProcess(
