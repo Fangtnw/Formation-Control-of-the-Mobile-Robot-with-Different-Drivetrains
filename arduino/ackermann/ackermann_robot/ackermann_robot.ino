@@ -54,6 +54,7 @@ double speed_cmd_right = 0;                   //Command speed for right wheel in
 double ang_req_servo = 0;                     //Desired angle for servo motor
 double ang_act_servo = 0;                     //Actual angle for servo motor
 double ang_cmd_servo = 0;                     //Command angle for servo motor
+double servo_cmd_act = 0;
 
 const double max_speed = 0.4;                 //Max speed (m/s)
 
@@ -83,8 +84,6 @@ volatile float pos_ack = 0;
 volatile float rad = 0;
 volatile float servo_left_calculated = 0;
 volatile float servo_right_calculated = 0;
-//double ang_act_servo_left = 0;                     //Actual angle for servo motor
-//double ang_act_servo_right = 0;                     //Actual angle for servo motor
 
 //PID Parameters
 const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
@@ -140,18 +139,10 @@ void handle_cmd() {
 
   //Servo SPD Command
   if (speed_req != 0){
-    ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI); }
+    ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
   else {
     ang_req_servo = 0;
   }
-
-  //Find actual steering angle 
-//   if (abs(pos_servo_right) < 10) {
-//    pos_servo_right = 0;
-//   }
-//   if (abs(pos_servo_left) < 10)  {
-//    pos_servo_left = 0;
-//  }
   
   servo_left_calculated = (abs(pos_servo_left)/encoder_cpr)*360;
   servo_right_calculated = (abs(pos_servo_right)/encoder_cpr)*360;
@@ -164,8 +155,12 @@ void handle_cmd() {
   }
     
   //calculate degree for servo
-  servo_cmd = 90 - (ang_req_servo); 
-}
+  
+  
+  servo_cmd = 90 - (ang_req_servo/0.52); 
+  
+  }
+  
 
 motor leftMotor, rightMotor;
 void setup() {
@@ -257,6 +252,11 @@ void loop() {
     servo_cmd = constrain(servo_cmd, min_angle , max_angle);
     //PID_servoMotor.Compute();                                               
     servo.write(servo_cmd);
+
+    if (servo_cmd == 90){
+      pos_servo_right = 0;
+      pos_servo_left = 0;
+    }
 
     if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
       ang_act_servo = 0;
