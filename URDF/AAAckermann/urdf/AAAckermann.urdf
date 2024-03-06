@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="AAAckermann">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.155033044322973 5.21064123681914E-07 -0.0374219405386322"
+        rpy="0 0 0" />
+      <mass
+        value="4.2064614062057" />
+      <inertia
+        ixx="0.0413486020291867"
+        ixy="-1.82796488685322E-07"
+        ixz="3.45960820664178E-07"
+        iyy="0.0152273358946837"
+        iyz="1.05010040456046E-07"
+        izz="0.0556459614992652" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 0.4" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="front_left">
+    <inertial>
+      <origin
+        xyz="3.8858E-15 -0.015274 4.6463E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="5.4339E-21"
+        ixz="-1.6941E-21"
+        iyy="0.00045262"
+        iyz="6.4709E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/front_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/front_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_joint"
+    type="continuous">
+    <origin
+      xyz="0.0190000000000679 0.301000000000045 -0.0695000000000887"
+      rpy="3.14159265358979 0.0849179307157281 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="front_right">
+    <inertial>
+      <origin
+        xyz="-2.9643E-14 0.025726 3.5749E-14"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="5.2554E-21"
+        ixz="0"
+        iyy="0.00045262"
+        iyz="4.3994E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/front_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/front_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_joint"
+    type="continuous">
+    <origin
+      xyz="0.0190000000000679 -0.259999999999977 -0.0695000000000887"
+      rpy="3.14159265358979 -0.692237011731428 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="left_steering">
+    <inertial>
+      <origin
+        xyz="0.012512933493309 -0.0163421015504649 -0.0213045365279689"
+        rpy="0 0 0" />
+      <mass
+        value="0.0396441172797539" />
+      <inertia
+        ixx="1.40345098300458E-05"
+        ixy="-1.52725955805096E-06"
+        ixz="-7.1949991184784E-06"
+        iyy="2.900901803087E-05"
+        iyz="2.01422351026883E-06"
+        izz="3.05054640970382E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/left_steering.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/left_steering.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="left_steering_joint"
+    type="continuous">
+    <origin
+      xyz="-0.544750000000063 0.229999999999977 -0.0837500000002837"
+      rpy="3.14159265358979 0 -0.00209254658538632" />
+    <parent
+      link="base_link" />
+    <child
+      link="left_steering" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rear_left">
+    <inertial>
+      <origin
+        xyz="-1.5192E-06 0.025619 0.006692"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="-4.9967E-09"
+        ixz="-5.3615E-10"
+        iyy="0.00045026"
+        iyz="2.201E-05"
+        izz="0.0002475" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/rear_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/rear_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.0367488381424265 -0.0159999999999999"
+      rpy="3.14159265358979 1.57056930363849 0" />
+    <parent
+      link="left_steering" />
+    <child
+      link="rear_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="right_steering">
+    <inertial>
+      <origin
+        xyz="-0.0141851959168551 -0.014911611158559 -0.0213045365279664"
+        rpy="0 0 0" />
+      <mass
+        value="0.039644117279754" />
+      <inertia
+        ixx="1.45321058215473E-05"
+        ixy="3.08590475566129E-06"
+        ixz="7.36894346824914E-06"
+        iyy="2.85153884323417E-05"
+        iyz="1.2337472935684E-06"
+        izz="3.05094304900102E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/right_steering.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/right_steering.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="right_steering_joint"
+    type="continuous">
+    <origin
+      xyz="-0.544750000000063 -0.230000000000023 -0.0837500000002836"
+      rpy="3.14159265358979 0 -3.13242627228221" />
+    <parent
+      link="base_link" />
+    <child
+      link="right_steering" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="rear_right">
+    <inertial>
+      <origin
+        xyz="1.415E-10 0.025722 1.2793E-08"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="4.6696E-13"
+        ixz="9.5503E-20"
+        iyy="0.00045262"
+        iyz="4.2319E-11"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/rear_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/rear_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_joint"
+    type="continuous">
+    <origin
+      xyz="0 -0.0370034448281129 -0.0159999999999995"
+      rpy="3.14159265358979 -1.55976234848309 0" />
+    <parent
+      link="right_steering" />
+    <child
+      link="rear_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="folk_right">
+    <inertial>
+      <origin
+        xyz="2.00693118415856 1.38000039371724 0.275"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.33963645354686E-16"
+        ixz="1.28434201717295E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736582761506E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/folk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/folk_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="folk_right_fixed"
+    type="fixed">
+    <origin
+      xyz="0.569999999999977 1.93943121112487 -1.35000039371702"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="folk_left">
+    <inertial>
+      <origin
+        xyz="2.00693118415856 1.38000039371724 0.275"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.33963423979683E-16"
+        ixz="1.28430282170194E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736584311901E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/folk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann/meshes/folk_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="folk_left_fixed"
+    type="fixed">
+    <origin
+      xyz="0.569999999999977 2.07443121112492 -1.35000039371702"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_left" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>

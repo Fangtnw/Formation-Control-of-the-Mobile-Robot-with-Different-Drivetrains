@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="DiffDrive">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.0244064139228263 -6.45065064808215E-07 0.0569804687199039"
+        rpy="0 0 0" />
+      <mass
+        value="4.66720366185749" />
+      <inertia
+        ixx="0.0541476224276237"
+        ixy="-6.12738449468893E-08"
+        ixz="1.53636097102655E-06"
+        iyy="0.0339227011620614"
+        iyz="6.21772279309861E-09"
+        izz="0.0871897608594921" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Wheel_left">
+    <inertial>
+      <origin
+        xyz="0 0.025726 -1.3878E-16"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="5.1275E-20"
+        ixz="0"
+        iyy="0.00045262"
+        iyz="-5.5784E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_left"
+    type="continuous">
+    <origin
+      xyz="-0.000999999999839296 -0.249999999999933 0.0305000000006919"
+      rpy="0 0.774914173734372 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="Wheel_right">
+    <inertial>
+      <origin
+        xyz="-1.3878E-16 0.025726 5.5511E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.24047" />
+      <inertia
+        ixx="0.00024514"
+        ixy="5.773E-21"
+        ixz="1.3553E-20"
+        iyy="0.00045262"
+        iyz="1.2923E-20"
+        izz="0.00024514" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/Wheel_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Joint_right"
+    type="continuous">
+    <origin
+      xyz="-0.000999999999862333 0.250000000000088 0.0305000000006919"
+      rpy="3.14159265358979 -0.53712555837446 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="Wheel_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="folk_right">
+    <inertial>
+      <origin
+        xyz="2.00693118415856 1.38000039371689 0.275000000001556"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.3396380565408E-16"
+        ixz="1.28430787388483E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736584376207E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/folk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/folk_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="folk_right_fixed"
+    type="fixed">
+    <origin
+      xyz="-0.63999999999945 -1.93943121112476 -1.25000039371728"
+      rpy="1.5707963267949 0 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="folk_left">
+    <inertial>
+      <origin
+        xyz="2.00693118415856 1.38000039371724 0.275"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.33963808663405E-16"
+        ixz="1.28430464843785E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736580735169E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/folk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://DiffDrive/meshes/folk_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="folk_left_fixed"
+    type="fixed">
+    <origin
+      xyz="-0.639999999997894 -2.07443121112487 -1.25000039371773"
+      rpy="1.5707963267949 0 1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_left" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
