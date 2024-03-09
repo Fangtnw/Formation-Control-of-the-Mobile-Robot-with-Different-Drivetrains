@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','ackermann_basic.xacro')
+                           'urdf','ackermann_fork.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -28,7 +28,7 @@ def generate_launch_description():
         executable="robot_state_publisher",
         parameters=[{'robot_description':ack_description} , {'use_sim_time': True}],
         # remappings=[('/robot_description', '/ackermann_description')]
-        # namespace="ackermann",
+        namespace="ackermann",
         output='screen'
     )
 
@@ -36,19 +36,35 @@ def generate_launch_description():
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
-            "-topic", "/robot_description",
+            "-topic", "/ackermann/robot_description",
             "-entity", "ackermann",
-            "-x", "1.25",   # Example: Set x-coordinate to 1.0
-            "-y", "1.8",   # Example: Set y-coordinate to 2.0
+            "-x", "1.8",   # Example: Set x-coordinate to 1.0
+            "-y", "-1.5",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","-1.57",
+            "-Y","-3.14159265359",
         ],
-        # namespace="ackermann",
+        namespace="ackermann",
+        output='screen'
+    )
+
+    spawn_ackermann_back= Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=[
+            "-topic", "/ackermann/robot_description",
+            "-entity", "ackermann",
+            "-x", "-0.1",   # Example: Set x-coordinate to 1.0
+            "-y", "-1.7",   # Example: Set y-coordinate to 2.0
+            "-z", "0.0",   # Example: Set z-coordinate to 0.0
+            "-Y","0.0",
+        ],
+        namespace="ackermann",
         output='screen'
     )
 
     return LaunchDescription([
         spawn_ackermann,
+        # spawn_ackermann_back,
         ack_state_publisher,
         
     ])

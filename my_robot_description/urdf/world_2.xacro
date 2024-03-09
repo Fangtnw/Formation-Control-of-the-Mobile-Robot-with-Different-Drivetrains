@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="workshop_map_2">
+  <link
+    name="map_link">
+    <inertial>
+      <origin
+        xyz="4.24237288135595 0.174576271186442 0.800000000000001"
+        rpy="0 0 0" />
+      <mass
+        value="3776" />
+      <inertia
+        ixx="5851.09333333324"
+        ixy="-1719.51999999999"
+        ixz="1.4147692057215E-12"
+        iyy="8450.84088888889"
+        iyz="7.72009770925547E-13"
+        izz="12690.8408888888" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/map_2/map_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/map_2/map_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+</robot>
+
+

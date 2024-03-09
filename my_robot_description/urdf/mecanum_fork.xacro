@@ -1,0 +1,501 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mecanum" >
+
+  <link name="base_footprint_mec">
+  </link>
+  <joint name="base_link_mec_to_base_footprint_mec" type="fixed">
+    <origin xyz="0 0 0.12" rpy="0 0 -1.57"/>
+    <parent link="base_footprint_mec"/>
+    <child link="base_link_mec"/>
+  </joint>
+
+  <link name="laser_mec">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.04"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0.01" />
+      <inertia
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
+    </inertial>
+  </link>
+
+  <joint name="laser_joint" type="fixed">
+    <origin xyz="0 0 0.02" rpy="0 0 0"/>
+    <parent link="base_link_mec"/>
+    <child link="laser_mec"/>
+  </joint> 
+
+  <link
+    name="base_link_mec">
+    <inertial>
+      <origin
+        xyz="-1.12180791878025E-08 -0.00977485494714381 -0.017441883763565"
+        rpy="0 0 0" />
+      <mass
+        value="5.29285820990711" />
+      <inertia
+        ixx="0.0312149550140326"
+        ixy="5.63125927824305E-20"
+        ixz="-5.59758545320241E-14"
+        iyy="0.0132712718999651"
+        iyz="-4.93932954500259E-08"
+        izz="0.0441257339050913" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="wheel_fr_right">
+    <inertial>
+      <origin
+        xyz="1.11022302462516E-16 2.77555756156289E-16 -0.0264473304136224"
+        rpy="0 0 0" />
+      <mass
+        value="2.321375664058358" />
+      <inertia
+        ixx="9.13370307716643E-05"
+        ixy="-1.71242059849761E-18"
+        ixz="4.25339531657401E-18"
+        iyy="9.13370307716681E-05"
+        iyz="7.83097503319576E-17"
+        izz="0.00011244499645403" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.07" length="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_fr_right"
+    type="fixed">
+    <origin
+      xyz="0.195390712673452 0.172500000000024 -0.0860000000000467"
+      rpy="1.5707963267949 0 1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="wheel_fr_right" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="wheel_bk_right">
+    <inertial>
+      <origin
+        xyz="0 -3.88578058618805E-16 -0.0264473304136225"
+        rpy="0 0 0" />
+      <mass
+        value="2.321375664058357" />
+      <inertia
+        ixx="9.13370307716783E-05"
+        ixy="2.71245560643652E-19"
+        ixz="1.52152894112278E-19"
+        iyy="9.13370307716787E-05"
+        iyz="-7.65183953893873E-17"
+        izz="0.000112444996454044" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.07" length="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_bk_right"
+    type="fixed">
+    <origin
+      xyz="0.195390712673452 -0.192499999999931 -0.0860000000000467"
+      rpy="-1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="wheel_bk_right" />
+    <axis
+      xyz="0 0 -1" />
+  </joint>
+  <link
+    name="wheel_fr_left">
+    <inertial>
+      <origin
+        xyz="-4.44089209850063E-16 -5.55111512312578E-17 -0.0264433822598776"
+        rpy="0 0 0" />
+      <mass
+        value="2.321375664058357" />
+      <inertia
+        ixx="9.13370307716802E-05"
+        ixy="-6.42456583323264E-19"
+        ixz="-3.07777027087178E-19"
+        iyy="9.13370307716807E-05"
+        iyz="-7.44176120030688E-17"
+        izz="0.000112444996454046" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_fr_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.07" length="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_fr_left"
+    type="fixed">
+    <origin
+      xyz="-0.195390712673501 0.172500000000024 -0.086000000000046"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="wheel_fr_left" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="wheel_bk_left">
+    <inertial>
+      <origin
+        xyz="-5.55111512312578E-16 -5.55111512312578E-17 -0.026443382259877"
+        rpy="0 0 0" />
+      <mass
+        value="2.321375664058359" />
+      <inertia
+        ixx="9.13370307716977E-05"
+        ixy="1.26228140656248E-18"
+        ixz="-5.44727388160575E-18"
+        iyy="9.13370307716954E-05"
+        iyz="-7.63080079235153E-17"
+        izz="0.000112444996454065" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/wheel_bk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.776470588235294 0.756862745098039 0.737254901960784 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <cylinder radius="0.07" length="0.04" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_bk_left"
+    type="fixed">
+    <origin
+      xyz="-0.195390712673501 -0.192499999999931 -0.086000000000046"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="wheel_bk_left" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="folk_mec_left">
+    <inertial>
+      <origin
+        xyz="0.177964644660968 0.0675000269663049 0.0100000000001946"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385207" />
+      <inertia
+        ixx="4.21229162907784E-05"
+        ixy="-2.2703170337156E-19"
+        ixz="4.95429230703519E-18"
+        iyy="0.0132439651239293"
+        iyz="2.33948473441914E-16"
+        izz="0.0132439651530278" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/folk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0.177964644660968 0.0675000269663049 0.0100000000001946"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_mec_left_fixed"
+    type="fixed">
+    <origin
+      xyz="0 0.257035355339056 0"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="folk_mec_left" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="folk_mec_right">
+    <inertial>
+      <origin
+        xyz="0.177964644660968 -0.0674999730337412 0.0100000000002874"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385207" />
+      <inertia
+        ixx="4.21229162907784E-05"
+        ixy="-2.27031748685045E-19"
+        ixz="4.95429230703519E-18"
+        iyy="0.0132439651239293"
+        iyz="2.33949438280395E-16"
+        izz="0.0132439651530278" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/mecanum_meshes/folk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0.177964644660968 -0.0674999730337412 0.0100000000002874"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_mec_right_fixed"
+    type="fixed">
+    <origin
+      xyz="0 0.257035355339056 0"
+      rpy="0 0 1.5707963267949" />
+    <parent
+      link="base_link_mec" />
+    <child
+      link="folk_mec_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+    <gazebo reference="wheel_fr_left">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_fr_right">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_bk_left">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="wheel_bk_right">
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+
+<gazebo>
+  <plugin name="gazebo_ros_planar_move" filename="libgazebo_ros_planar_move.so">
+
+    <ros>
+
+      <!-- Add a namespace -->
+      <namespace>mec</namespace>
+
+      <!-- Remap the default topic -->
+      <remapping>/mec/cmd_vel:=/cmd_vel_follower</remapping>
+      <remapping>odom:=odom</remapping>
+
+    </ros>
+
+    <update_rate>100</update_rate>
+    <publish_rate>10</publish_rate>
+
+    <!-- output -->
+    <publish_odom>true</publish_odom>
+    <publish_odom_tf>true</publish_odom_tf>
+
+    <odometry_frame>mec_odom</odometry_frame>
+    <robot_base_frame>base_footprint_mec</robot_base_frame>
+    <publish_wheel_tf>true</publish_wheel_tf>
+
+    <covariance_x>0.0001</covariance_x>
+    <covariance_y>0.0001</covariance_y>
+    <covariance_yaw>0.01</covariance_yaw>
+
+  </plugin>
+</gazebo>
+
+  <gazebo reference="laser_mec">
+    <material>Gazebo/Red</material>
+
+    <sensor name="laser" type="ray">
+      <namespace>mec</namespace>
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>360</samples>
+            <min_angle>-3.14</min_angle>
+            <max_angle>3.14</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.3</min>
+          <max>12</max>
+        </range>
+      </ray>
+      <plugin name="laser_mec" filename="libgazebo_ros_ray_sensor.so">
+        <namespace>mec</namespace>
+        <ros>
+          <argument>/mec/out:=/scan_mec</argument>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>laser_mec</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+
+</robot>    

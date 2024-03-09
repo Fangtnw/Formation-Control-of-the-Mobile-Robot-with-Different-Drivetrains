@@ -48,17 +48,14 @@
     name="base_link_diff">
     <inertial>
       <origin
-        xyz="-0.00843797932248264 7.91524717263514E-05 0.0510944704707574"
+        xyz="-0.0244064139228468 -6.45065062421235E-07 0.0569804687199345"
         rpy="0 0 0" />
       <mass
-        value="5.20115624935193" />
+        value="1.66720366185749" />
       <inertia
-        ixx="0.0441950216113175"
-        ixy="-6.1273841754346E-08"
-        ixz="1.5363609769836E-06"
-        iyy="0.0338853571996096"
-        iyz="2.75308042467669E-07"
-        izz="0.077237000418039" />
+        ixx="0.01" ixy="0.0" ixz="0.0"
+        iyy="0.01" iyz="0.0"
+        izz="0.01"/>
     </inertial>
     <visual>
       <origin
@@ -82,16 +79,28 @@
         <mesh
           filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/base_link.STL" />
       </geometry>
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
     </collision>
   </link>
   <link
-    name="wheel_left">
+    name="Wheel_left">
     <inertial>
       <origin
-        xyz="0 0.0257257525083612 -2.77555756156289E-17"
+        xyz="1.11022302462516E-16 0.0257257525083613 -8.32667268468867E-17"
         rpy="0 0 0" />
       <mass
-        value="2.40470068076377" />
+        value="4.40470068076377" />
       <inertia
         ixx="0.000245137261047142"
         ixy="5.12745004835681E-20"
@@ -106,9 +115,13 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_left.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_left.STL" />
       </geometry>
-      <material name="wheel" /> 
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
     </visual>
     <collision>
       <origin
@@ -116,7 +129,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_left.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_left.STL" />
       </geometry>
     </collision>
   </link>
@@ -129,35 +142,39 @@
     <parent
       link="base_link_diff" />
     <child
-      link="wheel_left" />
+      link="Wheel_left" />
     <axis
       xyz="0 1 0" />
   </joint>
   <link
-    name="wheel_right">
+    name="Wheel_right">
     <inertial>
       <origin
-        xyz="5.55111512312578E-17 0.0257257525083612 5.55111512312578E-17"
+        xyz="-1.38777878078145E-16 0.0257257525084522 5.55111512312578E-17"
         rpy="0 0 0" />
       <mass
-        value="2.40470068076377" />
+        value="4.40470068076377" />
       <inertia
         ixx="0.000245137261047143"
-        ixy="4.26861241081053E-21"
-        ixz="-6.7762635780344E-21"
+        ixy="5.77297627993884E-21"
+        ixz="1.35525271560688E-20"
         iyy="0.000452624182450972"
-        iyz="1.59972478988236E-20"
+        iyz="1.29229555498199E-20"
         izz="0.000245137261047143" />
     </inertial>
     <visual>
       <origin
         xyz="0 0 0"
         rpy="0 0 0" />
-      <geometry>      
+      <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_right.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_right.STL" />
       </geometry>
-      <material name="wheel" />     
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
     </visual>
     <collision>
       <origin
@@ -165,7 +182,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/wheel_right.STL" />
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/Wheel_right.STL" />
       </geometry>
     </collision>
   </link>
@@ -178,9 +195,137 @@
     <parent
       link="base_link_diff" />
     <child
-      link="wheel_right" />
+      link="Wheel_right" />
     <axis
       xyz="0 -1 0" />
+  </joint>
+  <link
+    name="folk_diff_right">
+    <inertial>
+      <origin
+        xyz="0.25796 -0.0675 0.01"
+        rpy="0 0 0" />
+      <mass
+        value="0.052454" />
+      <inertia
+        ixx="4.2123E-05"
+        ixy="1.618E-18"
+        ixz="-1.9029E-14"
+        iyy="0.013244"
+        iyz="2.3396E-16"
+        izz="0.013244" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/folk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 1 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0.25796 0.0675 0.01"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_diff_right_fixed"
+    type="fixed">
+    <origin
+      xyz="-0.107035355338993 0 0.120000000000272"
+      rpy="0 0 -3.14159265358979" />
+    <parent
+      link="base_link_diff" />
+    <child
+      link="folk_diff_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="folk_diff_left">
+    <inertial>
+      <origin
+        xyz="0.25796 0.0675 0.01"
+        rpy="0 0 0" />
+      <mass
+        value="0.052454" />
+      <inertia
+        ixx="4.2123E-05"
+        ixy="1.618E-18"
+        ixz="-1.9029E-14"
+        iyy="0.013244"
+        iyz="2.3396E-16"
+        izz="0.013244" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/diffdrive_meshes/folk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0 0.5 0 0.5" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0.25796 0.0675 0.01"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_diff_left_fixed"
+    type="fixed">
+    <origin
+      xyz="-0.107035355338993 0 0.120000000000272"
+      rpy="0 0 -3.14159265358979" />
+    <parent
+      link="base_link_diff" />
+    <child
+      link="folk_diff_left" />
+    <axis
+      xyz="0 0 0" />
   </joint>
 
     <gazebo>

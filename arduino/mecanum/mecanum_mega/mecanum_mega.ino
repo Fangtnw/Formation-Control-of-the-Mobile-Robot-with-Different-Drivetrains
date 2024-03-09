@@ -31,7 +31,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 // Other encoder output to Arduino to keep track of wheel direction
 // Tracks the direction of rotation.
 #define encoder_encoder1B 22
-#define encoder_encoder2B 2
+#define encoder_encoder2B 24
 #define encoder_encoder3B 26
 #define encoder_encoder4B 28
 
@@ -110,7 +110,7 @@ int PWM_Motor4 = 0;
 
 // PID Parameters
 
-const double PID_param[] = { 0.4, 0, 0.001 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_param[] = { 30, 0.1, 0.0 }; //Respectively Kp, Ki and Kd for left motor PID
 PID PID_Motor1(&speed_act_motor1,&speed_cmd_motor1, &speed_req_motor1, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_Motor2(&speed_act_motor2,&speed_cmd_motor2, &speed_req_motor2, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_Motor3(&speed_act_motor3,&speed_cmd_motor3, &speed_req_motor3, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
@@ -389,7 +389,15 @@ void publishSpeed(double time) {
   
 //  xicro.Publisher_mec_speed_req.message.vector.x = speed_req_right;
 //  xicro.Publisher_mec_speed_req.message.vector.y = speed_req_left;
-        
+
+  xicro.Publisher_mec_speed_req.message.linear.x = speed_req_motor1;
+  xicro.Publisher_mec_speed_req.message.linear.y = speed_req_motor2;
+  xicro.Publisher_mec_speed_req.message.angular.x = speed_req_motor3;
+  xicro.Publisher_mec_speed_req.message.angular.y = speed_req_motor4;
+  xicro.Publisher_mec_speed_cmd.message.linear.x = speed_cmd_motor1;
+  xicro.Publisher_mec_speed_cmd.message.linear.y = speed_cmd_motor2;
+  xicro.Publisher_mec_speed_cmd.message.angular.x = speed_cmd_motor3;
+  xicro.Publisher_mec_speed_cmd.message.angular.y = speed_cmd_motor4;
   xicro.publish_mec_speed_req();
     xicro.publish_mec_speed_cmd();
   

@@ -54,10 +54,10 @@
         <ode>
           <soft_cfm>2e+20</soft_cfm>
           <soft_erp>2e+20</soft_erp>
-          <kp>1</kp>
-          <kd>10</kd>
+          <kp>1000</kp>
+          <kd>1</kd>
           <max_vel>0.01</max_vel>
-          <min_depth>1</min_depth>
+          <min_depth>1.0</min_depth>
         </ode>
         </contact>
         <friction>

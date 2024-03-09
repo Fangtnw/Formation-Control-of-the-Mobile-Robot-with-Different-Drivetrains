@@ -1,4 +1,4 @@
-controller_manager:
+/diffdrive/controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
     use_sim_time: true
@@ -8,7 +8,7 @@ controller_manager:
     diff_drive_base_controller:
       type: diff_drive_controller/DiffDriveController
 
-diff_drive_base_controller:
+/diffdrive/diff_drive_base_controller:
   ros__parameters:
     left_wheel_names: ["left_wheel_joint"]
     right_wheel_names: ["right_wheel_joint"]
@@ -16,7 +16,7 @@ diff_drive_base_controller:
     wheel_separation: 0.55
     #wheels_per_side: 1  # actually 2, but both are controlled by 1 signal
     wheel_radius: 0.06
-
+    tf_frame_prefix_enable : false
     wheel_separation_multiplier: 1.0
     left_wheel_radius_multiplier: 1.0
     right_wheel_radius_multiplier: 1.0

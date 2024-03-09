@@ -50,7 +50,7 @@ def generate_launch_description():
                     executable='static_transform_publisher',
                     name='static_tf_pub_imu',
                     output='screen',
-                    arguments=['0', '0', '0','0', '0', '0', '0','Imu','laser_frame'],
+                    arguments=['0', '0', '0','0', '0', '0', '0','Imu_ack','laser_frame'],
                     )
     
     diff_footprint_to_base_tf = Node(package='tf2_ros',
@@ -60,11 +60,11 @@ def generate_launch_description():
                     arguments=['0', '0', '0','0', '0', '3.14','base_footprint_diff','base_link_diff'],
                     )
     
-    diff_laser_to_base_footprint_tf = Node(package='tf2_ros',
+    laser_to_base_footprint_tf = Node(package='tf2_ros',
                     executable='static_transform_publisher',
                     name='static_tf_pub_laser',
                     output='screen',
-                    arguments=['0.2', '0', '0.02','0', '0', '0', '1','base_footprint_diff','laser_frame'],
+                    arguments=['0.2', '0', '0.02','0', '0', '0', '1','base_footprint','laser_frame'],
                     )
 
     rviz = ExecuteProcess(
@@ -74,6 +74,13 @@ def generate_launch_description():
 
     slam_toolbox = ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',],
+        output='screen',
+    )
+
+
+    slam_toolbox_localize = ExecuteProcess(
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim_mapper_params_online_async.yaml'],
         output='screen',
     )
 
@@ -104,9 +111,14 @@ def generate_launch_description():
         output='screen',
     )
 
+    nav2_sim= ExecuteProcess(
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml', 'use_sim_time:=true'],
+        output='screen',
+    )
+
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/workshop_4th.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/sim_map_2.2.yaml'],
         output='screen',
     )
 
@@ -128,24 +140,29 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    ld.add_action(ydliar)
-    ld.add_action(xicro)
-    ld.add_action(diff_laser_to_base_footprint_tf)
-    ld.add_action(diff_odom_compute)
+    # ld.add_action(ydliar)
+    # ld.add_action(xicro)
+    # ld.add_action(laser_to_base_footprint_tf)
+    # ld.add_action(diff_odom_compute)
     # ld.add_action(imu_to_base_link_tf)
-    ld.add_action(diff_robot_localization_odom)
+    # ld.add_action(diff_robot_localization_odom)
     ld.add_action(rviz)
 
 
     # ld.add_action(nav2_default)
-    ld.add_action(slam_toolbox_diff)
-    ld.add_action(nav2_diff)
+    # ld.add_action(slam_toolbox_diff)
+    # ld.add_action(nav2_diff)
 
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2)
+    
+    # ld.add_action(slam_toolbox)
+    
+    ld.add_action(nav2_sim)
 
     # ld.add_action(map_server)
     # ld.add_action(lifecycle_map_server)
+    ld.add_action(slam_toolbox_localize)
     # ld.add_action(amcl)
     # ld.add_action(lifecycle_amcl)
 

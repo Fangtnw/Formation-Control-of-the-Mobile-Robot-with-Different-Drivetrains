@@ -40,7 +40,7 @@ def generate_launch_description():
             "-entity", "long_pallet",
             "-x", "1.25",   # Example: Set x-coordinate to 1.0
             "-y", "1.0",   # Example: Set y-coordinate to 2.0
-            "-z", "0.065",   # Example: Set z-coordinate to 0.0
+            "-z", "0.085",   # Example: Set z-coordinate to 0.0
             "-Y","1.57",
         ],
         namespace="long_pallet",

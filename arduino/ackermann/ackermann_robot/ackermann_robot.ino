@@ -154,9 +154,7 @@ void handle_cmd() {
     pos_ack = servo_left_calculated;
   }
     
-  //calculate degree for servo
-  
-  
+  //calculate degree for servo 
   servo_cmd = 90 - (ang_req_servo/0.52); 
   
   }
@@ -244,19 +242,21 @@ void setup() {
 
 void loop() {
   xicro.Spin_node();
-  handle_cmd();
+  
   if((millis()-lastMilli) >= LOOPTIME)   
   {                                                                           // enter timed loopf
     lastMilli = millis();
+    handle_cmd();
     byte status = mpu.begin();
+    
     servo_cmd = constrain(servo_cmd, min_angle , max_angle);
     //PID_servoMotor.Compute();                                               
     servo.write(servo_cmd);
 
-    if (servo_cmd == 90){
-      pos_servo_right = 0;
-      pos_servo_left = 0;
-    }
+//    if (servo_cmd == 90){
+//      pos_servo_right = 0;
+//      pos_servo_left = 0;
+//    }
 
     if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
       ang_act_servo = 0;
@@ -335,7 +335,8 @@ void loop() {
  }
 }
 void publishSpeed(double time) {
-    xicro.Spin_node();
+//    xicro.Spin_node();
+    IMUbringup();
     xicro.Publisher_ack_encoder_vel.message.angular.x = servo_left_calculated;
     xicro.Publisher_ack_encoder_vel.message.angular.y = servo_right_calculated;
     xicro.Publisher_ack_encoder_vel.message.angular.z = pos_ack;
@@ -364,6 +365,7 @@ void publishSpeed(double time) {
     xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
           
     xicro.publish_ack_PWM_cmd();
+    xicro.publish_ack_imu_raw();
 //  xicro.loginfo("Publishing odometry");
 }
 
@@ -423,6 +425,7 @@ void IMUbringup(){
     xicro.Publisher_ack_imu_raw.message.orientation.x = x;
     xicro.Publisher_ack_imu_raw.message.orientation.y = y;
     xicro.Publisher_ack_imu_raw.message.orientation.z = z;
+    
   
   }
   
@@ -433,8 +436,8 @@ void encoderLeftMotor() {
 
 //Right motor encoder counter
 void encoderRightMotor() {
-  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right--;
-  else pos_right++;
+  if (digitalRead(PIN_ENCOD_A_MOTOR_RIGHT) == digitalRead(PIN_ENCOD_B_MOTOR_RIGHT)) pos_right++;
+  else pos_right--;
 }
 
 void encoderRightServo() {

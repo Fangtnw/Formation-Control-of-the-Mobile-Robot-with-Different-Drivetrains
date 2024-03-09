@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_mec=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','mecanum.xacro')
+                           'urdf','mecanum_fork.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -38,10 +38,10 @@ def generate_launch_description():
         arguments=[
             "-topic", "/mecanum/robot_description",
             "-entity", "mecanum",
-            "-x", "1.25",   # Example: Set x-coordinate to 1.0
-            "-y", "0.1",   # Example: Set y-coordinate to 2.0
+            "-x", "-0.1",   # Example: Set x-coordinate to 1.0
+            "-y", "-1.5",   # Example: Set y-coordinate to 2.0
             "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y"," 1.57",
+            "-Y"," 0.0",
         ],
         namespace="mecanum",
         output='screen'

@@ -63,12 +63,12 @@ class FormationController(Node):
 
             #mecanum_follower case
             if self.follower_type == 'mecanum':
-                linear_vel_x = (tx - 1.5) * 5 
+                linear_vel_x = (tx - 1.65) * 5 
                 linear_vel_y = ty * 5
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 linear_vel_y = max(min(linear_vel_y, max_vx), -max_vx)
 
-                if abs(tx - 1.5) < 0.2 and abs(ty) < 0.2:
+                if abs(tx - 1.65) < 0.2 and abs(ty) < 0.2:
                     # Adjust rz with damping, considering previous direction:
                     if self.direction == 1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
                         self.direction = -1.0 
@@ -82,21 +82,22 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                linear_vel_x = (tx-1.5) * 5  
-                if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                    self.direction = -1.0 
-                elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                    self.direction = 1.0
-                angular_vel = ty * 5  * self.direction
+                linear_vel_x = (tx-1.65) * 5  
+                angular_vel = self.leader_rz
+                # if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
+                #     self.direction = -1.0 
+                # elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
+                #     self.direction = 1.0
+                # # angular_vel = ty * 5  * self.direction
                     
-                if abs(tx - 1.5) < 0.2 and ty < 0.2:
-                    if self.direction == 1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
-                        self.direction = -1.0 
-                    elif self.direction == -1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
-                        self.direction = 1.0
-                    angular_vel = (abs(rz) - 1) * 50  * self.direction  
-                else:
-                    angular_vel = 0.0
+                # if abs(tx - 1.5) < 0.2 :
+                #     if self.direction == 1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
+                #         self.direction = -1.0 
+                #     elif self.direction == -1.0 and abs(rz) < abs(self.previous_rz):   # Check turn direction
+                #         self.direction = 1.0
+                #     angular_vel = (abs(rz) - 1) * 50  * self.direction  
+                # else:
+                #     angular_vel = 0.0
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
