@@ -25,7 +25,6 @@ setup(
             "formation_controller = coop_controller.formation_controller:main",
             "odom_test = coop_controller.odom_test:main",
             "ack_odom = coop_controller.ack_odom:main",
-            "ack_odom_beta = coop_controller.ack_odom_beta:main",
             "sim_commander = coop_controller.sim_commander:main",
         ],
     },

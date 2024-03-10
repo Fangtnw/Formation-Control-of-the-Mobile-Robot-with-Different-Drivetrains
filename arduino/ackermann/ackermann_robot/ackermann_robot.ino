@@ -36,7 +36,7 @@ const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
 const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
-const double speed_to_pwm_ratio = 0.00383;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
+const double speed_to_pwm_ratio = 0.00582;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
 //Set Value to Zero
@@ -86,8 +86,8 @@ volatile float servo_left_calculated = 0;
 volatile float servo_right_calculated = 0;
 
 //PID Parameters
-const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
-const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
+const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
 const double PID_servo_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
@@ -337,6 +337,7 @@ void loop() {
 void publishSpeed(double time) {
 //    xicro.Spin_node();
     IMUbringup();
+    handle_cmd();
     xicro.Publisher_ack_encoder_vel.message.angular.x = servo_left_calculated;
     xicro.Publisher_ack_encoder_vel.message.angular.y = servo_right_calculated;
     xicro.Publisher_ack_encoder_vel.message.angular.z = pos_ack;

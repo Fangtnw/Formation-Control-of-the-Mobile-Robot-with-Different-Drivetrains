@@ -66,7 +66,7 @@ unsigned long lastMilli = 0;
 const double radius = 0.076;                   //Wheel radius, in m
 const double wheelbase = 0.55;               //Wheelbase, in m
 const double encoder_cpr = 360;               //Encoder ticks or counts per rotation
-const double speed_to_pwm_ratio = 0.0383;    // 0.00235 Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
+const double speed_to_pwm_ratio = 0.03;    // 0.0383   0.00235 Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.09;          //0.0882 (min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
 double linx = 0;
@@ -110,7 +110,7 @@ int PWM_Motor4 = 0;
 
 // PID Parameters
 
-const double PID_param[] = { 30, 0.1, 0.0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_param[] = { 1, 1, 0.0 }; //Respectively Kp, Ki and Kd for left motor PID
 PID PID_Motor1(&speed_act_motor1,&speed_cmd_motor1, &speed_req_motor1, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_Motor2(&speed_act_motor2,&speed_cmd_motor2, &speed_req_motor2, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_Motor3(&speed_act_motor3,&speed_cmd_motor3, &speed_req_motor3, PID_param[0], PID_param[1], PID_param[2], DIRECT);          //Setting up the PID for left motor
@@ -305,10 +305,10 @@ void loop() {
     PID_Motor3.Compute();
     PID_Motor4.Compute();                                                 
     // compute PWM value for left motor. Check constant definition comments for more information.
-    PWM_Motor1 = constrain(speed_req_motor1*(255/0.29), -255, 255); 
-    PWM_Motor2 = constrain(speed_req_motor2*(255/0.29), -255, 255);
-    PWM_Motor3 = constrain(speed_req_motor3*(255/0.29), -255, 255);
-    PWM_Motor4 = constrain(speed_req_motor4*(255/0.29), -255, 255);
+    PWM_Motor1 = constrain(speed_req_motor1*(255/0.25), -255, 255); 
+    PWM_Motor2 = constrain(speed_req_motor2*(255/0.25), -255, 255);
+    PWM_Motor3 = constrain(speed_req_motor3*(255/0.25), -255, 255);
+    PWM_Motor4 = constrain(speed_req_motor4*(255/0.25), -255, 255);
     
     if(PWM_Motor1 >= 0) // forward left
     {
