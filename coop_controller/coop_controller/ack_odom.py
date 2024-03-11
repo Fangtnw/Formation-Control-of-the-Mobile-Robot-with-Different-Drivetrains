@@ -34,7 +34,7 @@ class OdometryNode(Node):
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
 
-        self.odom_pub = self.create_publisher(Odometry, 'odom', 100)
+        self.odom_pub = self.create_publisher(Odometry, 'ack_odom_raw', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(

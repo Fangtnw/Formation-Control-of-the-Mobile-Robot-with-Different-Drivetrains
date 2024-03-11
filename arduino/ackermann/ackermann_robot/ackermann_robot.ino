@@ -134,6 +134,9 @@ void handle_cmd() {
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
 
+//  speed_req_left = speed_req - angular_speed_req*(wheelbase/2);     
+//  speed_req_right = speed_req + angular_speed_req*(wheelbase/2); 
+  
   speed_req_right = speed_req;
   speed_req_left = speed_req;
 

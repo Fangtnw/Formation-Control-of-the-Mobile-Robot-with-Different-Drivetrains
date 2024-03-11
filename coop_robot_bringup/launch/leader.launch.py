@@ -37,7 +37,13 @@ def generate_launch_description():
         executable='ack_odom',
         output='screen',
     )
+    mec_bringup = ExecuteProcess(
+        cmd=['ros2','launch','coop_robot_bringup','mec.launch.py']
+    )
 
+    diff_bringup = ExecuteProcess(
+        cmd=['ros2','launch','coop_robot_bringup','pi_diff.launch.py']
+    )
     diff_robot_localization_odom = Node(
             package='robot_localization',
             executable='ekf_node',
@@ -85,10 +91,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    slam_toolbox = ExecuteProcess(
-        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',],
-        output='screen',
-    )
 
 
     slam_toolbox_localize = ExecuteProcess(
@@ -132,12 +134,17 @@ def generate_launch_description():
 
     # Add actions to the LaunchDescription
     # ld.add_action(ydliar)
-    ld.add_action(xicro)
+    # ld.add_action(xicro)
 
     # ld.add_action(laser_to_base_footprint_tf)
     # ld.add_action(diff_odom_compute)
-    ld.add_action(ack_odom_compute)
-    ld.add_action(ack_to_mec_tf)
+
+    # ld.add_action(ack_odom_compute)
+
+
+    # ld.add_action(mec_bringup)
+    # ld.add_action(diff_bringup)
+
     # ld.add_action(imu_to_base_link_tf)
     # ld.add_action(diff_robot_localization_odom)
     ld.add_action(rviz)
@@ -146,11 +153,11 @@ def generate_launch_description():
     # ld.add_action(nav2)
     
     # ld.add_action(slam_toolbox)
-    # ld.add_action(nav2_sim)
+    ld.add_action(nav2_sim)
 
     # ld.add_action(map_server)
     # ld.add_action(lifecycle_map_server)
-    # ld.add_action(slam_toolbox_localize)
+    ld.add_action(slam_toolbox_localize)
     # ld.add_action(amcl)
     # ld.add_action(lifecycle_amcl)
 

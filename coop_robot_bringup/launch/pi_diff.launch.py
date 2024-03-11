@@ -6,6 +6,16 @@ from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch.actions import TimerAction
+import math
+
+angle = -math.pi
+
+# Calculate half angle for quaternion construction
+half_angle = angle / 2.0
+
+# Generate sine and cosine values
+sin_half_angle = math.sin(half_angle)
+cos_half_angle = math.cos(half_angle)
 
 def generate_launch_description():
     diffbot_bringup_dir = get_package_share_directory("coop_robot_bringup")
@@ -78,6 +88,16 @@ def generate_launch_description():
         output='screen',
     )
 
+    diff_to_mec_tf = Node(package='tf2_ros',
+                        executable='static_transform_publisher',
+                        name='static_tf_pub_imu',
+                        output='screen',
+                        arguments=[
+                            '1.65', '0.0', '0.0',  # Set translation to zero (no translation)
+                            '0.0', '0.0', str(sin_half_angle), str(cos_half_angle),  # Set rotation using quaternion
+                            'odom', 'odom_diff'  # Parent and child frame IDs
+                        ])
+
     # nav2 = ExecuteProcess(
     #     cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
     #     output='screen',
@@ -86,9 +106,10 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
-    ld.add_action(ydliar) 
-    ld.add_action(xicro_delay)
-    # ld.add_action(odom_compute)
+    # ld.add_action(ydliar) 
+    # ld.add_action(xicro_delay)
+    ld.add_action(odom_compute)
+    ld.add_action(diff_to_mec_tf)
     # ld.add_action(imu_to_base_link_tf)
     # ld.add_action(robot_localization_odom)
     # ld.add_action(rviz)

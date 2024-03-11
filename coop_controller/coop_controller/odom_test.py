@@ -10,8 +10,8 @@ class OdomTest(Node):
         self.get_logger().info('Odometry Test Node is running')
         self.initial_x = None
         self.current_x = 0.0
-        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel_follower', 10)
-        self.odom_sub = self.create_subscription(Odometry, '/mec_odom_raw', self.odom_callback, 10)
+        self.cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.odom_sub = self.create_subscription(Odometry, '/ack_odom_raw', self.odom_callback, 10)
         self.FORWARD_DISTANCE_CM = forward_distance_cm
 
     def odom_callback(self, msg):
