@@ -1,6 +1,0 @@
-setup.py
-xicro_pkg/__init__.py
-xicro_pkg.egg-info/PKG-INFO
-xicro_pkg.egg-info/SOURCES.txt
-xicro_pkg.egg-info/dependency_links.txt
-xicro_pkg.egg-info/top_level.txt

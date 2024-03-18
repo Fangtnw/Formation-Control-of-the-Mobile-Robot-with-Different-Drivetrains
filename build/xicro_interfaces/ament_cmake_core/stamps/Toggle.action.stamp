@@ -1,5 +1,0 @@
-uint64 a
----
-uint64 sum
----
-bool flag

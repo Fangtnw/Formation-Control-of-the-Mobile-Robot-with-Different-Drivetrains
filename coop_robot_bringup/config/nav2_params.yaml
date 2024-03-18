@@ -139,7 +139,7 @@ controller_server:
                 trajectory_step: 5
                 time_step: 3
             AckermannConstraints:
-                min_turning_r: 0.6
+                min_turning_r: 2.5 #0.6
             critics:
                 [
                     "ConstraintCritic",
@@ -322,7 +322,7 @@ planner_server:
       smooth_path: true
       motion_model_for_search: "REEDS_SHEPP" #REEDS_SHEPP
       angle_quantization_bins: 72    
-      minimum_turning_radius: 0.6  
+      minimum_turning_radius: 2.5  #0.6
       reverse_penalty: 4.0  #For Reeds-Shepp model: penalty to apply if motion is reversing, must be => 1
       change_penalty: 0.0      
       non_straight_penalty: 0.0     

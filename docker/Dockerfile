@@ -9,10 +9,14 @@ RUN apt-get update && \
     python3-argcomplete \
     python3-pip \
     terminator \
+    ros-humble-usb-cam \
+    ros-humble-aruco \
     tmux \
     cmake pkg-config \
     swig \
     && rm -rf /var/lib/apt/lists/*
+
+
 
 # Create a non-root user
 ARG USERNAME=pi5
@@ -37,7 +41,8 @@ USER $USERNAME
 RUN pip3 install --upgrade pip \
     && pip3 uninstall -y serial \
     && pip3 install pyserial \
-    && pip3 install numpy
+    && pip3 install numpy \
+    && pip install opencv-contrib-python
 
 # Create the log directory with the correct permissions
 # RUN mkdir -p /log/build_$(date '+%Y-%m-%d_%H-%M-%S') \

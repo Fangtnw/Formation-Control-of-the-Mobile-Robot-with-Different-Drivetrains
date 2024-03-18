@@ -30,7 +30,7 @@ class FormationController(Node):
         self.ki_x = 0.0  # Initialize for integral term
         self.kp_y = 1  # New gain for y-direction
         self.ki_y = 0.0  # Initialize for integral term
-        self.kp_yaw = 0.1
+        self.kp_yaw = 1
         self.ki_yaw = 0  # Initialize for integral term
 
         # Variables to store integral errors for PI control
@@ -108,7 +108,7 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                error_x = (tx - 1.65)
+                error_x = (tx - 1.5)
                 self.integral_error_x += error_x  # Accumulate error for integral term
                 linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
 
@@ -120,7 +120,7 @@ class FormationController(Node):
                 #     self.direction = 1.0
                 # # angular_vel = ty * 5  * self.direction
                     
-                if error_x < 0.2 :
+                if abs(error_x) < 0.2:
                     error_yaw = yaw
                     self.integral_error_yaw += error_yaw  # Accumulate error for integral term
                     angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
@@ -134,8 +134,11 @@ class FormationController(Node):
                 exit()
 
             cmd_msg.linear.x = linear_vel_x
-            # cmd_msg.angular.z = angular_vel
+            cmd_msg.angular.z = angular_vel
 
+            self.get_logger().info(
+                f"Follower_command: x:{linear_vel_x:.2f}, z:{angular_vel:.2f} "
+            )
             self.publisher.publish(cmd_msg)
             self.previous_ty = ty 
             self.previous_yaw = yaw 
