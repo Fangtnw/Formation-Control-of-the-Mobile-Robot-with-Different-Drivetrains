@@ -12,6 +12,7 @@ RUN apt-get update && \
     ros-humble-usb-cam \
     ros-humble-aruco \
     tmux \
+    v4l-utils \
     cmake pkg-config \
     swig \
     && rm -rf /var/lib/apt/lists/*
