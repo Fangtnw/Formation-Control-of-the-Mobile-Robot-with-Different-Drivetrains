@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','ackermann_fork.xacro')
+                           'urdf','ackermann_control.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -62,9 +62,58 @@ def generate_launch_description():
         output='screen'
     )
 
+    load_ackermann_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="ackermann",
+        arguments=["ackermann_steering_controller", "--controller-manager", "controller_manager"]
+    )
+    
+    load_joint_state_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="ackermann",
+        arguments=["joint_state_broadcaster", "--controller-manager", "controller_manager"]
+    )
+    load_position_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="ackermann",
+        arguments=["position_controller", "--controller-manager", "controller_manager"]
+    )
+    load_velocity_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace="ackermann",
+        arguments=["velocity_controller", "--controller-manager", "controller_manager"]
+    )
+
+
+
+    # load_joint_state_broadcaster = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+    #          '/ackermann/joint_state_broadcaster'],
+    #     output='screen'
+    # )
+
+    # load_velocity_controller = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', '/ackermann/velocity_controller'],
+    #     output='screen'
+    # )
+
+    # load_position_controller = ExecuteProcess(
+    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', '/ackermann/position_controller'],
+    #     output='screen'
+    # )
+
     return LaunchDescription([
         spawn_ackermann,
         # spawn_ackermann_back,
         ack_state_publisher,
+        load_joint_state_broadcaster,
+        load_ackermann_controller,
+        load_position_controller,
+        load_velocity_controller,
+        
         
     ])

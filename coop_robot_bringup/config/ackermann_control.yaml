@@ -1,18 +1,17 @@
-controller_manager:
+/ackermann/controller_manager:
   ros__parameters:
-    update_rate: 50
+    update_rate: 1000
 
-    use_sim_time: true
+    use_sim_time: false
 
-    joint_state_controller:
+    joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
     ackermann_steering_controller:
       type: ackermann_steering_controller/AckermannSteeringController
 
-ackermann_steering_controller:
+/ackermann/ackermann_steering_controller:
   ros__parameters:
-
     reference_timeout: 2.0
     front_steering: true
     open_loop: false
@@ -29,6 +28,55 @@ ackermann_steering_controller:
     front_wheels_radius: 0.165
     rear_wheels_radius: 0.165
 
-joint_state_controller:
-  ros__parameters:
-    type: joint_state_controller/JointStateController
+  
+    wheel_separation: 1.23
+    # wheel_radius: 0.2525
+    # wheel_base: 0.2
+    pivot_distance: 0.803
+    max_steering_speed: 1.5707963267948966
+    max_steering_angle: 0.42
+    odom_frame_id: odom
+    base_frame_id: base_footprint
+    enable_odom_tf: true
+    wheelbase: 1.530
+    front_wheel_track: 1.23
+    rear_wheel_track: 1.23
+    front_wheel_radius: 0.2525
+    rear_wheel_radius: 0.2525
+
+# /ackermann/controller_manager:
+#   ros__parameters:
+#     update_rate: 100  # Hz
+#     use_sim_time: true
+
+#     joint_state_broadcaster:
+#       type: joint_state_broadcaster/JointStateBroadcaster
+
+#     velocity_controller:
+#       type: velocity_controllers/JointGroupVelocityController
+
+#     position_controller:
+#       type: position_controllers/JointGroupPositionController
+
+# /ackermann/velocity_controller:
+#   ros__parameters:
+#     joints:
+#       - rear_left_joint
+#       - rear_right_joint
+#       - front_left_joint
+#       - front_right_joint
+#     interface_name: velocity
+
+# /ackermann/position_controller:
+#   ros__parameters:
+#     joints:
+#       - right_steering_joint
+#       - left_steering_joint
+#     interface_name: position
+
+
+
+
+
+
+    

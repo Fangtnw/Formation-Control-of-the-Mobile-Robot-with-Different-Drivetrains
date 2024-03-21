@@ -8,6 +8,7 @@
     <child link="base_link"/>
   </joint>
 
+
   <link name="laser_frame">
     <visual>
       <geometry>
@@ -38,21 +39,22 @@
     <child link="laser_frame"/>
   </joint>
 
+
   <link
     name="base_link">
     <inertial>
       <origin
-        xyz="-0.0651994405179663 4.22434509872449E-07 -0.0239634712761258"
+        xyz="-0.155033044322973 5.21064123681914E-07 -0.0374219405386322"
         rpy="0 0 0" />
       <mass
-        value="5.25555128497609" />
+        value="5.2064614062057" />
       <inertia
-        ixx="0.0414328478617682"
-        ixy="-1.82796488685318E-07"
-        ixz="3.45960820664179E-07"
-        iyy="0.0417152661425413"
-        iyz="1.05010040923958E-07"
-        izz="0.0821338918053197" />
+        ixx="0.0413486020291867"
+        ixy="-1.82796488685308E-07"
+        ixz="3.45960820667353E-07"
+        iyy="0.0152273358946837"
+        iyz="1.05010040456044E-07"
+        izz="0.0556459614992652" />
     </inertial>
     <visual>
       <origin
@@ -76,26 +78,17 @@
         <mesh
           filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/base_link.STL" />
       </geometry>
-      <surface>
-        <contact>
-          <poissons_ratio>0.347</poissons_ratio>
-          <elastic_modulus>8.8e+09</elastic_modulus>
-          <ode>
-            <soft_cfm>0.0</soft_cfm>
-            <soft_erp>0.2</soft_erp>
-            <kp>1e25</kp>
-            <kd>1e13</kd>
-            <max_vel>0.01</max_vel>
-            <min_depth>0.0001</min_depth>
-          </ode>
-        </contact>
-        <friction>
-          <ode>
-            <mu>0.1</mu>
-            <mu2>0.1</mu2>
-        <fdir1>1 0 0</fdir1>
-          </ode>
-        </friction>
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
       </surface>
     </collision>
   </link>
@@ -106,7 +99,7 @@
         xyz="3.8858E-15 -0.015274 4.6435E-14"
         rpy="0 0 0" />
       <mass
-        value="2.4" />
+        value="2.4047" />
       <inertia
         ixx="0.00024514"
         ixy="5.4339E-21"
@@ -141,10 +134,10 @@
   </link>
   <joint
     name="front_left_joint"
-    type="fixed">
+    type="continuous">
     <origin
       xyz="0.0190000000000679 0.301000000000045 -0.0695000000000887"
-      rpy="3.14159265358979 0.0849179307157281 3.14159265358979" />
+      rpy="3.14159265358979 0.0849179307157279 3.14159265358979" />
     <parent
       link="base_link" />
     <child
@@ -159,7 +152,7 @@
         xyz="-2.9643E-14 0.025726 3.5749E-14"
         rpy="0 0 0" />
       <mass
-        value="2.4" />
+        value="2.4047" />
       <inertia
         ixx="0.00024514"
         ixy="5.2554E-21"
@@ -194,7 +187,7 @@
   </link>
   <joint
     name="front_right_joint"
-    type="fixed">
+    type="continuous">
     <origin
       xyz="0.0190000000000679 -0.259999999999977 -0.0695000000000887"
       rpy="3.14159265358979 -0.692237011731428 0" />
@@ -209,17 +202,17 @@
     name="left_steering">
     <inertial>
       <origin
-        xyz="0.0121532099874294 -0.0166916241895938 -0.0211847288398316"
+        xyz="0.012512933493309 -0.0163421015504649 -0.0213045365279689"
         rpy="0 0 0" />
       <mass
-        value="4" />
+        value="1.5" />
       <inertia
-        ixx="1.43958495481578E-05"
-        ixy="-1.73339990683825E-06"
-        ixz="-7.11935154287877E-06"
-        iyy="2.95171085845272E-05"
-        iyz="2.08772590818048E-06"
-        izz="3.10994722329793E-05" />
+        ixx="1.40345098300458E-05"
+        ixy="-1.52725955805096E-06"
+        ixz="-7.1949991184784E-06"
+        iyy="2.900901803087E-05"
+        iyz="2.01422351026883E-06"
+        izz="3.05054640970382E-05" />
     </inertial>
     <visual>
       <origin
@@ -247,9 +240,9 @@
   </link>
   <joint
     name="left_steering_joint"
-    type="fixed">
+    type="revolute">
     <origin
-      xyz="-0.544750000000063 0.229999999999977 -0.0837500000002837"
+      xyz="-0.544750000000063 0.229999999999977 -0.0837500000002835"
       rpy="3.14159265358979 0 -0.00209254658538632" />
     <parent
       link="base_link" />
@@ -257,6 +250,10 @@
       link="left_steering" />
     <axis
       xyz="0 0 1" />
+    <limit
+      lower="-0.785"
+      upper="0.785"
+      effort="10"  velocity="10"  />
   </joint>
   <link
     name="rear_left">
@@ -265,7 +262,7 @@
         xyz="-1.5192E-06 0.025619 0.006692"
         rpy="0 0 0" />
       <mass
-        value="2.4" />
+        value="2.4047" />
       <inertia
         ixx="0.00024514"
         ixy="-4.9967E-09"
@@ -300,7 +297,7 @@
   </link>
   <joint
     name="rear_left_joint"
-    type="fixed">
+    type="continuous">
     <origin
       xyz="0 -0.0367488381424265 -0.0159999999999999"
       rpy="3.14159265358979 1.57056930363849 0" />
@@ -315,17 +312,17 @@
     name="right_steering">
     <inertial>
       <origin
-        xyz="-0.0138648104691156 -0.0152975676601856 -0.021184728839829"
+        xyz="-0.0141851959168551 -0.0149116111585591 -0.0213045365279664"
         rpy="0 0 0" />
       <mass
-        value="4" />
+        value="1.5" />
       <inertia
-        ixx="1.49389187707206E-05"
-        ixy="3.30295116006257E-06"
-        ixz="7.3015684371967E-06"
-        iyy="2.89780797923847E-05"
-        iyz="1.31491150207248E-06"
-        izz="3.11035126633983E-05" />
+        ixx="1.45321058215473E-05"
+        ixy="3.08590475566129E-06"
+        ixz="7.36894346824914E-06"
+        iyy="2.85153884323416E-05"
+        iyz="1.2337472935684E-06"
+        izz="3.05094304900102E-05" />
     </inertial>
     <visual>
       <origin
@@ -353,9 +350,9 @@
   </link>
   <joint
     name="right_steering_joint"
-    type="fixed">
+    type="revolute">
     <origin
-      xyz="-0.544750000000063 -0.230000000000023 -0.0837500000002836"
+      xyz="-0.544750000000063 -0.230000000000023 -0.0837500000002835"
       rpy="3.14159265358979 0 -3.13242627228221" />
     <parent
       link="base_link" />
@@ -363,6 +360,10 @@
       link="right_steering" />
     <axis
       xyz="0 0 1" />
+    <limit
+      lower="-0.785"
+      upper="0.785"
+      effort="10"  velocity="10"  />
   </joint>
   <link
     name="rear_right">
@@ -371,11 +372,11 @@
         xyz="1.415E-10 0.025722 1.2793E-08"
         rpy="0 0 0" />
       <mass
-        value="2.4" />
+        value="2.4047" />
       <inertia
         ixx="0.00024514"
         ixy="4.6696E-13"
-        ixz="9.4021E-20"
+        ixz="9.4868E-20"
         iyy="0.00045262"
         iyz="4.2319E-11"
         izz="0.00024514" />
@@ -406,7 +407,7 @@
   </link>
   <joint
     name="rear_right_joint"
-    type="fixed">
+    type="continuous">
     <origin
       xyz="0 -0.0370034448281129 -0.0159999999999995"
       rpy="3.14159265358979 -1.55976234848309 0" />
@@ -417,6 +418,231 @@
     <axis
       xyz="0 1 0" />
   </joint>
+  <link
+    name="folk_ack_right">
+    <inertial>
+      <origin
+        xyz="-0.257964644660853 0.067499973033625 0.010000000000158"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="4.2122916290778E-05"
+        ixy="1.2842833560071E-21"
+        ixz="-2.93149051739725E-18"
+        iyy="0.0132439651239288"
+        iyz="-2.33963808392073E-16"
+        izz="0.0132439651530273" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/folk_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.257964644660853 -0.067500026966421 0.0100000000001579"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_ack_right_fixed"
+    type="fixed">
+    <origin
+      xyz="0.0370353553391244 0 0.0200000000000697"
+      rpy="0 0 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_ack_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="folk_ack_left">
+    <inertial>
+      <origin
+        xyz="-0.257964644660853 -0.067500026966421 0.0100000000001579"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="4.2122916290778E-05"
+        ixy="1.28430313218206E-21"
+        ixz="-2.9314905173971E-18"
+        iyy="0.0132439651239288"
+        iyz="-2.33963772942766E-16"
+        izz="0.0132439651530273" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="file:///$(find my_robot_description)/meshes/ackermann_meshes/folk_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.257964644660853 -0.067500026966421 0.0100000000001579"
+        rpy="0.0 0.0 0.0" />
+        <geometry>
+            <box size="0.55 0.04 0.02"/>
+        </geometry> 
+     <surface>
+        <poissons_ratio>0.347</poissons_ratio>
+        <elastic_modulus>8.8e+09</elastic_modulus>
+        <ode>
+          <soft_cfm>2e+20</soft_cfm>
+          <soft_erp>2e+40</soft_erp>
+          <kp>1000</kp>
+          <kd>1</kd>
+          <max_vel>0.01</max_vel>
+          <min_depth>1.0</min_depth>
+        </ode>
+      </surface>
+    </collision>
+  </link>
+  <joint
+    name="folk_ack_left_fixed"
+    type="fixed">
+    <origin
+      xyz="0.0370353553391244 0 0.0200000000000697"
+      rpy="0 0 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="folk_ack_left" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+
+  <gazebo>
+      <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+        <namespace>ackermann</namespace>
+        <robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+        <parameters>$(find coop_robot_bringup)/config/ackermann_control.yaml</parameters>
+        <controller_manager_name>controller_manager</controller_manager_name>
+      </plugin>
+  </gazebo>
+
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+      <joint name="front_left_joint">
+        <command_interface name="velocity">
+          <param name="min">-0.5</param>
+          <param name="max">0.5</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="front_right_joint">
+        <command_interface name="velocity">
+          <param name="min">-0.5</param>
+          <param name="max">0.5</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="rear_left_joint">
+        <command_interface name="velocity">
+          <param name="min">-0.5</param>
+          <param name="max">0.5</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="rear_right_joint">
+        <command_interface name="velocity"> 
+          <param name="min">-0.5</param>
+          <param name="max">0.5</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="left_steering_joint">
+        <command_interface name="position">
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+      <joint name="right_steering_joint">
+        <command_interface name="position">
+        </command_interface>
+        <state_interface name="position">
+          <param name="initial_value">0.0</param>
+        </state_interface>
+        <state_interface name="velocity"/>
+      </joint>
+  </ros2_control>
+
+
+  <gazebo reference="laser_frame">
+      <material>Gazebo/Black</material>
+
+      <sensor name="laser" type="ray">
+        <namespace></namespace>
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>10</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>360</samples>
+              <min_angle>-3.14</min_angle>
+              <max_angle>3.14</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.3</min>
+            <max>12</max>
+          </range>
+        </ray>
+        <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
+          <namespace></namespace>
+          <ros>
+            <argument>~/out:=scan</argument>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>laser_frame</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
 
     <gazebo reference="front_left">
       <material>Gazebo/Green</material>
@@ -441,63 +667,4 @@
     <gazebo reference="left_steering">
       <material>Gazebo/Red</material>
     </gazebo>
-
-
-<ros2_control name="GazeboSystem" type="system">
-  <hardware>
-    <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-  </hardware>
-  <joint name="slider_to_cart">
-    <command_interface name="effort">
-      <param name="min">-1000</param>
-      <param name="max">1000</param>
-    </command_interface>
-    <state_interface name="position">
-      <param name="initial_value">1.0</param>
-    </state_interface>
-    <state_interface name="velocity"/>
-    <state_interface name="effort"/>
-  </joint>
-</ros2_control>
-
-<gazebo>
-    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
-      <robot_param>robot_description</robot_param>
-      <robot_param_node>robot_state_publisher</robot_param_node>
-      <parameters>$(find gazebo_ros2_control_demos)/config/cart_controller.yaml</parameters>
-      <controller_manager_name>simulation_controller_manager</controller_manager_name>
-    </plugin>
-</gazebo>
-
- <gazebo reference="laser_frame">
-    <material>Gazebo/Black</material>
-
-    <sensor name="laser" type="ray">
-      <namespace></namespace>
-      <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
-      <update_rate>10</update_rate>
-      <ray>
-        <scan>
-          <horizontal>
-            <samples>360</samples>
-            <min_angle>-3.14</min_angle>
-            <max_angle>3.14</max_angle>
-          </horizontal>
-        </scan>
-        <range>
-          <min>0.3</min>
-          <max>12</max>
-        </range>
-      </ray>
-      <plugin name="laser" filename="libgazebo_ros_ray_sensor.so">
-        <namespace></namespace>
-        <ros>
-          <argument>~/out:=scan</argument>
-        </ros>
-        <output_type>sensor_msgs/LaserScan</output_type>
-        <frame_name>laser_frame</frame_name>
-      </plugin>
-    </sensor>
-  </gazebo>
 </robot>

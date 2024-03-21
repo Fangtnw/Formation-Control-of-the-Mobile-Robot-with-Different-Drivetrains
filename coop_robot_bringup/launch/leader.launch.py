@@ -85,6 +85,13 @@ def generate_launch_description():
                     output='screen',
                     arguments=['0.2', '0', '0.02','0', '0', '0', '1','base_footprint','laser_frame'],
                     )
+    
+    camera_to_base_footprint = Node(package='tf2_ros',
+                    executable='static_transform_publisher',
+                    name='static_tf_pub_laser',
+                    output='screen',
+                    arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','camera_frame'],
+                    )
 
     rviz = ExecuteProcess(
         cmd=['ros2', 'run', 'rviz2', 'rviz2', '-d', '/opt/ros/humble/share/nav2_bringup/rviz/nav2_default_view.rviz'],
@@ -140,6 +147,7 @@ def generate_launch_description():
     # ld.add_action(diff_odom_compute)
 
     # ld.add_action(ack_odom_compute)
+    ld.add_action(camera_to_base_footprint)
 
 
     # ld.add_action(mec_bringup)
@@ -147,6 +155,7 @@ def generate_launch_description():
 
     # ld.add_action(imu_to_base_link_tf)
     # ld.add_action(diff_robot_localization_odom)
+
     ld.add_action(rviz)
 
     # ld.add_action(slam_toolbox)

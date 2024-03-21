@@ -21,6 +21,9 @@ class FormationController(Node):
         elif self.follower_type == 'diffdrive':
             self.robot1_frame = 'base_footprint'
             self.robot2_frame = 'base_footprint_diff'
+        elif self.follower_type == 'aruco':
+            self.robot1_frame = 'aruco_frame'
+            self.robot2_frame = 'camera_frame'
         self.leader_x = 0.0
         self.leader_yaw = 0.0
         self.direction = 1.0
@@ -108,7 +111,7 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                error_x = (tx - 1.5)
+                error_x = (tx - 1.45)
                 self.integral_error_x += error_x  # Accumulate error for integral term
                 linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
 
@@ -129,6 +132,9 @@ class FormationController(Node):
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
+            elif self.follower_type == 'aruco':
+                pass
+        
             else:
                 self.get_logger().error(f"Invalid follower type '{self.follower_type}'")
                 exit()
@@ -155,7 +161,7 @@ class FormationController(Node):
 def main(args=None):
     rclpy.init(args=args)
     parser = argparse.ArgumentParser(description='Formation Controller')
-    parser.add_argument('--follower_type', choices=['mecanum', 'diffdrive'], required=True,
+    parser.add_argument('--follower_type', choices=['mecanum', 'diffdrive', 'aruco'], required=True,
                         help='Specify follower robot type (mecanum or diffdrive)')
     args = parser.parse_args()
 

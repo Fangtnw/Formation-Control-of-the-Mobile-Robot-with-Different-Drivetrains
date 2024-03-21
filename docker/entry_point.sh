@@ -23,5 +23,6 @@ cd ..
 
 colcon build --symlink-install
 source ~/coop_ws/install/setup.bash
+sudo chmod 777 /dev/video*
 
 tmux

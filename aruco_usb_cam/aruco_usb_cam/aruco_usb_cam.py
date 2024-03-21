@@ -11,6 +11,7 @@ import geometry_msgs.msg
 from tf2_ros import TransformBroadcaster
 import tf_transformations
 from scipy.spatial.transform import Rotation as R
+from rclpy.qos import QoSProfile
 
 class ArUcoDetector(Node):
     def __init__(self):
@@ -24,12 +25,35 @@ class ArUcoDetector(Node):
             Image,
             'image_raw',
             self.image_callback,
-            10)
-        self.camera_info_sub = self.create_subscription(
-            CameraInfo,
-            'camera_info',
-            self.camera_info_callback,
-            10)
+            qos_profile=QoSProfile(
+                depth=10,  # This sets the history depth to 1 (optional)
+                reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,  # Set reliability level
+                durability=rclpy.qos.DurabilityPolicy.VOLATILE,  # Optional, adjust if needed
+                history=rclpy.qos.HistoryPolicy.KEEP_LAST
+                  # Sets the deadline to 1/10 seconds for 10 Hz
+            )
+        )
+        self.camera_matrix = np.array([
+        [678.32644258, 0.0, 291.36114031],
+        [0.0, 666.95790955, 233.72386481],
+        [0.0, 0.0, 1.0]
+            ])
+
+        self.dist_coeff = np.array([-0.54810353, 0.89866936, 0.02231926, 0.01317876, -2.36918976])
+
+
+        # self.camera_info_sub = self.create_subscription(
+        #     CameraInfo,
+        #     'camera_info',
+        #     self.camera_info_callback,
+        #     qos_profile=QoSProfile(
+        #         depth=10,  # This sets the history depth to 1 (optional)
+        #         reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,  # Set reliability level
+        #         durability=rclpy.qos.DurabilityPolicy.VOLATILE,  # Optional, adjust if needed
+        #         history=rclpy.qos.HistoryPolicy.KEEP_LAST
+        #           # Sets the deadline to 1/10 seconds for 10 Hz
+        #     )
+        # )
         self.tf_broadcaster = TransformBroadcaster(self)
 
     def image_callback(self, msg):
@@ -41,7 +65,7 @@ class ArUcoDetector(Node):
             return
 
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
-        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
+        aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_250)
         parameters = cv2.aruco.DetectorParameters()
         corners, ids, rejectedImgPoints = cv2.aruco.detectMarkers(
             gray, aruco_dict, parameters=parameters)
@@ -49,28 +73,28 @@ class ArUcoDetector(Node):
         if ids is not None:
             self.get_logger().info("Detected ArUco markers")
             for i, id in enumerate(ids):
-                if id == 42:  # Example ArUco ID, update with your specific ID
-                    self.get_logger().info("Found ArUco marker with ID 42")
+                if id == 145:  # Example ArUco ID, update with your specific ID
+                    self.get_logger().info("Found ArUco marker with ID 145")
                     rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
                         corners[i], 0.05, self.camera_matrix, self.dist_coeff)
                     
-                    if rvec is not None and tvec is not None:
+                    if rvec is not None and tvec is not None and tvec.any():  # Check if tvec is not empty
                         transform = TransformStamped()
                         transform.header.stamp = self.get_clock().now().to_msg()
                         transform.header.frame_id = self.camera_frame
                         transform.child_frame_id = self.aruco_frame
-                        transform.transform.translation.x = tvec[i][0][0]
-                        transform.transform.translation.y = tvec[i][0][1]
-                        transform.transform.translation.z = tvec[i][0][2]
+                        transform.transform.translation.y = tvec[i][0][0]
+                        transform.transform.translation.z = tvec[i][0][1]
+                        transform.transform.translation.x = tvec[i][0][2]
                         rotation_matrix = np.eye(4)
                         rotation_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvec[i][0]))[0]
                         r = R.from_matrix(rotation_matrix[0:3, 0:3])
                         quat = r.as_quat()   
                         
                         # Quaternion format     
-                        transform.transform.rotation.x = quat[0] 
-                        transform.transform.rotation.y = quat[1] 
-                        transform.transform.rotation.z = quat[2] 
+                        transform.transform.rotation.z = quat[0] 
+                        transform.transform.rotation.x = quat[1] 
+                        transform.transform.rotation.y = quat[2] 
                         transform.transform.rotation.w = quat[3] 
                         self.get_logger().info("Publishing ArUco transform")
                         self.tf_broadcaster.sendTransform(transform)
@@ -78,10 +102,10 @@ class ArUcoDetector(Node):
 
 
 
-    def camera_info_callback(self, msg):
-        self.get_logger().info("Received camera info message")
-        self.camera_matrix = np.array(msg.k).reshape((3, 3))
-        self.dist_coeff = np.array(msg.d)
+    # def camera_info_callback(self, msg):
+    #     self.get_logger().info("Received camera info message")
+    #     self.camera_matrix = np.array(msg.k).reshape((3, 3))
+    #     self.dist_coeff = np.array(msg.d)
 
 
 def main(args=None):
