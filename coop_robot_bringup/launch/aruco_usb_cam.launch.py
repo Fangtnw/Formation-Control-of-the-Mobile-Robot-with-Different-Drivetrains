@@ -10,7 +10,6 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription,DeclareLaunchArgument
 from ament_index_python.packages import get_package_share_path
 from launch.conditions import IfCondition
-import xacro
 
 def generate_launch_description():
 

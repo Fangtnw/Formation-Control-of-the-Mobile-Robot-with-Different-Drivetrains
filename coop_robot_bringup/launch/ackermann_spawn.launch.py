@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','ackermann_control.xacro')
+                           'urdf','ackermann_fork.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')
@@ -110,10 +110,10 @@ def generate_launch_description():
         spawn_ackermann,
         # spawn_ackermann_back,
         ack_state_publisher,
-        load_joint_state_broadcaster,
-        load_ackermann_controller,
-        load_position_controller,
-        load_velocity_controller,
+        # load_joint_state_broadcaster,
+        # load_ackermann_controller,
+        # load_position_controller,
+        # load_velocity_controller,
         
         
     ])
