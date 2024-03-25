@@ -26,6 +26,7 @@ setup(
             "odom_test = coop_controller.odom_test:main",
             "ack_odom = coop_controller.ack_odom:main",
             "sim_commander = coop_controller.sim_commander:main",
+            "dynamic_footprint = coop_controller.dynamic_footprint:main",
         ],
     },
 )

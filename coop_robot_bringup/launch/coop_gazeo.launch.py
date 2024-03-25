@@ -100,6 +100,16 @@ def generate_launch_description():
             arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "mec_odom"]
         )
     
+    dynamic_footprint_diff=ExecuteProcess(
+        cmd=['ros2', 'run', 'coop_controller', 'dynamic_footprint', "--follower_type", "diffdrive"],
+        output='screen',
+    )
+    
+    dynamic_footprint_mec=ExecuteProcess(
+        cmd=['ros2', 'run', 'coop_controller', 'dynamic_footprint', "--follower_type", "mecanum"],
+        output='screen',
+    )
+
     tf_ack_to_diff= Node(
             package="tf2_ros",
             executable="static_transform_publisher",
@@ -113,11 +123,14 @@ def generate_launch_description():
         gazebo_client,
         # joint_state_publisher_gui,
         spawn_ackermann,
-   
-        spawn_diffdrive,
-        # spawn_mecanum,
+
+        # dynamic_footprint_diff,
+        # spawn_diffdrive,
+
+        spawn_mecanum,
+        dynamic_footprint_mec,
         tf_ack_to_mec,
 
         tf_ack_to_diff,
-        rviz2,
+        # rviz2,
     ])

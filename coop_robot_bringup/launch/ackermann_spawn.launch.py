@@ -15,7 +15,7 @@ import xacro
 def generate_launch_description():
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
-                           'urdf','ackermann_control.xacro')
+                           'urdf','ackermann_fork.xacro')
     
     rviz_config_path=os.path.join(get_package_share_path('my_robot_description'),
                            'rviz','urdf_config.rviz')

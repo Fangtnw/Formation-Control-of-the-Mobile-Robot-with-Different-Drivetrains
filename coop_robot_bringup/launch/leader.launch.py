@@ -147,7 +147,7 @@ def generate_launch_description():
     # ld.add_action(diff_odom_compute)
 
     # ld.add_action(ack_odom_compute)
-    ld.add_action(camera_to_base_footprint)
+    # ld.add_action(camera_to_base_footprint)
 
 
     # ld.add_action(mec_bringup)
