@@ -11,6 +11,7 @@ RUN apt-get update && \
     terminator \
     ros-humble-usb-cam \
     ros-humble-aruco \
+    ros-humble-rmw-cyclonedds-cpp \
     tmux \
     v4l-utils \
     cmake pkg-config \
@@ -43,6 +44,7 @@ RUN pip3 install --upgrade pip \
     && pip3 uninstall -y serial \
     && pip3 install pyserial \
     && pip3 install numpy \
+    && pip install scipy \
     && pip install opencv-contrib-python
 
 # Create the log directory with the correct permissions

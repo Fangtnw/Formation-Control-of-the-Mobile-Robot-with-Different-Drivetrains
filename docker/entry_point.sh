@@ -23,6 +23,7 @@ cd ..
 
 colcon build --symlink-install
 source ~/coop_ws/install/setup.bash
+export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 sudo chmod 777 /dev/video*
 
 tmux
