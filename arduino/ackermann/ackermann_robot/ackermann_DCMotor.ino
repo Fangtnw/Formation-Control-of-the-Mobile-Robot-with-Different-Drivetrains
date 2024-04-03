@@ -29,7 +29,7 @@ const int PIN_ENCOD_B_STEER_RIGHT = 3;              //B channel for encoder of r
 const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
-const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
+const double encoder_cpr = 600;               //Encoder ticks or counts per rotation             
 const double speed_to_pwm_ratio = 0.00582;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
@@ -129,10 +129,6 @@ class motor{
     
 };
 
-int angleToPWM(int ang_cmd_steer) {
-  return map(ang_cmd_steer, min_angle, max_angle, -255, 255);
-}
-
 void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
@@ -141,17 +137,17 @@ void handle_cmd() {
   speed_req_right = speed_req;
   speed_req_left = speed_req;
 
-  //Steer SPD Command
+  //Steer degree Command
   if (speed_req != 0){
     ang_req_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
   else {
     ang_req_steer = 0;
   }
   
-  ang_left_calculated = (abs(pos_steer_left)/encoder_cpr)*360;
+  ang_left_calculated = (abs(pos_steer_left)/encoder_cpr)*360;      //Convert encoder tick to degree value
   ang_right_calculated = (abs(pos_steer_right)/encoder_cpr)*360;
  
-  if (ang_right_calculated > ang_left_calculated) {
+  if (ang_right_calculated > ang_left_calculated) {                 //Ackermann steering degree logic
     pos_ack = ang_right_calculated;
   }
   else if (ang_right_calculated < ang_left_calculated)  {
@@ -228,24 +224,19 @@ void setup() {
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
   attachInterrupt(5, encoderRightMotor, RISING);
 
-  // Define the rotary encoder for left servo motor
+  // Define the rotary encoder for left steer
   pinMode(PIN_ENCOD_A_STEER_LEFT, INPUT); 
   pinMode(PIN_ENCOD_B_STEER_LEFT, INPUT); 
   digitalWrite(PIN_ENCOD_A_STEER_LEFT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_STEER_LEFT, HIGH);
   attachInterrupt(0, encoderLeftSteer, RISING);             
   
-  //  Define the rotary encoder for right servo motor
+  //  Define the rotary encoder for right steer
   pinMode(PIN_ENCOD_A_STEER_RIGHT, INPUT);
   pinMode(PIN_ENCOD_B_STEER_RIGHT, INPUT);
   digitalWrite(PIN_ENCOD_A_STEER_RIGHT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_STEER_RIGHT, HIGH);
   attachInterrupt(1, encoderRightSteer, RISING);
-}
-
-void setMotorAngle(int ang_cmd_steer) {
-  int angle = angleToPWM(ang_cmd_steer);
-  steerMotor.setSpeed(angle);
 }
 
 void loop() {
@@ -330,7 +321,20 @@ void loop() {
     ang_cmd_steer = constrain(ang_cmd_steer, min_angle, max_angle);    
     PID_steerMotor.Compute();                                                 
     // compute PWM value for steer motor. Check constant definition comments for more information.
-    setMotorAngle(ang_cmd_steer);
+    PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -255, 255); // 
+   
+    if (ang_req_steer == 0){                       //Stopping
+      steerMotor.setSpeed(0);
+      steerMotor.run("BRAKE");
+    }
+    else if (PWM_steerMotor > 0){                         //Going "FORWARD"
+      steerMotor.setSpeed(abs(PWM_steerMotor));
+      steerMotor.run("FORWARD");
+    }
+    else {                                                //Going ""BACKWARD""
+      steerMotor.setSpeed(abs(PWM_steerMotor));
+      steerMotor.run("BACKWARD");
+    }
     }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
