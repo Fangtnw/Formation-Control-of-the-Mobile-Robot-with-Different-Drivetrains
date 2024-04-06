@@ -42,12 +42,12 @@ double speed_req_right = 0;                   //Desired speed for right wheel in
 double speed_act_right = 0;                   //Actual speed for right wheel in m/s
 double speed_cmd_right = 0;                   //Command speed for right wheel in m/s 
 
-double ang_req_steer = 0;                     //Desired angle for servo motor
-double ang_act_steer = 0;                     //Actual angle for servo motor
-double ang_cmd_steer = 0;                     //Command angle for servo motor
-
-double ang_left_calculated = 0;               //Change from encoder tick to degree
-double ang_right_calculated = 0;
+double ang_req_steer = 0;                     //Desired speed for steer in m/s
+double ang_act_steer = 0;                     //Actual speed for steer
+double ang_cmd_steer = 0;                     //Command speed for steer
+double ang_desire_steer = 0;                  //Desire angle(deg) for steer
+               
+double ang_right_calculated = 0;              //Change from encoder tick to degree
 double encode_err = 0;
 
 const double max_speed = 0.4;                 //Max speed (m/s)
@@ -73,7 +73,6 @@ int PWM_steerMotor = 0;                    //PWM command for steer motor
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
 volatile float pos_steer = 0;      //Steer motor encoder position
-volatile float pos_steer_left = 0;      //Steer motor encoder left position
 volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
@@ -111,29 +110,29 @@ class motor{
 
     void setSpeed(const int speedInput){
         analogWrite(pinPWM, speedInput);
-        analogWrite(pinPWM_R, speedInput);
-        analogWrite(pinPWM_L, speedInput);
-        
+//        analogWrite(pinPWM_R, speedInput);  
+//        analogWrite(pinPWM_L, speedInput);        
+      
     }
 
     void run(const String runInput){
        if(runInput == "BRAKE"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, HIGH);
-            digitalWrite(pinPWM_R, HIGH);
-            digitalWrite(pinPWM_L, HIGH);
+//            digitalWrite(pinPWM_R, LOW);
+//            digitalWrite(pinPWM_L, LOW);
        }
        else if(runInput == "FORWARD"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, LOW);
-            digitalWrite(pinPWM_R, HIGH);
-            digitalWrite(pinPWM_L, LOW);
+//            digitalWrite(pinPWM_R, LOW);
+//            digitalWrite(pinPWM_L, HIGH);
        }
        else if(runInput == "BACKWARD"){
             digitalWrite(pinA, LOW);
             digitalWrite(pinB, HIGH);
-            digitalWrite(pinPWM_R, LOW);
-            digitalWrite(pinPWM_L, HIGH);            
+//            digitalWrite(pinPWM_R, HIGH);
+//            digitalWrite(pinPWM_L, LOW);            
        }
     }
     
@@ -146,12 +145,15 @@ void handle_cmd() {
   
   speed_req_right = speed_req;
   speed_req_left = speed_req;
+  ang_req_steer = angular_speed_req;
 
   //Steer degree Command
   if (speed_req != 0){
-    ang_req_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
+    ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
+
+    
   else {
-    ang_req_steer = 0;
+    ang_desire_steer = 0;
   }
   
   pos_ack = (abs(pos_steer_right)/encoder_cpr)*360;    //Convert encoder tick to degree value
@@ -311,24 +313,24 @@ void loop() {
     }
 
     //Steer Motor Command
-    ang_req_steer = constrain(ang_req_steer, min_angle, max_angle);    
-    PID_steerMotor.Compute();                                                 
-    // compute PWM value for steer motor. Check constant definition comments for more information.
-    PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -255, 255); // 
-    encode_err = ang_req_steer - pos_ack;
-   
-    if (encode_err == 0){                       //Stopping
-      steerMotor.setSpeed(0);
-      steerMotor.run("BRAKE");
-    }
-    else if (encode_err > 0){                         //Going "FORWARD"
-      steerMotor.setSpeed(abs(PWM_steerMotor));
-      steerMotor.run("FORWARD");
-    }
-    else {                                                //Going ""BACKWARD""
-      steerMotor.setSpeed(abs(PWM_steerMotor));
-      steerMotor.run("BACKWARD");
-    }
+//    ang_cmd_steer = constrain(ang_req_steer, -max_speed, max_speed);    
+//    PID_steerMotor.Compute();                                                 
+//    // compute PWM value for steer motor. Check constant definition comments for more information.
+//    PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_req_steer/speed_to_pwm_ratio), -255, 255); // 
+//    encode_err = ang_desire_steer - pos_ack;
+//   
+//    if (encode_err == 0){                       //Stopping
+//      steerMotor.setSpeed(0);
+//      steerMotor.run("BRAKE");
+//    }
+//    else if (encode_err > 0){                         //Going "FORWARD"
+//      steerMotor.setSpeed(abs(PWM_steerMotor));
+//      steerMotor.run("FORWARD");
+//    }
+//    else {                                                //Going ""BACKWARD""
+//      steerMotor.setSpeed(abs(PWM_steerMotor));
+//      steerMotor.run("BACKWARD");
+//    }
     
     }
     
@@ -347,15 +349,15 @@ void publishSpeed(double time) {
 //    xicro.Spin_node();
     IMUbringup();
     handle_cmd();
-    xicro.Publisher_ack_encoder_vel.message.angular.x = ang_left_calculated;
-    xicro.Publisher_ack_encoder_vel.message.angular.y = ang_right_calculated;
+    xicro.Publisher_ack_encoder_vel.message.angular.x = pos_steer_right;
+    xicro.Publisher_ack_encoder_vel.message.angular.y = pos_ack;
     xicro.Publisher_ack_encoder_vel.message.angular.z = ang_req_steer;
     xicro.Publisher_ack_encoder_vel.message.linear.x = speed_act_left;
     xicro.Publisher_ack_encoder_vel.message.linear.y = speed_act_right;
     xicro.publish_ack_encoder_vel();
     xicro.Publisher_ack_encoder_tick.message.linear.x = pos_right;
     xicro.Publisher_ack_encoder_tick.message.linear.y = pos_left;
-    xicro.Publisher_ack_encoder_tick.message.angular.x = pos_steer_left;
+    xicro.Publisher_ack_encoder_tick.message.angular.x = 0;
     xicro.Publisher_ack_encoder_tick.message.angular.y = pos_steer_right;
     xicro.publish_ack_encoder_tick();
     xicro.Publisher_ack_imu.message.linear.x = mpu.getAngleX();
@@ -450,6 +452,7 @@ void encoderRightMotor() {
   else pos_right--;
 }
 
+//Steer motor encoder
 void encoderRightSteer() {
   if (digitalRead(PIN_ENCOD_A_STEER_RIGHT) == digitalRead(PIN_ENCOD_B_STEER_RIGHT)) pos_steer_right--;
   else pos_steer_right++;
