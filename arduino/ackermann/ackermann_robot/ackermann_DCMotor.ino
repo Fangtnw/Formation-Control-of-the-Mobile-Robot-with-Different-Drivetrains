@@ -17,13 +17,10 @@ const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of 
 const int PIN_ENCOD_B_MOTOR_LEFT = 19;               //B channel for encoder of left motor
 
 const int PIN_ENCOD_A_MOTOR_RIGHT = 16;         //A channel for encoder of right motor         
-const int PIN_ENCOD_B_MOTOR_RIGHT = 18;         //B channel for encoder of right motor 
+const int PIN_ENCOD_B_MOTOR_RIGHT = 18;         //B channel for encoder of right motor  
 
-const int PIN_ENCOD_A_STEER_LEFT = 5;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_STEER_LEFT = 2;              //B channel for encoder of left servo motor 
-
-const int PIN_ENCOD_A_STEER_RIGHT = 22;              //A channel for encoder of right servo motor         
-const int PIN_ENCOD_B_STEER_RIGHT = 3;              //B channel for encoder of right servo motor 
+const int PIN_ENCOD_A_STEER_RIGHT = 3;              //A channel for encoder of right servo motor         
+const int PIN_ENCOD_B_STEER_RIGHT = 2;              //B channel for encoder of right servo motor 
 
 //Define Value of Parameter
 const double radius = 0.06;                     //Wheel radius, in m
@@ -51,7 +48,7 @@ double ang_cmd_steer = 0;                     //Command angle for servo motor
 
 double ang_left_calculated = 0;               //Change from encoder tick to degree
 double ang_right_calculated = 0;
- 
+double encode_err = 0;
 
 const double max_speed = 0.4;                 //Max speed (m/s)
 
@@ -81,13 +78,13 @@ volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
 
-const int min_angle = 0;
-const int max_angle = 180;
+const int min_angle = -18;
+const int max_angle = 18;
 
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
 const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
-const double PID_steer_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
+const double PID_steer_param[] = { 2.2, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
@@ -101,29 +98,42 @@ class motor{
         int pinA;
         int pinB;
         int pinPWM;
+        int pinPWM_R;
+        int pinPWM_L;
     
     void motor_setup(){
         pinMode(pinA,OUTPUT);
         pinMode(pinB,OUTPUT);
         pinMode(pinPWM,OUTPUT);
+        pinMode(pinPWM_R,OUTPUT);
+        pinMode(pinPWM_L,OUTPUT);
     }
 
     void setSpeed(const int speedInput){
         analogWrite(pinPWM, speedInput);
+        analogWrite(pinPWM_R, speedInput);
+        analogWrite(pinPWM_L, speedInput);
+        
     }
 
     void run(const String runInput){
        if(runInput == "BRAKE"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, HIGH);
+            digitalWrite(pinPWM_R, HIGH);
+            digitalWrite(pinPWM_L, HIGH);
        }
        else if(runInput == "FORWARD"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, LOW);
+            digitalWrite(pinPWM_R, HIGH);
+            digitalWrite(pinPWM_L, LOW);
        }
        else if(runInput == "BACKWARD"){
             digitalWrite(pinA, LOW);
             digitalWrite(pinB, HIGH);
+            digitalWrite(pinPWM_R, LOW);
+            digitalWrite(pinPWM_L, HIGH);            
        }
     }
     
@@ -144,18 +154,9 @@ void handle_cmd() {
     ang_req_steer = 0;
   }
   
-  ang_left_calculated = (abs(pos_steer_left)/encoder_cpr)*360;      //Convert encoder tick to degree value
-  ang_right_calculated = (abs(pos_steer_right)/encoder_cpr)*360;
- 
-  if (ang_right_calculated > ang_left_calculated) {                 //Ackermann steering degree logic
-    pos_ack = ang_right_calculated;
+  pos_ack = (abs(pos_steer_right)/encoder_cpr)*360;    //Convert encoder tick to degree value
+                  
   }
-  else if (ang_right_calculated < ang_left_calculated)  {
-    pos_ack = ang_left_calculated;
-  }
-  
-  }
-  
 
 motor leftMotor, rightMotor,  steerMotor;
 void setup() {
@@ -175,10 +176,10 @@ void setup() {
   rightMotor.pinB = 13;
   rightMotor.pinPWM = 11;
 
-  //Steer DC
-  steerMotor.pinA = 6;
-  steerMotor.pinB = 7;
-  steerMotor.pinPWM = 4;
+  //Steer DC 5,4
+  steerMotor.pinPWM_R = 5;
+  steerMotor.pinPWM_L = 4;
+  
  
   Serial.begin(115200);
   xicro.begin(&Serial);
@@ -193,7 +194,6 @@ void setup() {
   steerMotor.run("BRAKE");
 
   //Set DEG to 0 when start
-  pos_steer_left = 0;
   pos_steer_right = 0;
   
   //setting PID parameters
@@ -222,16 +222,9 @@ void setup() {
   pinMode(PIN_ENCOD_B_MOTOR_RIGHT, INPUT); 
   digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
-  attachInterrupt(5, encoderRightMotor, RISING);
-
-  // Define the rotary encoder for left steer
-  pinMode(PIN_ENCOD_A_STEER_LEFT, INPUT); 
-  pinMode(PIN_ENCOD_B_STEER_LEFT, INPUT); 
-  digitalWrite(PIN_ENCOD_A_STEER_LEFT, HIGH);                // turn on pullup resistor
-  digitalWrite(PIN_ENCOD_B_STEER_LEFT, HIGH);
-  attachInterrupt(0, encoderLeftSteer, RISING);             
+  attachInterrupt(5, encoderRightMotor, RISING);            
   
-  //  Define the rotary encoder for right steer
+  //  Define the rotary encoder for steer
   pinMode(PIN_ENCOD_A_STEER_RIGHT, INPUT);
   pinMode(PIN_ENCOD_B_STEER_RIGHT, INPUT);
   digitalWrite(PIN_ENCOD_A_STEER_RIGHT, HIGH);                // turn on pullup resistor
@@ -249,11 +242,11 @@ void loop() {
     byte status = mpu.begin();
     
     //PID_servoMotor.Compute();                                               
-    if (abs(pos_steer) < 5){                                                   //Avoid taking in account small disturbances
+    if (abs(pos_steer) < 1){                                                   //Avoid taking in account small disturbances
       ang_act_steer = 0;
     }
     else {
-      ang_act_steer= pos_steer;             // calculate degree of servo
+      ang_act_steer = pos_steer;             // calculate degree of servo
     }
     
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -318,16 +311,17 @@ void loop() {
     }
 
     //Steer Motor Command
-    ang_cmd_steer = constrain(ang_cmd_steer, min_angle, max_angle);    
+    ang_req_steer = constrain(ang_req_steer, min_angle, max_angle);    
     PID_steerMotor.Compute();                                                 
     // compute PWM value for steer motor. Check constant definition comments for more information.
     PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -255, 255); // 
+    encode_err = ang_req_steer - pos_ack;
    
-    if (ang_req_steer == 0){                       //Stopping
+    if (encode_err == 0){                       //Stopping
       steerMotor.setSpeed(0);
       steerMotor.run("BRAKE");
     }
-    else if (PWM_steerMotor > 0){                         //Going "FORWARD"
+    else if (encode_err > 0){                         //Going "FORWARD"
       steerMotor.setSpeed(abs(PWM_steerMotor));
       steerMotor.run("FORWARD");
     }
@@ -335,6 +329,7 @@ void loop() {
       steerMotor.setSpeed(abs(PWM_steerMotor));
       steerMotor.run("BACKWARD");
     }
+    
     }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
@@ -458,11 +453,6 @@ void encoderRightMotor() {
 void encoderRightSteer() {
   if (digitalRead(PIN_ENCOD_A_STEER_RIGHT) == digitalRead(PIN_ENCOD_B_STEER_RIGHT)) pos_steer_right--;
   else pos_steer_right++;
-}
-
-void encoderLeftSteer() {
-  if (digitalRead(PIN_ENCOD_A_STEER_LEFT) == digitalRead(PIN_ENCOD_B_STEER_LEFT)) pos_steer_left--;
-  else pos_steer_left++;
 }
   
 template <typename T> int sgn(T val) {
