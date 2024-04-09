@@ -127,8 +127,8 @@ def generate_launch_description():
         # dynamic_footprint_diff,
         # spawn_diffdrive,
 
-        spawn_mecanum,
-        dynamic_footprint_mec,
+        # spawn_mecanum,
+        # dynamic_footprint_mec,
         tf_ack_to_mec,
 
         tf_ack_to_diff,

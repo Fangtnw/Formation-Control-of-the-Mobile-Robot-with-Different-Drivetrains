@@ -7,14 +7,14 @@ unsigned long lastMilli = 0;
 
 
 // Motor 1
-const int motor1INA = 12;
-const int motor1INB = 11;
+const int motor1INA = 9;
+const int motor1INB = 8;
 const int motor1PWM = 10;
 
 // Motor 2
-const int motor2INA = 6;
-const int motor2INB = 7;
-const int motor2PWM = 5;
+const int motor2INA = 12;
+const int motor2INB = 13;
+const int motor2PWM = 11;
 
 const int PIN_ENCOD_A_MOTOR_LEFT = 2;               //A channel for encoder of left motor                    
 const int PIN_ENCOD_B_MOTOR_LEFT = 8;               //B channel for encoder of left motor

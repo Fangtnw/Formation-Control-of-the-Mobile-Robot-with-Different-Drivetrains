@@ -1,11 +1,9 @@
 #include <PID_v1.h>
 #include <Xicro_ack_xicro_ID_2.h>
 #include <Wire.h>
-#include <Servo.h>
 #include <MPU6050_light.h>
 
 MPU6050 mpu(Wire);
-Servo servo;
 Xicro xicro;
 //initializing all the variables
 #define LOOPTIME                      100     //Looptime in millisecond
@@ -25,10 +23,8 @@ const int PIN_ENCOD_B_MOTOR_LEFT = 19;               //B channel for encoder of 
 const int PIN_ENCOD_A_MOTOR_RIGHT = 16;         //A channel for encoder of right motor         
 const int PIN_ENCOD_B_MOTOR_RIGHT = 18;         //B channel for encoder of right motor 
 
-const int PIN_ENCOD_A_SERVO_LEFT = 5;              //A channel for encoder of left servo motor         
-const int PIN_ENCOD_B_SERVO_LEFT = 2;              //B channel for encoder of left servo motor 
-const int PIN_ENCOD_A_SERVO_RIGHT = 6;              //A channel for encoder of right servo motor         
-const int PIN_ENCOD_B_SERVO_RIGHT = 3;              //B channel for encoder of right servo motor 
+const int PIN_ENCOD_A_STEER_RIGHT = 3;              //A channel for encoder of right servo motor         
+const int PIN_ENCOD_B_STEER_RIGHT = 2;              //B channel for encoder of right servo motor 
 
 //Define Value of Parameter
 const double radius = 0.06;                     //Wheel radius, in m
@@ -50,10 +46,14 @@ double speed_req_right = 0;                   //Desired speed for right wheel in
 double speed_act_right = 0;                   //Actual speed for right wheel in m/s
 double speed_cmd_right = 0;                   //Command speed for right wheel in m/s 
 
-double ang_req_servo = 0;                     //Desired angle for servo motor
-double ang_act_servo = 0;                     //Actual angle for servo motor
-double ang_cmd_servo = 0;                     //Command angle for servo motor
-double servo_cmd_act = 0;
+
+double ang_req_steer = 0;                     //Desired speed for steer in m/s
+double ang_act_steer = 0;                     //Actual speed for steer
+double ang_cmd_steer = 0;                     //Command speed for steer
+double ang_desire_steer = 0;                  //Desire angle(deg) for steer
+               
+double ang_right_calculated = 0;              //Change from encoder tick to degree
+double encode_err = 0;
 
 const double max_speed = 0.4;                 //Max speed (m/s)
 
@@ -76,22 +76,19 @@ int PWM_rightMotor = 0;                    //PWM command for right motor
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
-volatile float pos_servo = 0;      //Servo motor encoder position
-volatile float pos_servo_left = 0;      //Servo motor encoder position
-volatile float pos_servo_right = 0;      //Servo motor encoder position
+volatile float pos_steer = 0;      //Steer motor encoder position
+volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
-volatile float servo_left_calculated = 0;
-volatile float servo_right_calculated = 0;
 
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
 const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
-const double PID_servo_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
+const double PID_steer_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
-PID PID_servoMotor(&ang_act_servo, &ang_cmd_servo, &ang_req_servo, PID_servo_param[0], PID_servo_param[1], PID_servo_param[2], DIRECT);   //Setting up the PID for Servo
+PID PID_steerMotor(&ang_act_steer, &ang_cmd_steer, &ang_req_steer, PID_steer_param[0], PID_steer_param[1], PID_steer_param[2], DIRECT);    //Setting up the PID for Servo
 
 //const unsigned long print_interval = 1000; // 1 second
 //unsigned long previous_print_time = 0;
@@ -101,73 +98,77 @@ class motor{
         int pinA;
         int pinB;
         int pinPWM;
+        int pinPWM_R;
+        int pinPWM_L;
     
     void motor_setup(){
         pinMode(pinA,OUTPUT);
         pinMode(pinB,OUTPUT);
         pinMode(pinPWM,OUTPUT);
+        pinMode(pinPWM_R,OUTPUT);
+        pinMode(pinPWM_L,OUTPUT);
     }
 
     void setSpeed(const int speedInput){
         analogWrite(pinPWM, speedInput);
+//        analogWrite(pinPWM_R, speedInput);  
+//        analogWrite(pinPWM_L, speedInput);        
+      
     }
 
     void run(const String runInput){
        if(runInput == "BRAKE"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, HIGH);
+            analogWrite(pinPWM_R, 0);  
+            analogWrite(pinPWM_L, 0); 
        }
        else if(runInput == "FORWARD"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, LOW);
+            analogWrite(pinPWM_R, 255);  
+            analogWrite(pinPWM_L, 0); 
        }
        else if(runInput == "BACKWARD"){
             digitalWrite(pinA, LOW);
             digitalWrite(pinB, HIGH);
+            analogWrite(pinPWM_R, 0);  
+            analogWrite(pinPWM_L, 255);            
        }
     }
+    
 };
+
 
 void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
-
-//  speed_req_left = speed_req - angular_speed_req*(wheelbase/2);     
-//  speed_req_right = speed_req + angular_speed_req*(wheelbase/2); 
   
   speed_req_right = speed_req;
   speed_req_left = speed_req;
+  ang_req_steer = angular_speed_req;
 
-  //Servo SPD Command
+  //Steer degree Command
   if (speed_req != 0){
-    ang_req_servo = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
-  else {
-    ang_req_servo = 0;
-  }
-  
-  servo_left_calculated = (abs(pos_servo_left)/encoder_cpr)*360;
-  servo_right_calculated = (abs(pos_servo_right)/encoder_cpr)*360;
- 
-  if (servo_right_calculated > servo_left_calculated) {
-    pos_ack = servo_right_calculated;
-  }
-  else if (servo_right_calculated < servo_left_calculated)  {
-    pos_ack = servo_left_calculated;
-  }
+    ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
+
     
-  //calculate degree for servo 
-  servo_cmd = 90 - (ang_req_servo/0.52); 
+  else {
+    ang_desire_steer = 0;
+  }
   
+  pos_ack = (pos_steer_right/encoder_cpr)*360;    //Convert encoder tick to degree value
+                  
   }
   
 
-motor leftMotor, rightMotor;
+motor leftMotor, rightMotor, steerMotor;
 void setup() {
   Wire.begin();
 
   //SERVO PIN
-  servo.attach(4);
+
   byte status = mpu.begin();
   mpu.calcOffsets(); // gyro and accelero
 
@@ -181,7 +182,10 @@ void setup() {
   rightMotor.pinA = 12;
   rightMotor.pinB = 13;
   rightMotor.pinPWM = 11;
- 
+
+  steerMotor.pinPWM_R = 5;
+  steerMotor.pinPWM_L = 4;
+  
   Serial.begin(115200);
   xicro.begin(&Serial);
   Serial.println("Setup complete");
@@ -191,23 +195,23 @@ void setup() {
   leftMotor.run("BRAKE");
   rightMotor.setSpeed(0);
   rightMotor.run("BRAKE");
+  steerMotor.run("BRAKE");
 
   //Set DEG to 0 when start
-  servo.write(90);
-  pos_servo_left = 0;
-  pos_servo_right = 0;
+  pos_steer_right = 0;
+
   
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
   PID_rightMotor.SetSampleTime(95);
-  PID_servoMotor.SetSampleTime(95);
+  PID_steerMotor.SetSampleTime(95);
   PID_leftMotor.SetOutputLimits(-max_speed, max_speed);
   PID_rightMotor.SetOutputLimits(-max_speed, max_speed);
-  PID_servoMotor.SetOutputLimits(min_angle, max_angle);
+  PID_steerMotor.SetOutputLimits(-max_speed, max_speed);
 
   PID_leftMotor.SetMode(AUTOMATIC);
   PID_rightMotor.SetMode(AUTOMATIC);
-  PID_servoMotor.SetMode(AUTOMATIC);
+  PID_steerMotor.SetMode(AUTOMATIC);
   
   //Define Encoder **Interrupt PIN: 0 = PIN2, 1 = PIN3, 2 = PIN21, 3 = PIN20, 4 = PIN19, 5 = PIN18**
   
@@ -225,18 +229,13 @@ void setup() {
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
   attachInterrupt(5, encoderRightMotor, RISING);
 
-  // Define the rotary encoder for left servo motor
-  pinMode(PIN_ENCOD_A_SERVO_LEFT, INPUT); 
-  pinMode(PIN_ENCOD_B_SERVO_LEFT, INPUT); 
-  digitalWrite(PIN_ENCOD_A_SERVO_LEFT, HIGH);                // turn on pullup resistor
-  digitalWrite(PIN_ENCOD_B_SERVO_LEFT, HIGH);
-  attachInterrupt(0, encoderLeftServo, RISING);             
+          
   
   //  Define the rotary encoder for right servo motor
-  pinMode(PIN_ENCOD_A_SERVO_RIGHT, INPUT);
-  pinMode(PIN_ENCOD_B_SERVO_RIGHT, INPUT);
-  digitalWrite(PIN_ENCOD_A_SERVO_RIGHT, HIGH);                // turn on pullup resistor
-  digitalWrite(PIN_ENCOD_B_SERVO_RIGHT, HIGH);
+  pinMode(PIN_ENCOD_A_STEER_RIGHT, INPUT);
+  pinMode(PIN_ENCOD_B_STEER_RIGHT, INPUT);
+  digitalWrite(PIN_ENCOD_A_STEER_RIGHT, HIGH);                // turn on pullup resistor
+  digitalWrite(PIN_ENCOD_B_STEER_RIGHT, HIGH);
   attachInterrupt(1, encoderRightServo, RISING);
 
 
@@ -250,36 +249,6 @@ void loop() {
     lastMilli = millis();
     handle_cmd();
     byte status = mpu.begin();
-    
-    servo_cmd = constrain(servo_cmd, min_angle , max_angle);
-    //PID_servoMotor.Compute();                                               
-    servo.write(servo_cmd);
-
-//    if (servo_cmd == 90){
-//      pos_servo_right = 0;
-//      pos_servo_left = 0;
-//    }
-
-    if (abs(pos_servo) < 5){                                                   //Avoid taking in account small disturbances
-      ang_act_servo = 0;
-    }
-    else {
-      ang_act_servo= pos_servo;             // calculate degree of servo
-    }
-    
-    if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
-      speed_act_left = 0;
-    }
-    else {
-      speed_act_left=((pos_left/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;           // calculate speed of left wheel
-    }
-    
-    if (abs(pos_right) < 5){                                                  //Avoid taking in account small disturbances
-      speed_act_right = 0;
-    }
-    else {
-    speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
-    }
     
     pos_left = 0;
     pos_right = 0;
@@ -324,6 +293,27 @@ void loop() {
       rightMotor.setSpeed(abs(PWM_rightMotor));
       rightMotor.run("BACKWARD");
     }
+
+//    ang_cmd_steer = constrain(ang_req_steer, -max_speed, max_speed);    
+//    PID_steerMotor.Compute();                                                 
+//    // compute PWM value for steer motor. Check constant definition comments for more information.
+//    PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_req_steer/speed_to_pwm_ratio), -255, 255); // 
+    encode_err = ang_desire_steer - pos_ack;
+   
+    if (abs(encode_err) <= 1){                       //Stopping
+//      steerMotor.setSpeed(0);
+      steerMotor.run("BRAKE");
+    }
+    else if (encode_err > 1){                         //Going "FORWARD"
+//      steerMotor.setSpeed(abs(PWM_steerMotor));
+      steerMotor.run("FORWARD");
+    }
+    else if (encode_err < -1) {                                                //Going ""BACKWARD""
+//      steerMotor.setSpeed(abs(PWM_steerMotor));
+      steerMotor.run("BACKWARD");
+    }
+    
+    
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
       Serial.println(" TOO LONG ");
@@ -340,16 +330,16 @@ void publishSpeed(double time) {
 //    xicro.Spin_node();
     IMUbringup();
     handle_cmd();
-    xicro.Publisher_ack_encoder_vel.message.angular.x = servo_left_calculated;
-    xicro.Publisher_ack_encoder_vel.message.angular.y = servo_right_calculated;
-    xicro.Publisher_ack_encoder_vel.message.angular.z = pos_ack;
+    xicro.Publisher_ack_encoder_vel.message.angular.x = pos_steer_right;
+    xicro.Publisher_ack_encoder_vel.message.angular.y = pos_ack;
+    xicro.Publisher_ack_encoder_vel.message.angular.z = ang_req_steer;
     xicro.Publisher_ack_encoder_vel.message.linear.x = speed_act_left;
     xicro.Publisher_ack_encoder_vel.message.linear.y = speed_act_right;
     xicro.publish_ack_encoder_vel();
     xicro.Publisher_ack_encoder_tick.message.linear.x = pos_right;
     xicro.Publisher_ack_encoder_tick.message.linear.y = pos_left;
-    xicro.Publisher_ack_encoder_tick.message.angular.x = pos_servo_left;
-    xicro.Publisher_ack_encoder_tick.message.angular.y = pos_servo_right;
+    xicro.Publisher_ack_encoder_tick.message.angular.x = 0;
+    xicro.Publisher_ack_encoder_tick.message.angular.y = pos_steer_right;
     xicro.publish_ack_encoder_tick();
     xicro.Publisher_ack_imu.message.linear.x = mpu.getAngleX();
     xicro.Publisher_ack_imu.message.linear.y = mpu.getAngleY();
@@ -357,11 +347,11 @@ void publishSpeed(double time) {
     xicro.publish_ack_imu();
     xicro.Publisher_ack_speed_req.message.linear.x = speed_req_left;
     xicro.Publisher_ack_speed_req.message.linear.y = speed_req_right;
-    xicro.Publisher_ack_speed_req.message.linear.z = ang_req_servo;
+    xicro.Publisher_ack_speed_req.message.linear.z = ang_req_steer;
     xicro.publish_ack_speed_req();
     xicro.Publisher_ack_speed_cmd.message.linear.x = speed_cmd_left;
     xicro.Publisher_ack_speed_cmd.message.linear.y = speed_cmd_right;
-    xicro.Publisher_ack_speed_cmd.message.linear.z = servo_cmd;
+    xicro.Publisher_ack_speed_cmd.message.linear.z = ang_desire_steer;
     xicro.publish_ack_speed_cmd();
   
     xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
@@ -444,14 +434,11 @@ void encoderRightMotor() {
 }
 
 void encoderRightServo() {
-  if (digitalRead(PIN_ENCOD_A_SERVO_RIGHT) == digitalRead(PIN_ENCOD_B_SERVO_RIGHT)) pos_servo_right--;
-  else pos_servo_right++;
+  if (digitalRead(PIN_ENCOD_A_STEER_RIGHT) == digitalRead(PIN_ENCOD_B_STEER_RIGHT)) pos_steer_right--;
+  else pos_steer_right++;
 }
 
-void encoderLeftServo() {
-  if (digitalRead(PIN_ENCOD_A_SERVO_LEFT) == digitalRead(PIN_ENCOD_B_SERVO_LEFT)) pos_servo_left--;
-  else pos_servo_left++;
-}
+
   
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));

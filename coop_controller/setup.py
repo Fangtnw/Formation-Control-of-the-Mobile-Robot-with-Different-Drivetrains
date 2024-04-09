@@ -27,6 +27,8 @@ setup(
             "ack_odom = coop_controller.ack_odom:main",
             "sim_commander = coop_controller.sim_commander:main",
             "dynamic_footprint = coop_controller.dynamic_footprint:main",
+            "coop_planner = coop_controller.coop_planner:main",
+            "pure_pursuit_controller = coop_controller.pure_pursuit_controller:main",
         ],
     },
 )

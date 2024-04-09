@@ -31,7 +31,7 @@ class FormationController(Node):
         self.previous_ty = 0
         self.kp_x = 1
         self.ki_x = 0.0  # Initialize for integral term
-        self.kp_y = 1  # New gain for y-direction
+        self.kp_y = 2  # New gain for y-direction
         self.ki_y = 0.0  # Initialize for integral term
         self.kp_yaw = 1
         self.ki_yaw = 0  # Initialize for integral term
@@ -133,19 +133,43 @@ class FormationController(Node):
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
             elif self.follower_type == 'aruco':
-                pass
+                error_x = (tx - 0.8)
+                self.integral_error_x += error_x  # Accumulate error for integral term
+                linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
+                error_y = ty
+                self.integral_error_y += error_y  # Accumulate error for integral term
+                linear_vel_y = self.kp_y * error_y + self.ki_y * self.integral_error_y
+
+                linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
+                linear_vel_y = max(min(linear_vel_y, max_vx), -max_vx)
+
+                if abs(error_x) < 0.1 and abs(error_y) < 0.1:
+                    # Adjust yaw with damping, considering previous direction:
+                    # if self.direction == 1.0 and abs(yaw) < abs(self.previous_yaw):   # Check turn direction
+                    #     self.direction = -1.0 
+                    # elif self.direction == -1.0 and abs(yaw) < abs(self.previous_yaw):   # Check turn direction
+                    #     self.direction = 1.0
+                    error_yaw = yaw
+                    self.integral_error_yaw += error_yaw  # Accumulate error for integral term
+                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
+                    # angular_vel = 0.0
+                else:
+                    angular_vel = 0.0  # Prioritize x, y if they are large
+                # cmd_msg.linear.y = linear_vel_y
+                angular_vel = max(min(angular_vel, max_rz), -max_rz)
         
             else:
                 self.get_logger().error(f"Invalid follower type '{self.follower_type}'")
                 exit()
 
             cmd_msg.linear.x = linear_vel_x
+            cmd_msg.linear.y = linear_vel_y
             cmd_msg.angular.z = angular_vel
 
             self.get_logger().info(
                 f"Follower_command: x:{linear_vel_x:.2f}, z:{angular_vel:.2f} "
             )
-            self.publisher.publish(cmd_msg)
+            # self.publisher.publish(cmd_msg)
             self.previous_ty = ty 
             self.previous_yaw = yaw 
 

@@ -51,10 +51,10 @@ class DynamicFootprint(Node):
                 dx = (tx - 1.65)
             elif self.follower_type == 'diffdrive':
                 dx = (tx - 1.45)
-            self.get_logger().info(
-                f"Translation: x:{tx:.2f}, y:{ty:.2f}, z:{tz:.2f} , "
-                f"Rotation: roll:{roll:.2f}, pitch:{pitch:.2f}, yaw:{yaw:.4f}"
-            )
+            # self.get_logger().info(
+            #     f"Translation: x:{tx:.2f}, y:{ty:.2f}, z:{tz:.2f} , "
+            #     f"Rotation: roll:{roll:.2f}, pitch:{pitch:.2f}, yaw:{yaw:.4f}"
+            # )
 
             footprint_msg = Polygon()
             footprint_msg.points = [

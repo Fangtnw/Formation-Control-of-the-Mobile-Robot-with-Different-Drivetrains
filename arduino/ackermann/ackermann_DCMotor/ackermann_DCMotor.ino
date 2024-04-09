@@ -119,20 +119,20 @@ class motor{
        if(runInput == "BRAKE"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, HIGH);
-//            digitalWrite(pinPWM_R, LOW);
-//            digitalWrite(pinPWM_L, LOW);
+            analogWrite(pinPWM_R, 0);  
+            analogWrite(pinPWM_L, 0); 
        }
        else if(runInput == "FORWARD"){
             digitalWrite(pinA, HIGH);
             digitalWrite(pinB, LOW);
-//            digitalWrite(pinPWM_R, LOW);
-//            digitalWrite(pinPWM_L, HIGH);
+            analogWrite(pinPWM_R, 255);  
+            analogWrite(pinPWM_L, 0); 
        }
        else if(runInput == "BACKWARD"){
             digitalWrite(pinA, LOW);
             digitalWrite(pinB, HIGH);
-//            digitalWrite(pinPWM_R, HIGH);
-//            digitalWrite(pinPWM_L, LOW);            
+            analogWrite(pinPWM_R, 0);  
+            analogWrite(pinPWM_L, 255);            
        }
     }
     
@@ -179,8 +179,8 @@ void setup() {
   rightMotor.pinPWM = 11;
 
   //Steer DC 5,4
-  steerMotor.pinPWM_R = 5;
-  steerMotor.pinPWM_L = 4;
+//  steerMotor.pinPWM_R = 5;
+//  steerMotor.pinPWM_L = 4;
   
  
   Serial.begin(115200);

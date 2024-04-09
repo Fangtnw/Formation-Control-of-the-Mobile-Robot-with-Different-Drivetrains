@@ -11,6 +11,7 @@ import geometry_msgs.msg
 from tf2_ros import TransformBroadcaster
 from scipy.spatial.transform import Rotation as R
 from rclpy.qos import QoSProfile
+import tf_transformations
 
 class ArUcoDetector(Node):
     def __init__(self):
@@ -33,11 +34,18 @@ class ArUcoDetector(Node):
             )
         )
         self.camera_matrix = np.array([
-        [678.32644258, 0.0, 291.36114031],
-        [0.0, 666.95790955, 233.72386481],
-        [0.0, 0.0, 1.0]
+            
+        # [678.32644258, 0.0, 291.36114031],
+        # [0.0, 666.95790955, 233.72386481],
+        # [0.0, 0.0, 1.0]
+
+        [509.186325 , 0.0, 345.35379696],
+        [  0.0 , 615.39364127, 306.27040277],
+        [  0.0 , 0.0 , 1.0        ]
+
             ])
 
+        # self.dist_coeff = np.array([ 1.94117292, -3.75643948,  0.013334,    0.40815147,  3.84220463])
         self.dist_coeff = np.array([-0.54810353, 0.89866936, 0.02231926, 0.01317876, -2.36918976])
 
 
@@ -82,18 +90,19 @@ class ArUcoDetector(Node):
                         transform.header.stamp = self.get_clock().now().to_msg()
                         transform.header.frame_id = self.camera_frame
                         transform.child_frame_id = self.aruco_frame
-                        transform.transform.translation.y = tvec[i][0][0]
-                        transform.transform.translation.z = tvec[i][0][1]
-                        transform.transform.translation.x = tvec[i][0][2]
+                        transform.transform.translation.y = -tvec[0][0][0]
+                        transform.transform.translation.z = -tvec[0][0][1]
+                        transform.transform.translation.x = tvec[0][0][2]
                         rotation_matrix = np.eye(4)
-                        rotation_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvec[i][0]))[0]
+                        rotation_matrix[0:3, 0:3] = cv2.Rodrigues(np.array(rvec[0][0]))[0]
                         r = R.from_matrix(rotation_matrix[0:3, 0:3])
-                        quat = r.as_quat()   
-                        
+                        quat = r.as_quat()  
+
+                        # quat = tf_transformations.quaternion_from_euler(roll,pitch,yaw)
                         # Quaternion format     
-                        transform.transform.rotation.z = quat[0] 
-                        transform.transform.rotation.x = quat[1] 
-                        transform.transform.rotation.y = quat[2] 
+                        transform.transform.rotation.y = -quat[0] 
+                        transform.transform.rotation.z = -quat[1] 
+                        transform.transform.rotation.x = quat[2] 
                         transform.transform.rotation.w = quat[3] 
                         self.get_logger().info("Publishing ArUco transform")
                         self.tf_broadcaster.sendTransform(transform)
