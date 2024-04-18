@@ -6,15 +6,32 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
+import argparse
 
 class CubicPolynomialPlanner(Node):
-    def __init__(self):
+    def __init__(self,path):
         super().__init__('cubic_polynomial_planner')  # Unique node name
+        self.path = path
         self.subscription = self.create_subscription(Odometry, '/diffdrive/odom', self.odom_callback, 10)
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.publisher_local_plan = self.create_publisher(Path, '/plan', 10)
-        self.via_points = [[1.5, -1.5],[4.0, -1.2],[5.0, -1.0], [5.0, 3.0]]
-        self.fixed_via_points = [[1.5, -1.5],[4.0, -1.2],[5.0, -1.0], [5.0, 3.0]]  # Add additional via points
+        self.initial_pose_set = False  # Flag to check if initial pose is set
+        self.initial_pose = None  # Store initial pose
+        if self.path == '1.1':
+            self.via_points = [[4.0, -1.2],[5.0, -1.0], [5.0, 3.0]]  #[1.5, -1.5]
+        if self.path == '1.2':
+            self.via_points = [[3.5, -1.3],[5.0, -1.0], [5.0, 3.0]]  #[1.5, -1.5]
+        elif self.path == '2':
+            self.via_points = [[1.5, -1.5],[8.0, -1.5],[6.0, -1.2],[5.0, -1.0], [5.0, 3.0]]
+        elif self.path == '2.1':
+            self.via_points = [[1.5, -1.5],[8.0, -1.5]]
+        elif self.path == '2.2':
+            self.via_points = [[8.0, -1.5],[6.0, -1.2],[5.0, -1.0], [5.0, 3.0]]
+        elif self.path == '3.1':
+            self.via_points = [[5.0, -1.0], [5.0, 3.0]]
+        elif self.path == '3.2':
+            self.via_points = [[5.0, -1.0], [5.0, 3.0]]
+
         self.tf = 1
         self.x_trajectory = []
         self.y_trajectory = []
@@ -22,23 +39,61 @@ class CubicPolynomialPlanner(Node):
         self.generate_trajectory(self.via_points, self.tf)
 
     def generate_trajectory(self, via_points, tf):
-        t0 = 0.0
-        dt = 0.1  # time step
-        timesteps = int(tf / dt)
+        if self.initial_pose_set:
+            t0 = 0.0
+            dt = 0.01  # time step
+            timesteps = int(tf / dt)
 
-        # Interpolate the first segment from via_point 1 to via_point 3
-        x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
+            # Interpolate the first segment from via_point 1 to via_point 3
+            if self.path == '1.1':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2  
+                self.y_trajectory = y_segment1 + y_segment2  
+            elif self.path == '1.2':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2  
+                self.y_trajectory = y_segment1 + y_segment2  
+            elif self.path == '2':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[1:4], timesteps, tf/2)
+                x_segment3, y_segment3 = self.interpolate_spline(via_points[3:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2 + x_segment3  
+                self.y_trajectory = y_segment1 + y_segment2 + y_segment3
+            elif self.path == '2.1':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points, timesteps, tf/2)
+                self.x_trajectory = x_segment1 
+                self.y_trajectory = y_segment1 
+            elif self.path == '2.2':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2  
+                self.y_trajectory = y_segment1 + y_segment2  
+            elif self.path == '3.1':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[1:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2  
+                self.y_trajectory = y_segment1 + y_segment2  
+            elif self.path == '3.2':
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[1:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2  
+                self.y_trajectory = y_segment1 + y_segment2  
 
-        # Interpolate the second segment from via_point 3 to via_point 5
-        x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
+            # Combine the segments
 
-        # Combine the segments
-        self.x_trajectory = x_segment1 + x_segment2  # Remove overlapping point
-        self.y_trajectory = y_segment1 + y_segment2  # Remove overlapping point
+            self.yaw_trajectory = [math.atan2(self.y_trajectory[i+1] - self.y_trajectory[i], self.x_trajectory[i+1] - self.x_trajectory[i])
+                                for i in range(len(self.x_trajectory) - 1)]
 
-        self.yaw_trajectory = [math.atan2(self.y_trajectory[i+1] - self.y_trajectory[i], self.x_trajectory[i+1] - self.x_trajectory[i])
-                               for i in range(len(self.x_trajectory) - 1)]
-        self.yaw_trajectory.append(self.yaw_trajectory[-1])
+            if self.path in ['1.1','3.1', '3.2']:
+                self.yaw_trajectory = [(yaw + math.pi) % (2 * math.pi) for yaw in self.yaw_trajectory]
+
+
+            if self.yaw_trajectory:
+                self.yaw_trajectory.append(self.yaw_trajectory[-1])
+        else:
+            pass
 
     def interpolate_spline(self, via_points, timesteps, tf):
         num_points = len(via_points)
@@ -56,10 +111,22 @@ class CubicPolynomialPlanner(Node):
         return x_interpolated.tolist(), y_interpolated.tolist()
 
     def odom_callback(self, msg):
-        # Store the current robot position as the first via point
-        if not self.via_points:
-            self.via_points.append([msg.pose.pose.position.x, msg.pose.pose.position.y])
-            self.via_points.extend(self.fixed_via_points)
+        if not self.initial_pose_set:
+            # Store the initial pose of the robot as the first via point
+            self.via_points.insert(0, [msg.pose.pose.position.x, msg.pose.pose.position.y])
+            self.initial_pose_set = True
+            self.initial_pose = [msg.pose.pose.position.x, msg.pose.pose.position.y]
+            self.get_logger().info("get initial pose")
+        else:
+            # Replace the initial via point with the updated pose
+            # self.via_points[0] = [msg.pose.pose.position.x, msg.pose.pose.position.y]
+            # If initial pose is set, generate trajectory and publish it
+            self.generate_trajectory(self.via_points, self.tf)
+            self.publish_trajectory()
+            plot_trajectory(self.x_trajectory, self.y_trajectory, self.via_points)
+            
+
+
 
     def publish_trajectory(self):
         path_msg = Path()
@@ -105,11 +172,16 @@ def plot_trajectory(x_traj, y_traj, via_points):
 
 def main(args=None):
     rclpy.init(args=args)
-    planner = CubicPolynomialPlanner()
-    planner.publish_trajectory()
-    plot_trajectory(planner.x_trajectory, planner.y_trajectory, planner.via_points)
+    parser = argparse.ArgumentParser(description='Cubic_Polynomial_Planner')
+    parser.add_argument('--path', choices=['1.1','1.1','2','2.1','2.2','3.1','3.2','4'], required=True,
+                        help='Specify the desired path')
+    args = parser.parse_args()
+    planner = CubicPolynomialPlanner(args.path)
+    # planner.publish_trajectory()
+    
     rclpy.spin(planner)
     rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
+plot_trajectory

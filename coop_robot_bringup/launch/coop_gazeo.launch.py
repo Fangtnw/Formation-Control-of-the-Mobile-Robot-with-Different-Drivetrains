@@ -117,6 +117,12 @@ def generate_launch_description():
             output="screen",
             arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "odom", "diff_odom"]
         )
+    
+   
+    pallet_spawn= ExecuteProcess(
+        cmd=['ros2', 'launch', 'coop_robot_bringup', 'spawn_long_pallet.xml'],
+        output='screen',
+    )
 
     return LaunchDescription([
         gazebo_server,
@@ -125,12 +131,14 @@ def generate_launch_description():
         spawn_ackermann,
 
         # dynamic_footprint_diff,
-        # spawn_diffdrive,
+        spawn_diffdrive,
 
-        # spawn_mecanum,
+        spawn_mecanum,
         # dynamic_footprint_mec,
         tf_ack_to_mec,
 
         tf_ack_to_diff,
         # rviz2,
+
+        # pallet_spawn,
     ])

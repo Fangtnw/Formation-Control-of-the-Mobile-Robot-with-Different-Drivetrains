@@ -13,6 +13,11 @@ from launch.conditions import IfCondition
 import xacro
 
 def generate_launch_description():
+    pose_arg = DeclareLaunchArgument(
+        'pose',
+        default_value='front',  # Default value is 'front'
+        description='Specify the pose of the ackermann vehicle (front/back)'
+    )
 
     xacro_ack=os.path.join(get_package_share_path('my_robot_description'),
                            'urdf','ackermann_fork.xacro')
@@ -32,34 +37,36 @@ def generate_launch_description():
         output='screen'
     )
 
-    spawn_ackermann= Node(
+    spawn_ackermann_front = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
             "-topic", "/ackermann/robot_description",
             "-entity", "ackermann",
-            "-x", "1.8",   # Example: Set x-coordinate to 1.0
-            "-y", "-1.5",   # Example: Set y-coordinate to 2.0
-            "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","-3.14159265359",
+            "-x", "1.8",
+            "-y", "-1.5",
+            "-z", "0.0",
+            "-Y", "-3.14159265359",
         ],
         namespace="ackermann",
-        output='screen'
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_front"']))
     )
 
-    spawn_ackermann_back= Node(
+    spawn_ackermann_back = Node(
         package="gazebo_ros",
         executable="spawn_entity.py",
         arguments=[
             "-topic", "/ackermann/robot_description",
             "-entity", "ackermann",
-            "-x", "-0.1",   # Example: Set x-coordinate to 1.0
-            "-y", "-1.7",   # Example: Set y-coordinate to 2.0
-            "-z", "0.0",   # Example: Set z-coordinate to 0.0
-            "-Y","0.0",
+            "-x", "-0.1",
+            "-y", "-1.5",
+            "-z", "0.0",
+            "-Y", "0.0",
         ],
         namespace="ackermann",
-        output='screen'
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_back"']))
     )
 
     load_ackermann_controller = Node(
@@ -89,31 +96,9 @@ def generate_launch_description():
     )
 
 
-
-    # load_joint_state_broadcaster = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-    #          '/ackermann/joint_state_broadcaster'],
-    #     output='screen'
-    # )
-
-    # load_velocity_controller = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', '/ackermann/velocity_controller'],
-    #     output='screen'
-    # )
-
-    # load_position_controller = ExecuteProcess(
-    #     cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', '/ackermann/position_controller'],
-    #     output='screen'
-    # )
-
     return LaunchDescription([
-        spawn_ackermann,
-        # spawn_ackermann_back,
+        pose_arg,
         ack_state_publisher,
-        # load_joint_state_broadcaster,
-        # load_ackermann_controller,
-        # load_position_controller,
-        # load_velocity_controller,
-        
-        
+        spawn_ackermann_front,
+        spawn_ackermann_back
     ])

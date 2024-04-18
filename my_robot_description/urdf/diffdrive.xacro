@@ -334,7 +334,8 @@
             <ros>
             <!-- Add a namespace -->
             <namespace>diff</namespace>
-             <remapping>/diff/cmd_vel:=/cmd_vel_follower</remapping>
+             <remapping>/diff/cmd_vel:=/cmd_vel</remapping>
+             <remapping>/diff/odom:=/diffdrive/odom</remapping>
             </ros>
             <update_rate>50</update_rate>
             <!-- wheels -->

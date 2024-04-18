@@ -25,8 +25,9 @@ class FormationController(Node):
             self.robot1_frame = 'aruco_frame'
             self.robot2_frame = 'camera_frame'
         self.leader_x = 0.0
-        self.leader_yaw = 0.0
+        self.leader_w = 0.0
         self.direction = 1.0
+        
         self.previous_yaw = 0
         self.previous_ty = 0
         self.kp_x = 1
@@ -35,6 +36,11 @@ class FormationController(Node):
         self.ki_y = 0.0  # Initialize for integral term
         self.kp_yaw = 1
         self.ki_yaw = 0  # Initialize for integral term
+
+        self.kl_x = 1
+        self.kl_xw = 5
+        self.kl_yw = 5
+        self.kl_yaw = 1
 
         # Variables to store integral errors for PI control
         self.integral_error_x = 0
@@ -58,7 +64,7 @@ class FormationController(Node):
 
     def cmd_vel_callback(self, msg):
         self.leader_x = msg.linear.x 
-        self.leader_yaw = msg.angular.z 
+        self.leader_w = msg.angular.z 
         # pass
 
     def control_callback(self):
@@ -87,10 +93,10 @@ class FormationController(Node):
             if self.follower_type == 'mecanum':
                 error_x = (tx - 1.65)
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
+                linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) 
                 error_y = ty
                 self.integral_error_y += error_y  # Accumulate error for integral term
-                linear_vel_y = self.kp_y * error_y + self.ki_y * self.integral_error_y
+                linear_vel_y = (self.kp_y * error_y) + (-self.leader_w * self.kl_yw)
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 linear_vel_y = max(min(linear_vel_y, max_vx), -max_vx)
@@ -103,7 +109,7 @@ class FormationController(Node):
                     #     self.direction = 1.0
                     error_yaw = yaw
                     self.integral_error_yaw += error_yaw  # Accumulate error for integral term
-                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
+                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  + (self.leader_w * self.kl_yaw) # Apply direction factor for yaw
                 else:
                     angular_vel = 0.0  # Prioritize x, y if they are large
                 cmd_msg.linear.y = linear_vel_y
@@ -113,10 +119,9 @@ class FormationController(Node):
             elif self.follower_type == 'diffdrive':
                 error_x = (tx - 1.45)
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
-
+                linear_vel_x = self.kp_x * error_x 
                 # linear_vel_x = (tx-1.65) * 5  
-                # angular_vel = self.leader_yaw
+                # angular_vel = self.leader_w
                 # if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
                 #     self.direction = -1.0 
                 # elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
@@ -169,7 +174,7 @@ class FormationController(Node):
             self.get_logger().info(
                 f"Follower_command: x:{linear_vel_x:.2f}, z:{angular_vel:.2f} "
             )
-            # self.publisher.publish(cmd_msg)
+            self.publisher.publish(cmd_msg)
             self.previous_ty = ty 
             self.previous_yaw = yaw 
 
@@ -177,8 +182,8 @@ class FormationController(Node):
             self.get_logger().error(f"Error looking up transform: {str(e)}")
             return
 
-        # linear_vel = self.leader_x * cos(yaw*180/pi) + (k_x * ((tx-1) - d * (1 - cos(yaw*180/pi)))) - k_yaw*180/pi * yaw*180/pi * self.leader_yaw
-        # angular_vel = self.leader_yaw + self.leader_x*(k_y*k_a*(ty+sin(yaw*180/pi)+k_yaw*180/pi*(yaw*180/pi)))+ k_b/k_a * sin(yaw*180/pi)
+        # linear_vel = self.leader_x * cos(yaw*180/pi) + (k_x * ((tx-1) - d * (1 - cos(yaw*180/pi)))) - k_yaw*180/pi * yaw*180/pi * self.leader_w
+        # angular_vel = self.leader_w + self.leader_x*(k_y*k_a*(ty+sin(yaw*180/pi)+k_yaw*180/pi*(yaw*180/pi)))+ k_b/k_a * sin(yaw*180/pi)
 
 
 

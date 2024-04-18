@@ -52,6 +52,8 @@ double ang_desire_steer = 0;                  //Desire angle(deg) for steer
 double ang_right_calculated = 0;              //Change from encoder tick to degree
 double encode_err = 0;
 
+const int k_steer = 8;
+double pwm_steer = 0;
 const double max_speed = 0.4;                 //Max speed (m/s)
 
 double speedlinx = 0;
@@ -68,12 +70,9 @@ float linear_acceleration[3]={0};
 float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
 double theta = 0;
 
-const float Kp = 2;
-const float Ki = 3;
-const float Kd = 0;
-
 int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
+int PWM_steerMotor = 0;
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -101,7 +100,7 @@ class motor{
         int pinPWM;
         int pinPWM_R;
         int pinPWM_L;
-    
+        
     void motor_setup(){
         pinMode(pinA,OUTPUT);
         pinMode(pinB,OUTPUT);
@@ -137,7 +136,6 @@ class motor{
             analogWrite(pinPWM_L, 0);            
        }
     }
-    
 };
 
 
@@ -165,6 +163,7 @@ void handle_cmd() {
   
 
 motor leftMotor, rightMotor, steerMotor;
+
 void setup() {
   Wire.begin();
 
@@ -266,6 +265,7 @@ void loop() {
       leftMotor.run("BRAKE");
       rightMotor.setSpeed(0);
       rightMotor.run("BRAKE");
+      steerMotor.run("BRAKE");
     }
     else if (speed_req_left == 0){                        //Stopping
       leftMotor.setSpeed(0);
@@ -297,57 +297,59 @@ void loop() {
       rightMotor.run("BACKWARD");
     }
 
-//    PID_steerMotor.Compute();                                                 
+    ang_cmd_steer = constrain(ang_cmd_steer, -max_speed, max_speed);
+    //PID_steerMotor.Compute();                                                 
 //    // compute PWM value for steer motor. Check constant definition comments for more information.
-//    PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_req_steer/speed_to_pwm_ratio), -255, 255); // 
-    encode_err = ang_desire_steer - pos_ack;
-
-    float Pwm_error_L = 0;
-    float Pwm_error_R = 0;
-    float integral1 = 0;
-    float integral2 = 0;
-    float Pwm_lasterror_L = 0;
-    float Pwm_lasterror_R = 0;
+    //PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -100, 100); // 
+    encode_err = ang_desire_steer - pos_ack; 
     
-    Pwm_error_L = analogRead(steerMotor.pinPWM_L);
-    Pwm_error_R = analogRead(steerMotor.pinPWM_R);
+//    pwm_steer = abs(encode_err) * k_steer;
+//    pwm_steer = constrain(pwm_steer,150,255);
+//      
+//    if (abs(encode_err) <= 1){                       //Stopping
+//      steerMotor.run("BRAKE");
+//    }
+//    else if (encode_err > 1){                         //Going "FORWARD"
+//      analogWrite(steerMotor.pinPWM_R, 0);  
+//      analogWrite(steerMotor.pinPWM_L, pwm_steer);  
+//    }
+//    else if (encode_err < -1) {                                                //Going ""BACKWARD""
+//      analogWrite(steerMotor.pinPWM_R, pwm_steer);  
+//      analogWrite(steerMotor.pinPWM_L, 0);  
+//    }
 
-//PID for Left PWM
-    float P1 = Kp * Pwm_error_L;
-    integral1 += Pwm_error_L;
-    float I1 = Ki * integral1;
-    float derivative1 = Pwm_error_L - Pwm_lasterror_L;
-    float D1 = Kd * derivative1;
-    float Pid_L = P1 + I1 + D1;
-
-//PID for Right PWM
-    float P2 = Kp * Pwm_error_R;
-    integral2 += Pwm_error_R;
-    float I2 = Ki * integral2;
-    float derivative2 = Pwm_error_R - Pwm_lasterror_R;
-    float D2 = Kd * derivative2;
-    float Pid_R = P2 + I2 + D2;
-
-    analogWrite(steerMotor.pinPWM_R, Pid_L);  
-    analogWrite(steerMotor.pinPWM_L, Pid_R);             
-       
-    Pwm_lasterror_L = Pwm_error_L;
-    Pwm_lasterror_R = Pwm_error_R;
-   
-    if (abs(encode_err) <= 1){                       //Stopping
-//      steerMotor.setSpeed(0);
-      steerMotor.run("BRAKE");
-    }
-    else if (encode_err > 1){                         //Going "FORWARD"
-//      steerMotor.setSpeed(abs(PWM_steerMotor));
-      steerMotor.run("FORWARD");
-    }
-    else if (encode_err < -1) {                                                //Going ""BACKWARD""
-//      steerMotor.setSpeed(abs(PWM_steerMotor));
-      steerMotor.run("BACKWARD");
-    }
+    float k_p = 8.0;  // Proportional constant
+    float k_i = 1.0;  // Integral constant
+    float k_d = 0.01; // Derivative constant
     
+    // Define variables for PID control
+    float integral = 0.0;
+    float prev_error = 0.0;
     
+    // Compute PID control output
+    float error = encode_err;
+    float pwm_steer = k_p * error;
+    integral += error;
+    pwm_steer += k_i * integral;
+    float derivative = error - prev_error;
+    pwm_steer += k_d * derivative;
+    
+    // Update previous error for next iteration
+    prev_error = error;
+    
+    // Apply constraints to PWM value
+    pwm_steer = constrain(pwm_steer, 200, 255);
+    
+    // Perform action based on error direction
+    if (abs(error) <= 5) {  // Stopping
+        steerMotor.run("BRAKE");
+    } else if (error > 5) { // Going forward
+        analogWrite(steerMotor.pinPWM_R, 0);  
+        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
+    } else if (error < -5) { // Going backward
+        analogWrite(steerMotor.pinPWM_R, pwm_steer);  
+        analogWrite(steerMotor.pinPWM_L, 0);  
+    }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
       Serial.println(" TOO LONG ");
@@ -390,6 +392,9 @@ void publishSpeed(double time) {
   
     xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
     xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
+    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+
+    
           
     xicro.publish_ack_PWM_cmd();
     xicro.publish_ack_imu_raw();

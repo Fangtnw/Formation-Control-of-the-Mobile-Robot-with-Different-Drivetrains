@@ -13,7 +13,11 @@ from launch.conditions import IfCondition
 import xacro
 
 def generate_launch_description():
-
+    pose_arg = DeclareLaunchArgument(
+        'pose',
+        default_value='back',  # Default value is 'front'
+        description='Specify the pose of the ackermann vehicle (front/back)'
+    )
     xacro_mec=os.path.join(get_package_share_path('my_robot_description'),
                            'urdf','mecanum_fork.xacro')
     
@@ -44,11 +48,29 @@ def generate_launch_description():
             "-Y"," 0.0",
         ],
         namespace="mecanum",
-        output='screen'
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_front" or "', LaunchConfiguration('pose'), '" == "diff_front"']))
+    )
+
+    spawn_mecanum_front= Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=[
+            "-topic", "/mecanum/robot_description",
+            "-entity", "mecanum",
+            "-x", "1.8",   # Example: Set x-coordinate to 1.0
+            "-y", "-1.5",   # Example: Set y-coordinate to 2.0
+            "-z", "0.0",   # Example: Set z-coordinate to 0.0
+            "-Y","-3.14159265359",
+        ],
+        namespace="mecanum",
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_back" or "', LaunchConfiguration('pose'), '" == "diff_back"']))
     )
 
     return LaunchDescription([
-        spawn_mecanum,
+        pose_arg,
         mecanum_state_publisher,
-        
+        spawn_mecanum,
+        spawn_mecanum_front
     ])

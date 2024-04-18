@@ -20,7 +20,7 @@ slam_toolbox:
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
     map_file_name: coop_ws/src/coop_robot_bringup/map/sim_map_2.3
-    map_start_pose: [1.8, -1.5, -3.14]
+    map_start_pose: [1.8, -1.5, -3.14] #[1.8, -1.5, -3.14] front | [-0.1, -1.5, 0]  back 
     # map_start_at_dock: True
 
     debug_logging: false
