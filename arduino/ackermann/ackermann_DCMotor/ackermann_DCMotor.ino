@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 16;                 //Max angle (degree)
+const double max_angle = 28;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -52,8 +52,6 @@ double ang_desire_steer = 0;                  //Desire angle(deg) for steer
 double ang_right_calculated = 0;              //Change from encoder tick to degree
 double encode_err = 0;
 
-const int k_steer = 8;
-double pwm_steer = 0;
 const double max_speed = 0.4;                 //Max speed (m/s)
 
 double speedlinx = 0;
@@ -72,7 +70,6 @@ double theta = 0;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
 int PWM_rightMotor = 0;                    //PWM command for right motor 
-int PWM_steerMotor = 0;
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -80,6 +77,17 @@ volatile float pos_steer = 0;      //Steer motor encoder position
 volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
+
+float k_p = 4.0;  // Proportional constant
+float k_i = 1.0;  // Integral constant
+float k_d = 0.01; // Derivative constant
+    
+// Define variables for PID control
+float integral = 0.0;
+float prev_error = 0.0;
+float pwm_steer = 0.0;
+float error = 0.0;
+float derivative = 0.0; 
 
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
@@ -144,8 +152,8 @@ void handle_cmd() {
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
   
-  speed_req_right = speed_req;
-  speed_req_left = speed_req;
+  speed_req_right = speed_req - angular_speed_req*(wheelbase/2);
+  speed_req_left = speed_req + angular_speed_req*(wheelbase/2);
   ang_req_steer = angular_speed_req;
 
   //Steer degree Command
@@ -160,7 +168,6 @@ void handle_cmd() {
   pos_ack = (pos_steer_right/encoder_cpr)*360;    //Convert encoder tick to degree value
                   
   }
-  
 
 motor leftMotor, rightMotor, steerMotor;
 
@@ -238,7 +245,6 @@ void setup() {
   digitalWrite(PIN_ENCOD_B_STEER_RIGHT, HIGH);
   attachInterrupt(1, encoderRightServo, RISING);
 
-
 }
 
 void loop() {
@@ -254,7 +260,7 @@ void loop() {
 
     pos_left = 0;
     pos_right = 0;
-        
+            
     speed_cmd_left = constrain(speed_cmd_left, -max_speed, max_speed);
     PID_leftMotor.Compute();                                                 
     // compute PWM value for left motor. Check constant definition comments for more information.
@@ -302,36 +308,13 @@ void loop() {
 //    // compute PWM value for steer motor. Check constant definition comments for more information.
     //PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -100, 100); // 
     encode_err = ang_desire_steer - pos_ack; 
-    
-//    pwm_steer = abs(encode_err) * k_steer;
-//    pwm_steer = constrain(pwm_steer,150,255);
-//      
-//    if (abs(encode_err) <= 1){                       //Stopping
-//      steerMotor.run("BRAKE");
-//    }
-//    else if (encode_err > 1){                         //Going "FORWARD"
-//      analogWrite(steerMotor.pinPWM_R, 0);  
-//      analogWrite(steerMotor.pinPWM_L, pwm_steer);  
-//    }
-//    else if (encode_err < -1) {                                                //Going ""BACKWARD""
-//      analogWrite(steerMotor.pinPWM_R, pwm_steer);  
-//      analogWrite(steerMotor.pinPWM_L, 0);  
-//    }
 
-    float k_p = 8.0;  // Proportional constant
-    float k_i = 1.0;  // Integral constant
-    float k_d = 0.01; // Derivative constant
-    
-    // Define variables for PID control
-    float integral = 0.0;
-    float prev_error = 0.0;
-    
     // Compute PID control output
-    float error = encode_err;
-    float pwm_steer = k_p * error;
+    error = encode_err;
+    pwm_steer = k_p * error;
     integral += error;
     pwm_steer += k_i * integral;
-    float derivative = error - prev_error;
+    derivative = error - prev_error;
     pwm_steer += k_d * derivative;
     
     // Update previous error for next iteration
@@ -339,16 +322,17 @@ void loop() {
     
     // Apply constraints to PWM value
     pwm_steer = constrain(pwm_steer, 200, 255);
+    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
-    if (abs(error) <= 5) {  // Stopping
+    if (abs(error) <= 3) {  // Stopping
         steerMotor.run("BRAKE");
-    } else if (error > 5) { // Going forward
-        analogWrite(steerMotor.pinPWM_R, 0);  
-        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
-    } else if (error < -5) { // Going backward
+    } else if (error > 3) { // Going forward
         analogWrite(steerMotor.pinPWM_R, pwm_steer);  
         analogWrite(steerMotor.pinPWM_L, 0);  
+    } else if (error < -3) { // Going backward
+        analogWrite(steerMotor.pinPWM_R, 0);  
+        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
     }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
