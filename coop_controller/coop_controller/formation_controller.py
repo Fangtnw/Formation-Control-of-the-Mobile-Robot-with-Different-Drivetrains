@@ -5,6 +5,7 @@ from tf2_ros import Buffer, TransformListener
 from tf2_geometry_msgs import do_transform_vector3
 from math import cos , sin, pi
 import argparse
+import numpy as np
 import math
 import tf_transformations
 
@@ -117,9 +118,11 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                error_x = (tx - 1.45)
+                error_x = (tx - 1.55)
+                error_y = ty
+                error_yaw = yaw
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                linear_vel_x = self.kp_x * error_x 
+                linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + (self.kp_y * error_y)
                 # linear_vel_x = (tx-1.65) * 5  
                 # angular_vel = self.leader_w
                 # if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
@@ -127,16 +130,21 @@ class FormationController(Node):
                 # elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
                 #     self.direction = 1.0
                 # # angular_vel = ty * 5  * self.direction
-                    
-                if abs(error_x) < 0.2:
-                    error_yaw = yaw
-                    self.integral_error_yaw += error_yaw  # Accumulate error for integral term
-                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
-                else:
-                    angular_vel = 0.0
+                
+                linear_vel_y = 0.0
+                #try to decrease ty
+                if abs(error_y) > 0.2:
+                    angular_vel = np.sign(self.kp_yaw * error_yaw)*((self.leader_w * self.kl_yaw)+(self.kp_y * error_y))
+                # if abs(error_x) < 0.2:
+                
+                self.integral_error_yaw += error_yaw  # Accumulate error for integral term
+                  # Apply direction factor for yaw
+                # else:
+                #     angular_vel = 0.0
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
+
             elif self.follower_type == 'aruco':
                 error_x = (tx - 0.8)
                 self.integral_error_x += error_x  # Accumulate error for integral term

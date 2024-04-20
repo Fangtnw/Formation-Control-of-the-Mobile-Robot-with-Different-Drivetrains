@@ -321,13 +321,23 @@ void loop() {
     prev_error = error;
     
     // Apply constraints to PWM value
+<<<<<<< Updated upstream
     pwm_steer = constrain(pwm_steer, 200, 255);
+=======
+    pwm_steer = constrain(pwm_steer, 210, 255);
+>>>>>>> Stashed changes
     xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
     if (abs(error) <= 3) {  // Stopping
         steerMotor.run("BRAKE");
     } else if (error > 3) { // Going forward
+<<<<<<< Updated upstream
+=======
+        analogWrite(steerMotor.pinPWM_R, 0);  
+        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
+    } else if (error < -3) { // Going backward
+>>>>>>> Stashed changes
         analogWrite(steerMotor.pinPWM_R, pwm_steer);  
         analogWrite(steerMotor.pinPWM_L, 0);  
     } else if (error < -3) { // Going backward

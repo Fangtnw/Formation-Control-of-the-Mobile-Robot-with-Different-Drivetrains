@@ -49,7 +49,7 @@ def generate_launch_description():
         ],
         namespace="mecanum",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_front" or "', LaunchConfiguration('pose'), '" == "diff_front"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_mec"']))
     )
 
     spawn_mecanum_front= Node(
@@ -65,7 +65,8 @@ def generate_launch_description():
         ],
         namespace="mecanum",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_back" or "', LaunchConfiguration('pose'), '" == "diff_back"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "mec_ack"']))
+        # condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_back" or "', LaunchConfiguration('pose'), '" == "diff_back"']))
     )
 
     return LaunchDescription([

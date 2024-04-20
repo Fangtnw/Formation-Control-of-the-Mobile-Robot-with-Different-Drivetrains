@@ -50,7 +50,7 @@ def generate_launch_description():
         ],
         namespace="ackermann",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_front"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_diff" or "', LaunchConfiguration('pose'), '" == "ack_mec"']))
     )
 
     spawn_ackermann_back = Node(
@@ -66,7 +66,7 @@ def generate_launch_description():
         ],
         namespace="ackermann",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_back"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "diff_ack" or "', LaunchConfiguration('pose'), '" == "mec_ack"']))
     )
 
     load_ackermann_controller = Node(

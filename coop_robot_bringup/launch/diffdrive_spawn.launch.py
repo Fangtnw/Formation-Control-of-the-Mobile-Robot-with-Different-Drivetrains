@@ -54,7 +54,7 @@ def generate_launch_description():
         ],
         namespace="diffdrive",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "diff_front"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "diff_ack"']))
     )
 
     spawn_follow_diffdrive= Node(
@@ -70,7 +70,7 @@ def generate_launch_description():
         ],
         namespace="diffdrive",
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "diff_back"']))
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('pose'), '" == "ack_diff"']))
     )
 
     load_joint_state_broadcaster = Node(
