@@ -158,18 +158,23 @@ void handle_cmd() {
 //  speed_req_left = speed_req - angular_speed_req*; 
   if (speed_req!=0){
 
-  ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; 
-  turning_r = wheel_length / sin(ang_desire_steer);
-  
-  speed_req_right = (speed_req*turning_r) / (turning_r+(wheelbase/2));
-  speed_req_left = (speed_req*turning_r) / (turning_r-(wheelbase/2));
-  
+    ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; 
+    turning_r = wheel_length / sin(ang_desire_steer);
+
+    if (ang_desire_steer != 0){
+      speed_req_right = (speed_req*turning_r) / (turning_r + (wheelbase/2));
+      speed_req_left = (speed_req*turning_r) / (turning_r - (wheelbase/2));
+    }
+    else{
+      speed_req_right = speed_req;
+      speed_req_left = speed_req;
+    }
   }
   else{
     ang_desire_steer = 0;
-   turning_r = 0;
-  speed_req_right =0;
-  speed_req_left = 0;
+    turning_r = 0;
+    speed_req_right =0;
+    speed_req_left = 0;
     }
 //
 //  speed_req_right = speed_req;
@@ -248,8 +253,6 @@ void setup() {
   digitalWrite(PIN_ENCOD_A_MOTOR_RIGHT, HIGH);                // turn on pullup resistor
   digitalWrite(PIN_ENCOD_B_MOTOR_RIGHT, HIGH);
   attachInterrupt(5, encoderRightMotor, RISING);
-
-          
   
   //  Define the rotary encoder for right servo motor
   pinMode(PIN_ENCOD_A_STEER_RIGHT, INPUT);
@@ -383,7 +386,7 @@ void publishSpeed(double time) {
     xicro.publish_ack_imu();
     xicro.Publisher_ack_speed_req.message.linear.x = speed_req_left;
     xicro.Publisher_ack_speed_req.message.linear.y = speed_req_right;
-    xicro.Publisher_ack_speed_req.message.linear.z = ang_req_steer;
+    xicro.Publisher_ack_speed_req.message.linear.z = turning_r;
     xicro.publish_ack_speed_req();
     xicro.Publisher_ack_speed_cmd.message.linear.x = speed_cmd_left;
     xicro.Publisher_ack_speed_cmd.message.linear.y = speed_cmd_right;
