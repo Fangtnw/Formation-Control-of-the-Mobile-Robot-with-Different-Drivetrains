@@ -31,9 +31,9 @@ class FormationController(Node):
         
         self.previous_yaw = 0
         self.previous_ty = 0
-        self.kp_x = 1
+        self.kp_x = 5
         self.ki_x = 0.0  # Initialize for integral term
-        self.kp_y = 2  # New gain for y-direction
+        self.kp_y = 1  # New gain for y-direction
         self.ki_y = 0.0  # Initialize for integral term
         self.kp_yaw = 1
         self.ki_yaw = 0  # Initialize for integral term
@@ -118,29 +118,26 @@ class FormationController(Node):
 
             #differential_drive robot follower case
             elif self.follower_type == 'diffdrive':
-                error_x = (tx - 1.55)
+                error_x = (tx - 1.60)
                 error_y = ty
                 error_yaw = yaw
+
+
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + (self.kp_y * error_y)
-                # linear_vel_x = (tx-1.65) * 5  
-                # angular_vel = self.leader_w
-                # if self.direction == 1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                #     self.direction = -1.0 
-                # elif self.direction == -1.0 and abs(ty) < abs(self.previous_ty):   # Check turn direction
-                #     self.direction = 1.0
-                # # angular_vel = ty * 5  * self.direction
                 
                 linear_vel_y = 0.0
                 #try to decrease ty
-                if abs(error_y) > 0.2:
-                    angular_vel = np.sign(self.kp_yaw * error_yaw)*((self.leader_w * self.kl_yaw)+(self.kp_y * error_y))
-                # if abs(error_x) < 0.2:
-                
+                if abs(error_y) > 0.1:
+                    # angular_vel = -np.sign(self.kp_yaw * error_yaw)*((self.leader_w * self.kl_yaw)+(self.kp_y * error_y))
+                    angular_vel = ((np.sign(error_y))*self.kp_y * error_y)
+                    linear_vel_x = (-self.leader_x * self.kl_x) + (self.kp_y * (-np.sign(error_x+0.3))*(error_y))
+                else:
+                    linear_vel_x = self.kp_x * error_x
+                    angular_vel = self.kp_yaw * error_yaw
+
                 self.integral_error_yaw += error_yaw  # Accumulate error for integral term
                   # Apply direction factor for yaw
-                # else:
-                #     angular_vel = 0.0
+
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)

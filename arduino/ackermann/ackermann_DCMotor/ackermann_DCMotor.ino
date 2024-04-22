@@ -78,7 +78,7 @@ volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
 
-float k_p = 4.0;  // Proportional constant
+float k_p = 6.0;  // Proportional constant
 float k_i = 1.0;  // Integral constant
 float k_d = 0.01; // Derivative constant
     
@@ -88,6 +88,7 @@ float prev_error = 0.0;
 float pwm_steer = 0.0;
 float error = 0.0;
 float derivative = 0.0; 
+float turning_r = 0.0;
 
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
@@ -151,19 +152,31 @@ void handle_cmd() {
   noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
   speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
-  
-  speed_req_right = speed_req - angular_speed_req*(wheelbase/2);
-  speed_req_left = speed_req + angular_speed_req*(wheelbase/2);
+
   ang_req_steer = angular_speed_req;
 
-  //Steer degree Command
-  if (speed_req != 0){
-    ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; }
+//  speed_req_left = speed_req - angular_speed_req*; 
+  if (speed_req!=0){
 
-    
-  else {
-    ang_desire_steer = 0;
+  ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; 
+  turning_r = wheel_length / sin(ang_desire_steer);
+  
+  speed_req_right = (speed_req*turning_r) / (turning_r+(wheelbase/2));
+  speed_req_left = (speed_req*turning_r) / (turning_r-(wheelbase/2));
+  
   }
+  else{
+    ang_desire_steer = 0;
+   turning_r = 0;
+  speed_req_right =0;
+  speed_req_left = 0;
+    }
+//
+//  speed_req_right = speed_req;
+//  speed_req_left = speed_req;
+//    
+
+
   
   pos_ack = (pos_steer_right/encoder_cpr)*360;    //Convert encoder tick to degree value
                   
@@ -321,23 +334,16 @@ void loop() {
     prev_error = error;
     
     // Apply constraints to PWM value
-<<<<<<< Updated upstream
-    pwm_steer = constrain(pwm_steer, 200, 255);
-=======
-    pwm_steer = constrain(pwm_steer, 210, 255);
->>>>>>> Stashed changes
+
+    pwm_steer = constrain(pwm_steer, 150, 255);
+
     xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
     if (abs(error) <= 3) {  // Stopping
         steerMotor.run("BRAKE");
     } else if (error > 3) { // Going forward
-<<<<<<< Updated upstream
-=======
-        analogWrite(steerMotor.pinPWM_R, 0);  
-        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
-    } else if (error < -3) { // Going backward
->>>>>>> Stashed changes
+
         analogWrite(steerMotor.pinPWM_R, pwm_steer);  
         analogWrite(steerMotor.pinPWM_L, 0);  
     } else if (error < -3) { // Going backward
