@@ -92,7 +92,7 @@ class PurePursuitController(Node):
             angular_velocity = 0.0
             steering_angle = 0.0  # Adjust steering angle for a smooth stop
         else:
-            if abs(alpha) > 1.57:
+            if abs(alpha) < 1.57:
                 linear_velocity = min(self.target_speed, self.kp * distance_error)
                 angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
             else:
@@ -113,7 +113,7 @@ class PurePursuitController(Node):
 
         for i, waypoint in enumerate(self.waypoints):
             distance = self.distance_between_points(self.current_pose.position, waypoint.pose.position)
-            if distance < closest_distance:
+            if distance < closest_distance:  
                 closest_distance = distance
                 closest_index = i
 

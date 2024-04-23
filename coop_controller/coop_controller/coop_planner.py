@@ -24,15 +24,15 @@ class CubicPolynomialPlanner(Node):
         if self.path == '1.1':
             self.via_points = [[4.0, -1.2],[5.0, -1.0], [5.0, 4.1]]  #[1.5, -1.5]
         if self.path == '1.2':
-            self.via_points = [[3.5, -1.3],[5.0, -1.0], [5.0, 3.0]]  #[1.5, -1.5]
+            self.via_points = [[4.0, -1.7],[5.0, -1.0], [5.0, 4.1]]   #[1.5, -1.5]
         elif self.path == '2':
             self.via_points = [[1.5, -1.5],[8.0, -1.5],[6.0, -1.2],[5.0, -1.0], [5.0, 3.0]]
         elif self.path == '2.1':
-            self.via_points = [[1.5, -1.5],[8.0, -1.5]]
+            self.via_points = [[1.5, -1.5],[9.1, -1.5]]
         elif self.path == '2.2':
-            self.via_points = [[8.0, -1.5],[6.0, -1.2],[5.0, -1.0], [5.0, 3.0]]
+            self.via_points = [[6.0, -1.2],[5.0, -1.0], [5.0, 4.1]]
         elif self.path == '3.1':
-            self.via_points = [[5.0, -1.0], [5.0, 3.0]]
+            self.via_points = [[3.0, -1.7],[2.0, -1.9],[5.0, -1.0], [5.0, 4.1]]
         elif self.path == '3.2':
             self.via_points = [[5.0, -1.0], [5.0, 3.0]]
 
@@ -45,35 +45,38 @@ class CubicPolynomialPlanner(Node):
         self.actual_follower_x_positions = []
         self.actual_follower_y_positions = []
         self.generate_trajectory(self.via_points, self.tf)
-        self.timer = self.create_timer(1.0, self.record_trajectories_to_csv)  # Timer fires every 1 second
+        # self.timer = self.create_timer(1.0, self.record_trajectories_to_csv)  # Timer fires every 1 second
 
     def record_trajectories_to_csv(self):
         # Ensure the directory for CSV files exists
-        output_dir = 'trajectory_data'
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        if self.latest_leader_x and self.latest_leader_y and self.latest_follower_x and self.actual_follower_y_positions is not None:
+            output_dir = 'trajectory_data'
+            if not os.path.exists(output_dir):
+                os.makedirs(output_dir)
 
-        # Current timestamp for the filename
-        timestamp = self.get_clock().now().to_msg().sec  # or use Time.now() in a different format
+            # Current timestamp for the filename
+            timestamp = self.get_clock().now().to_msg().sec  # or use Time.now() in a different format
 
-        # Filename for the CSV
-        csv_filename = f'{output_dir}/trajectories_{self.path}_{timestamp}.csv'
+            # Filename for the CSV
+            csv_filename = f'{output_dir}/trajectories_{self.path}_{timestamp}.csv'
 
-        # Create a dictionary to record data
-        data = {
-            'x_trajectory': self.x_trajectory,
-            'y_trajectory': self.y_trajectory,
-            'leader_x_positions': self.actual_leader_x_positions,
-            'leader_y_positions': self.actual_leader_y_positions,
-            'follower_x_positions': self.actual_follower_x_positions,
-            'follower_y_positions': self.actual_follower_y_positions,
-        }
+            # Create a dictionary to record data
+            data = {
+                # 'x_trajectory': self.x_trajectory,
+                # 'y_trajectory': self.y_trajectory,
+                'leader_x_positions': self.latest_leader_x,
+                'leader_y_positions': self.latest_leader_y,
+                'follower_x_positions': self.latest_follower_x,
+                'follower_y_positions': self.latest_follower_y,
+            }
 
-        # Create a DataFrame from the data
-        df = pd.DataFrame(data)
+            # Create a DataFrame from the data
+            df = pd.DataFrame(data)
 
-        # Save to CSV
-        df.to_csv(csv_filename, index=False)
+            # Save to CSV
+            df.to_csv(csv_filename, index=False)
+            self.get_logger().info(f'Recorded trajectories to {csv_filename}')
+
     def generate_trajectory(self, via_points, tf):
         if self.initial_pose_set:
             t0 = 0.0
@@ -107,8 +110,8 @@ class CubicPolynomialPlanner(Node):
                 self.x_trajectory = x_segment1 + x_segment2  
                 self.y_trajectory = y_segment1 + y_segment2  
             elif self.path == '3.1':
-                x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
-                x_segment2, y_segment2 = self.interpolate_spline(via_points[1:], timesteps, tf/2)
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
                 self.x_trajectory = x_segment1 + x_segment2  
                 self.y_trajectory = y_segment1 + y_segment2  
             elif self.path == '3.2':
@@ -122,8 +125,8 @@ class CubicPolynomialPlanner(Node):
             self.yaw_trajectory = [math.atan2(self.y_trajectory[i+1] - self.y_trajectory[i], self.x_trajectory[i+1] - self.x_trajectory[i])
                                 for i in range(len(self.x_trajectory) - 1)]
 
-            if self.path in ['1.1','3.1', '3.2']:
-                self.yaw_trajectory = [(yaw + math.pi) % (2 * math.pi) for yaw in self.yaw_trajectory]
+            # if self.path in ['1,1','3.1', '3.2']:
+            #     self.yaw_trajectory = [(yaw + math.pi) % (2 * math.pi) for yaw in self.yaw_trajectory]
 
 
             if self.yaw_trajectory:
@@ -162,10 +165,14 @@ class CubicPolynomialPlanner(Node):
             # self.plot_trajectory()
         self.actual_leader_x_positions.append(msg.pose.pose.position.x)
         self.actual_leader_y_positions.append(msg.pose.pose.position.y)
+        self.latest_leader_x = msg.pose.pose.position.x
+        self.latest_leader_y = msg.pose.pose.position.y
             
     def odom_callback_mec(self, msg):
         self.actual_follower_x_positions.append(msg.pose.pose.position.x)
         self.actual_follower_y_positions.append(msg.pose.pose.position.y)
+        self.latest_follower_x = msg.pose.pose.position.x
+        self.latest_follower_y = msg.pose.pose.position.y
 
 
     def publish_trajectory(self):
@@ -222,7 +229,7 @@ class CubicPolynomialPlanner(Node):
 def main(args=None):
     rclpy.init(args=args)
     parser = argparse.ArgumentParser(description='Cubic_Polynomial_Planner')
-    parser.add_argument('--path', choices=['1.1','1.1','2','2.1','2.2','3.1','3.2','4'], required=True,
+    parser.add_argument('--path', choices=['1.1','1.2','2','2.1','2.2','3.1','3.2','4'], required=True,
                         help='Specify the desired path')
     args = parser.parse_args()
     planner = CubicPolynomialPlanner(args.path)
