@@ -78,7 +78,7 @@ volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
 
-float k_p = 6.0;  // Proportional constant
+float k_p = 7.0;  // Proportional constant
 float k_i = 1.0;  // Integral constant
 float k_d = 0.01; // Derivative constant
     
@@ -149,43 +149,31 @@ class motor{
 
 
 void handle_cmd() {
-  noCommLoops = 0;                                                  //Reset the counter for number of main loops without communication
-  speed_req = xicro.Subscription_cmd_vel.message.linear.x;          //Extract the commanded linear speed from the message
-  angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; //Extract the commanded angular speed from the message
+  noCommLoops = 0;                                                  // Reset the counter for number of main loops without communication
+  speed_req = xicro.Subscription_cmd_vel.message.linear.x;          // Extract the commanded linear speed from the message
+  angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; // Extract the commanded angular speed from the message
 
-  ang_req_steer = angular_speed_req;
-
-//  speed_req_left = speed_req - angular_speed_req*; 
-  if (speed_req!=0){
-
-    ang_desire_steer = (atan(angular_speed_req*wheel_length)/speed_req)*(180/PI)*0.52; 
+  // Check if speed_req is not equal to 0 to avoid division by zero
+  if (speed_req != 0) {
+    ang_desire_steer = (atan(angular_speed_req * wheel_length) / speed_req) * (180 / PI) * 0.52; 
     turning_r = wheel_length / sin(ang_desire_steer);
 
-    if (ang_desire_steer != 0){
-      speed_req_right = (speed_req*turning_r) / (turning_r + (wheelbase/2));
-      speed_req_left = (speed_req*turning_r) / (turning_r - (wheelbase/2));
-    }
-    else{
+    if (ang_desire_steer == 0) { 
       speed_req_right = speed_req;
       speed_req_left = speed_req;
+    } else {
+      speed_req_right = (speed_req * turning_r) / (turning_r - (wheelbase / 2));
+      speed_req_left = (speed_req * turning_r) / (turning_r + (wheelbase / 2));
     }
-  }
-  else{
+  } else {
     ang_desire_steer = 0;
     turning_r = 0;
-    speed_req_right =0;
+    speed_req_right = 0;
     speed_req_left = 0;
-    }
-//
-//  speed_req_right = speed_req;
-//  speed_req_left = speed_req;
-//    
-
-
-  
-  pos_ack = (pos_steer_right/encoder_cpr)*360;    //Convert encoder tick to degree value
-                  
   }
+  
+  pos_ack = (pos_steer_right / encoder_cpr) * 360;    // Convert encoder tick to degree value
+}
 
 motor leftMotor, rightMotor, steerMotor;
 
@@ -346,12 +334,11 @@ void loop() {
     if (abs(error) <= 3) {  // Stopping
         steerMotor.run("BRAKE");
     } else if (error > 3) { // Going forward
-
-        analogWrite(steerMotor.pinPWM_R, pwm_steer);  
+        analogWrite(steerMotor.pinPWM_R, 200);  
         analogWrite(steerMotor.pinPWM_L, 0);  
     } else if (error < -3) { // Going backward
         analogWrite(steerMotor.pinPWM_R, 0);  
-        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
+        analogWrite(steerMotor.pinPWM_L, 200);  
     }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime

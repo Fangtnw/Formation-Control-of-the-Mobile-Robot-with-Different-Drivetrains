@@ -122,20 +122,23 @@ class FormationController(Node):
                 error_y = ty
                 error_yaw = yaw
 
-
                 self.integral_error_x += error_x  # Accumulate error for integral term
+                self.integral_error_yaw += error_yaw  # Accumulate error for integral term
                 
                 linear_vel_y = 0.0
                 #try to decrease ty
                 if abs(error_y) > 0.1:
                     # angular_vel = -np.sign(self.kp_yaw * error_yaw)*((self.leader_w * self.kl_yaw)+(self.kp_y * error_y))
-                    angular_vel = ((np.sign(error_y))*self.kp_y * error_y)
                     linear_vel_x = (-self.leader_x * self.kl_x) + (self.kp_y * (-np.sign(error_x+0.3))*(error_y))
+                    if abs(error_yaw) < 0.25:
+                        angular_vel = ((np.sign(error_y))*self.kp_y * error_y)
+                    else:
+                        angular_vel = 0.0
                 else:
                     linear_vel_x = self.kp_x * error_x
                     angular_vel = self.kp_yaw * error_yaw
 
-                self.integral_error_yaw += error_yaw  # Accumulate error for integral term
+                
                   # Apply direction factor for yaw
 
 

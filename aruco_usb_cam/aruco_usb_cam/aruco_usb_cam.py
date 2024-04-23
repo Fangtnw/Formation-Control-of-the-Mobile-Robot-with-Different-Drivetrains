@@ -81,9 +81,9 @@ class ArUcoDetector(Node):
             self.get_logger().info("Detected ArUco markers")
             for i, id in enumerate(ids):
                 if id == 145:  # Example ArUco ID, update with your specific ID
-                    self.get_logger().info("Found ArUco marker with ID 145")
+                    self.get_logger().info("Found ArUco marker with ID 154")
                     rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
-                        corners[i], 0.05, self.camera_matrix, self.dist_coeff)
+                        corners[i], 0.1, self.camera_matrix, self.dist_coeff)
                     
                     if rvec is not None and tvec is not None and tvec.any():  # Check if tvec is not empty
                         transform = TransformStamped()

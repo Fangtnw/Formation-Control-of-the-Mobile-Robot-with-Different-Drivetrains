@@ -7,18 +7,22 @@ import math
 import matplotlib.pyplot as plt
 from scipy.interpolate import CubicSpline
 import argparse
+import signal
+import pandas as pd
+import os
 
 class CubicPolynomialPlanner(Node):
     def __init__(self,path):
         super().__init__('cubic_polynomial_planner')  # Unique node name
         self.path = path
         self.subscription = self.create_subscription(Odometry, '/diffdrive/odom', self.odom_callback, 10)
+        self.subscription_mec = self.create_subscription(Odometry, '/mec/odom', self.odom_callback_mec, 10)
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.publisher_local_plan = self.create_publisher(Path, '/plan', 10)
         self.initial_pose_set = False  # Flag to check if initial pose is set
         self.initial_pose = None  # Store initial pose
         if self.path == '1.1':
-            self.via_points = [[4.0, -1.2],[5.0, -1.0], [5.0, 3.0]]  #[1.5, -1.5]
+            self.via_points = [[4.0, -1.2],[5.0, -1.0], [5.0, 4.1]]  #[1.5, -1.5]
         if self.path == '1.2':
             self.via_points = [[3.5, -1.3],[5.0, -1.0], [5.0, 3.0]]  #[1.5, -1.5]
         elif self.path == '2':
@@ -36,8 +40,40 @@ class CubicPolynomialPlanner(Node):
         self.x_trajectory = []
         self.y_trajectory = []
         self.yaw_trajectory = []
+        self.actual_leader_x_positions = []
+        self.actual_leader_y_positions = []
+        self.actual_follower_x_positions = []
+        self.actual_follower_y_positions = []
         self.generate_trajectory(self.via_points, self.tf)
+        self.timer = self.create_timer(1.0, self.record_trajectories_to_csv)  # Timer fires every 1 second
 
+    def record_trajectories_to_csv(self):
+        # Ensure the directory for CSV files exists
+        output_dir = 'trajectory_data'
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+
+        # Current timestamp for the filename
+        timestamp = self.get_clock().now().to_msg().sec  # or use Time.now() in a different format
+
+        # Filename for the CSV
+        csv_filename = f'{output_dir}/trajectories_{self.path}_{timestamp}.csv'
+
+        # Create a dictionary to record data
+        data = {
+            'x_trajectory': self.x_trajectory,
+            'y_trajectory': self.y_trajectory,
+            'leader_x_positions': self.actual_leader_x_positions,
+            'leader_y_positions': self.actual_leader_y_positions,
+            'follower_x_positions': self.actual_follower_x_positions,
+            'follower_y_positions': self.actual_follower_y_positions,
+        }
+
+        # Create a DataFrame from the data
+        df = pd.DataFrame(data)
+
+        # Save to CSV
+        df.to_csv(csv_filename, index=False)
     def generate_trajectory(self, via_points, tf):
         if self.initial_pose_set:
             t0 = 0.0
@@ -123,9 +159,13 @@ class CubicPolynomialPlanner(Node):
             # If initial pose is set, generate trajectory and publish it
             self.generate_trajectory(self.via_points, self.tf)
             self.publish_trajectory()
-            plot_trajectory(self.x_trajectory, self.y_trajectory, self.via_points)
+            # self.plot_trajectory()
+        self.actual_leader_x_positions.append(msg.pose.pose.position.x)
+        self.actual_leader_y_positions.append(msg.pose.pose.position.y)
             
-
+    def odom_callback_mec(self, msg):
+        self.actual_follower_x_positions.append(msg.pose.pose.position.x)
+        self.actual_follower_y_positions.append(msg.pose.pose.position.y)
 
 
     def publish_trajectory(self):
@@ -157,18 +197,27 @@ class CubicPolynomialPlanner(Node):
         quaternion[3] = math.cos(yaw / 2)
         return quaternion
 
-def plot_trajectory(x_traj, y_traj, via_points):
-    via_points = np.array(via_points)
-    plt.figure(figsize=(8, 6))
-    plt.plot(x_traj, y_traj, label='Trajectory', color='blue')
-    plt.scatter(via_points[:, 0], via_points[:, 1], marker='o', color='red', label='Via Points')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.title('Cubic Polynomial Spline Trajectory')
-    plt.legend()
-    plt.grid(True)
-    plt.axis('equal')
-    plt.show()
+    def plot_trajectory(self):
+        # Convert via_points to a NumPy array
+        via_points_np = np.array(self.via_points)
+        
+        # Correct plotting logic
+        plt.figure(figsize=(8, 6))
+        plt.plot(self.x_trajectory, self.y_trajectory, label='Planned Trajectory', color='blue')
+        plt.plot(self.actual_leader_x_positions, self.actual_leader_y_positions, label='Leader Trajectory', color='orange')
+        plt.plot(self.actual_follower_x_positions, self.actual_follower_y_positions, label='Follower Trajectory', color='green')
+        
+        # Using NumPy array, now you can use tuple-based indexing
+        plt.scatter(via_points_np[:, 0], via_points_np[:, 1], marker='o', color='red', label='Via Points')
+
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Comparison of Planned and Actual Trajectories')
+        plt.legend()
+        plt.grid(True)
+        plt.axis('equal')
+        plt.show()
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -178,10 +227,18 @@ def main(args=None):
     args = parser.parse_args()
     planner = CubicPolynomialPlanner(args.path)
     # planner.publish_trajectory()
+    # signal.signal(signal.SIGINT, on_exit_signal_received)
+
     
+
+    def on_exit_signal_received(sig, frame):
+        # Handle Ctrl+C interrupt
+        planner.plot_trajectory()  # Plot trajectory before shutting down
+        rclpy.shutdown()
+
+    signal.signal(signal.SIGINT, on_exit_signal_received)
+
     rclpy.spin(planner)
-    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
-plot_trajectory

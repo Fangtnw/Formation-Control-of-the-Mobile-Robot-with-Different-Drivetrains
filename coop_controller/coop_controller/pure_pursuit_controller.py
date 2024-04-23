@@ -22,7 +22,7 @@ class PurePursuitController(Node):
             10)
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.target_speed = 0.25 # Set your desired speed here
-        self.lookahead_distance = 1.6 # Set the lookahead distance here
+        self.lookahead_distance = 1.1 # Set the lookahead distance here
         self.kp = 1  # Proportional control gain
         self.wheel_base = 0.5
 
@@ -50,64 +50,61 @@ class PurePursuitController(Node):
 
         # Calculate the lookahead index
         lookahead_index = closest_index
-        total_distance = 0
-        while total_distance < self.lookahead_distance and lookahead_index < len(self.waypoints) - 1:
-            lookahead_index += 1
-            total_distance += self.distance_between_points(
-                self.waypoints[lookahead_index].pose.position,
-                self.waypoints[lookahead_index - 1].pose.position
-            )
+        if len(self.waypoints) > 0:
+            total_distance = 0
+            while total_distance < self.lookahead_distance and lookahead_index < len(self.waypoints) - 1:
+                lookahead_index += 1
+                total_distance += self.distance_between_points(
+                    self.waypoints[lookahead_index].pose.position,
+                    self.waypoints[lookahead_index - 1].pose.position
+                )
 
-        # Calculate target point coordinates
         target_x = self.waypoints[lookahead_index].pose.position.x
         target_y = self.waypoints[lookahead_index].pose.position.y
         target_orientation = self.waypoints[lookahead_index].pose.orientation
-        if (target_x or target_y) is None or (target_x or target_y) == 0:
-            delta_x = 0
-            delta_y = 0 
+
         # Calculate errors
         delta_x = target_x - self.current_pose.position.x
         delta_y = target_y - self.current_pose.position.y
         distance_error = math.sqrt(delta_x ** 2 + delta_y ** 2)
 
         desired_heading = self.quaternion_to_yaw(target_orientation)
-        # Calculate desired heading angle
-        # desired_heading = math.atan2(delta_y, delta_x)
 
-        # Calculate steering angle (pure pursuit controller)
         current_orientation = self.quaternion_to_yaw(self.current_pose.orientation)
-        # Calculate alpha (difference between desired heading and current orientation)
+
         alpha = desired_heading - current_orientation
 
-        # Change the steer output with the lateral controller.
-        # steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), self.lookahead_distance)
-        steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), self.lookahead_distance)
+        if alpha > math.pi:
+            alpha -= 2 * math.pi
+        elif alpha < -math.pi:
+            alpha += 2 * math.pi
+            
+        steering_angle = math.atan2(2 * self.wheel_base * np.sin(abs(alpha)), total_distance)
 
-        # Determine the sign of the angle between the current heading and desired heading
-        # This determines the direction of the turn (left or right)
         heading_sign = np.sign(np.sin(alpha))
 
         max_steering_angle = math.radians(35)
         steering_angle = max(min(steering_angle, max_steering_angle), -max_steering_angle) * heading_sign
 
+        # Check if the robot is close to the last waypoint
         if lookahead_index == len(self.waypoints) - 1 and distance_error < self.lookahead_distance:
-            # Stop the robot
             linear_velocity = 0.0
             angular_velocity = 0.0
-        elif abs(alpha) > 1.57:
-            linear_velocity = -min(self.target_speed, self.kp * distance_error)
-            angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
+            steering_angle = 0.0  # Adjust steering angle for a smooth stop
         else:
-            linear_velocity = min(self.target_speed, self.kp * distance_error)
-            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
-        # Publish control commands
+            if abs(alpha) > 1.57:
+                linear_velocity = min(self.target_speed, self.kp * distance_error)
+                angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
+            else:
+                linear_velocity = -min(self.target_speed, self.kp * distance_error)
+                angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
 
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_velocity
         cmd_vel_msg.angular.z = angular_velocity
         self.publisher_cmd_vel.publish(cmd_vel_msg)
 
-        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}".format(linear_velocity, steering_angle))
+        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}, Distance = {}, Alpha = {}".format(linear_velocity, steering_angle,total_distance,alpha))
 
 
     def find_closest_waypoint(self):
