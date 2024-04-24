@@ -8,3 +8,5 @@ DDBots is a project about Cooperative transport of the mobile robot with differe
 
 Reference
 https://github.com/YDLIDAR/ydlidar_ros2_driver.git
+https://github.com/zhm-real/CurvesGenerator
+https://github.com/RajPShinde/Hybrid-A-Star
