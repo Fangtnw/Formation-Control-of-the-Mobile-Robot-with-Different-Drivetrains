@@ -7,20 +7,24 @@ import matplotlib.pyplot as plt
 from heapdict import heapdict
 import scipy.spatial.kdtree as kd
 import CurvesGenerator.reeds_shepp as rsCurve
+import rclpy
+from rclpy.node import Node as rosNode
+from nav_msgs.msg import OccupancyGrid
+from geometry_msgs.msg import PoseStamped
 
 class Car:
     maxSteerAngle = 0.6
     steerPresion = 10
-    wheelBase = 3.5
-    axleToFront = 9.5
-    axleToBack = 1
-    width = 3
+    wheelBase = 3
+    axleToFront = 14
+    axleToBack = 1.4
+    width = 4
 
 class Cost:
-    reverse = 10
-    directionChange = 150
+    reverse = 0
+    directionChange = 10
     steerAngle = 1
-    steerAngleChange = 5
+    steerAngleChange = 5000
     hybridCost = 50
 
 class Node:
@@ -322,7 +326,7 @@ def holonomicCostsWithObstacles(goalNode, mapParameters):
                 else:
                     openSet[neighbourNodeIndex] = neighbourNode
                     heapq.heappush(priorityQueue, (neighbourNode.cost, neighbourNodeIndex))
-
+    
     holonomicCost = [[np.inf for i in range(max(mapParameters.obstacleY))]for i in range(max(mapParameters.obstacleX))]
 
     for nodes in closedSet.values():
@@ -334,45 +338,54 @@ def map():
     # Build Map
     obstacleX, obstacleY = [], []
 
-    for i in range(51):
+    for i in range(81):
         obstacleX.append(i)
         obstacleY.append(0)
 
-    for i in range(51):
+    for i in range(81):
         obstacleX.append(0)
         obstacleY.append(i)
 
-    for i in range(51):
+    for i in range(81):
         obstacleX.append(i)
-        obstacleY.append(50)
+        obstacleY.append(80)
 
-    for i in range(51):
-        obstacleX.append(50)
+    for i in range(81):
+        obstacleX.append(80)
         obstacleY.append(i)
     
-    for i in range(10,20):
+    for i in range(28,30):
         obstacleX.append(i)
-        obstacleY.append(30) 
+        obstacleY.append(49.5)
 
-    for i in range(30,51):
+    for i in range(28,30):
         obstacleX.append(i)
-        obstacleY.append(30) 
+        obstacleY.append(55.5) 
 
-    for i in range(0,31):
-        obstacleX.append(20)
-        obstacleY.append(i) 
 
-    for i in range(0,31):
+    # for i in range(30,51):
+    #     obstacleX.append(i)
+    #     obstacleY.append(30) 
+
+    for i in range(0,50):
         obstacleX.append(30)
         obstacleY.append(i) 
 
-    for i in range(40,50):
-        obstacleX.append(15)
-        obstacleY.append(i)
+    for i in range(56,81):
+        obstacleX.append(30)
+        obstacleY.append(i) 
 
-    for i in range(25,40):
-        obstacleX.append(i)
-        obstacleY.append(35)
+    for i in range(0,81):
+        obstacleX.append(50)
+        obstacleY.append(i) 
+
+    # for i in range(40,50):
+    #     obstacleX.append(15)
+    #     obstacleY.append(i)
+
+    # for i in range(25,40):
+    #     obstacleX.append(i)
+    #     obstacleY.append(35)
 
     # Parking Map
     # for i in range(51):
@@ -538,21 +551,96 @@ def drawCar(x, y, yaw, color='black'):
     car += np.array([[x], [y]])
     plt.plot(car[0, :], car[1, :], color)
 
-def main():
+class HybridAStarPlanner(rosNode):
+    def __init__(self):
+        super().__init__("hybrid_astar_planner")
+        self.subscription = self.create_subscription(
+            OccupancyGrid,
+            "/map",
+            self.map_callback,
+            10
+        )
+        self.subscription  # prevent unused variable warning
+        self.obstacle_map = None
+        self.resolution = None
+        self.map_received = False
+
+    def map_callback(self, msg):
+        self.get_logger().info("Received map")
+        self.resolution = msg.info.resolution
+        width = msg.info.width
+        height = msg.info.height
+        self.map_origin_x = msg.info.origin.position.x
+        self.map_origin_y = msg.info.origin.position.y
+
+        # Extract obstacle coordinates
+        self.obstacle_map = []
+        obstacles = []
+        for y in range(height):
+            for x in range(width):
+                index = y * width + x
+                if msg.data[index] > 50:  # Assuming occupancy value > 50 is an obstacle
+                    world_x = self.map_origin_x + x * self.resolution
+                    world_y = self.map_origin_y + y * self.resolution
+                    self.obstacle_map.append([world_x, world_y])
+                    obstacles.append([x, y])
+
+        # self.obstacle_tree = kd(self.obstacle_map)
+        self.map_received = True
+
+    def calculate_map_parameters(self):
+        obstacle_x = [obs[0] for obs in self.obstacle_map]
+        obstacle_y = [obs[1] for obs in self.obstacle_map]
+
+        obstacle_x = [int(x) for x in obstacle_x]
+        obstacle_y = [int(y) for y in obstacle_y]
+
+        map_min_x = round(min(obstacle_x) / self.resolution)
+        map_min_y = round(min(obstacle_y) / self.resolution)
+        map_max_x = round(max(obstacle_x) / self.resolution)
+        map_max_y = round(max(obstacle_x) / self.resolution)
+
+        self.obstacle_tree = kd.KDTree([[x, y] for x, y in zip(obstacle_x, obstacle_y)])
+
+        return MapParameters(
+            int(map_min_x),
+            int(map_min_y),
+            int(map_max_x),
+            int(map_max_y),
+            self.resolution,
+            math.radians(15),
+            self.obstacle_tree,
+            obstacle_x,
+            obstacle_y
+        ) 
+
+
+
+def main(args=None):
+    # rclpy.init(args=args)
+    # planner = HybridAStarPlanner()
 
     # Set Start, Goal x, y, theta
-    s = [10, 10, np.deg2rad(90)]
-    g = [25, 20, np.deg2rad(90)]
+    # s = [40, 5, np.deg2rad(90)]
+    # g = [10, 52.5, np.deg2rad(0)]
+
+    s = [40, 23, np.deg2rad(-90)]
+    g = [10, 52.5, np.deg2rad(0)]
+
     # s = [10, 35, np.deg2rad(0)]
     # g = [22, 28, np.deg2rad(0)]
+
+    # while not planner.map_received:
+    #     planner.get_logger().info("Waiting for map...")
+    #     rclpy.spin_once(planner, timeout_sec=1)
 
     # Get Obstacle Map
     obstacleX, obstacleY = map()
 
-    # Calculate map Paramaters
-    mapParameters = calculateMapParameters(obstacleX, obstacleY, 4, np.deg2rad(15.0))
-
-    # Run Hybrid A*
+    # # Calculate map Paramaters
+    mapParameters = calculateMapParameters(obstacleX, obstacleY, 2, np.deg2rad(15.0))
+    # mapParameters = planner.calculate_map_parameters()
+    # # Run Hybrid A*
     x, y, yaw = run(s, g, mapParameters, plt)
 
     # Draw Start, Goal Location Map and Path
@@ -588,6 +676,8 @@ def main():
         plt.pause(0.001)
     
     plt.show()
+
+    # rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

@@ -322,11 +322,11 @@ planner_server:
       smooth_path: false
       motion_model_for_search: "REEDS_SHEPP" #REEDS_SHEPP
       angle_quantization_bins: 72    
-      minimum_turning_radius: 2.5  #0.6 , 2.5
-      reverse_penalty: 4.0  #For Reeds-Shepp model: penalty to apply if motion is reversing, must be => 1
+      minimum_turning_radius: 6.0  #0.6 , 2.5
+      reverse_penalty: 1.0  #For Reeds-Shepp model: penalty to apply if motion is reversing, must be => 1
       change_penalty: 0.0      
       non_straight_penalty: 0.0     
-      cost_penalty: 10.5
+      cost_penalty: 150.5
       lookup_table_size: 20.0    
       cache_obstacle_heuristic: True      
       # plugin: "nav2_navfn_planner/NavfnPlanner"
