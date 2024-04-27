@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 28;                 //Max angle (degree)
+const double max_angle = 32;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    

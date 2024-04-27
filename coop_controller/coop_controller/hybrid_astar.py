@@ -521,7 +521,8 @@ def run(s, g, mapParameters, plt):
 
             # Draw Simulated Node
             x,y,z =zip(*simulatedNode.traj)
-            plt.plot(x, y, linewidth=0.3, color='g')
+            
+            # plt.plot(x, y, linewidth=0.3, color='g')
 
             # Check if simulated node is already in closed set
             simulatedNodeIndex = index(simulatedNode)
@@ -638,7 +639,7 @@ def main(args=None):
     obstacleX, obstacleY = map()
 
     # # Calculate map Paramaters
-    mapParameters = calculateMapParameters(obstacleX, obstacleY, 2, np.deg2rad(15.0))
+    mapParameters = calculateMapParameters(obstacleX, obstacleY, 3, np.deg2rad(15.0))
     # mapParameters = planner.calculate_map_parameters()
     # # Run Hybrid A*
     x, y, yaw = run(s, g, mapParameters, plt)
@@ -654,14 +655,15 @@ def main(args=None):
 
 
     # Draw Path, Map and Car Footprint
-    # plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
-    # plt.plot(obstacleX, obstacleY, "sk")
-    # for k in np.arange(0, len(x), 2):
-    #     plt.xlim(min(obstacleX), max(obstacleX)) 
-    #     plt.ylim(min(obstacleY), max(obstacleY))
-    #     drawCar(x[k], y[k], yaw[k])
-    #     plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
-    #     plt.title("Hybrid A*")
+    plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
+    plt.plot(obstacleX, obstacleY, "sk")
+    for k in np.arange(0, len(x), 2):
+        plt.xlim(min(obstacleX), max(obstacleX)) 
+        plt.ylim(min(obstacleY), max(obstacleY))
+        drawCar(x[k], y[k], yaw[k])
+        plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
+        plt.title("Hybrid A* Path  - Ackermann front")
+
 
     # Draw Animated Car
     for k in range(len(x)):
@@ -672,7 +674,7 @@ def main(args=None):
         plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
         drawCar(x[k], y[k], yaw[k])
         plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
-        plt.title("Hybrid A*")
+        plt.title("Hybrid A* Path - Ackermann front ")
         plt.pause(0.001)
     
     plt.show()
