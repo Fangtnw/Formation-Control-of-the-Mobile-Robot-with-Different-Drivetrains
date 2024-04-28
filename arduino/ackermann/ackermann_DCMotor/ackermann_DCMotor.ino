@@ -262,6 +262,20 @@ void loop() {
     
     ang_desire_steer = constrain(ang_desire_steer, -max_angle, max_angle);
 
+    if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
+      speed_act_left = 0;
+    }
+    else {
+      speed_act_left=((pos_left/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;           // calculate speed of left wheel
+    }
+    
+    if (abs(pos_right) < 5){                                                  //Avoid taking in account small disturbances
+      speed_act_right = 0;
+    }
+    else {
+    speed_act_right=((pos_right/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;          // calculate speed of right wheel
+    }
+
     pos_left = 0;
     pos_right = 0;
             
