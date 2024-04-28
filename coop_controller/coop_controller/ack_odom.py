@@ -9,6 +9,7 @@ from std_msgs.msg import Header
 from math import sin, cos, tan
 import tf2_ros
 from tf2_ros import TransformBroadcaster
+import math
 
 wheel_distance = 0.5
 length = 0.5
@@ -47,13 +48,13 @@ class OdometryNode(Node):
         self.timer = self.create_timer(0.1, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
-        self.left_encoder_ticks = msg.linear.x
-        self.right_encoder_ticks = msg.linear.y
+        self.left_encoder_ticks = msg.linear.y
+        self.right_encoder_ticks = msg.linear.x
 
     def encoder_vel_callback(self, msg):
-        self.left_vel = msg.linear.x
-        self.right_vel = msg.linear.y
-        self.Robot_Yaw = msg.angular.z
+        self.left_vel = -msg.linear.y
+        self.right_vel =  -msg.linear.x
+        self.steering_angle = -msg.angular.y
         #self.steering_angle = 0.0
         #self.avg_vel = (self.left_vel + self.right_vel)/ 2
 
@@ -116,7 +117,8 @@ class OdometryNode(Node):
 
     def forward_kinematic(self):
         self.Robot_LinVel = (self.left_vel + self.right_vel)* 0.5
-        self.Robot_AngVel = (self.right_vel - self.left_vel)* tan(self.Robot_Yaw) / wheel_distance
+        
+        self.Robot_AngVel = (self.right_vel + self.left_vel)*0.5* tan(math.radians(self.steering_angle)) / wheel_distance
 
     def odom_compute(self, time_step):
         temp_tetra = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)

@@ -150,7 +150,7 @@ class motor{
 
 void handle_cmd() {
   noCommLoops = 0;                                                  // Reset the counter for number of main loops without communication
-  speed_req = xicro.Subscription_cmd_vel.message.linear.x;          // Extract the commanded linear speed from the message
+  speed_req = -xicro.Subscription_cmd_vel.message.linear.x;          // Extract the commanded linear speed from the message
   angular_speed_req = xicro.Subscription_cmd_vel.message.angular.z; // Extract the commanded angular speed from the message
 
   // Check if speed_req is not equal to 0 to avoid division by zero

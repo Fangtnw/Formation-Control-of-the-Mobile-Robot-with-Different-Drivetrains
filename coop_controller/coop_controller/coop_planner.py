@@ -19,6 +19,8 @@ class CubicPolynomialPlanner(Node):
         self.subscription_mec = self.create_subscription(Odometry, '/mec/odom', self.odom_callback_mec, 10)
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.publisher_local_plan = self.create_publisher(Path, '/plan', 10)
+        self.publisher_goal_pose = self.create_publisher(PoseStamped, '/goal_pose', 10)
+
         self.initial_pose_set = False  # Flag to check if initial pose is set
         self.initial_pose = None  # Store initial pose
         if self.path == '1.1':
@@ -32,7 +34,7 @@ class CubicPolynomialPlanner(Node):
         elif self.path == '2.2':
             self.via_points = [[6.0, -1.2],[5.0, -1.0], [5.0, 4.1]]
         elif self.path == '3.1':
-            self.via_points = [[3.0, -1.7],[2.0, -1.9],[5.0, -1.0], [5.0, 4.1]]
+            self.via_points = [[3.0, -1.7],[2.0, -1.9],[5.0, -1.0], [5.0, 3.0]]
         elif self.path == '3.2':
             self.via_points = [[5.0, -1.0], [5.0, 3.0]]
 
@@ -45,6 +47,7 @@ class CubicPolynomialPlanner(Node):
         self.actual_follower_x_positions = []
         self.actual_follower_y_positions = []
         self.generate_trajectory(self.via_points, self.tf)
+        
         # self.timer = self.create_timer(1.0, self.record_trajectories_to_csv)  # Timer fires every 1 second
 
     def record_trajectories_to_csv(self):
@@ -110,10 +113,12 @@ class CubicPolynomialPlanner(Node):
                 self.x_trajectory = x_segment1 + x_segment2  
                 self.y_trajectory = y_segment1 + y_segment2  
             elif self.path == '3.1':
-                x_segment1, y_segment1 = self.interpolate_spline(via_points[:3], timesteps, tf/2)
-                x_segment2, y_segment2 = self.interpolate_spline(via_points[2:], timesteps, tf/2)
-                self.x_trajectory = x_segment1 + x_segment2  
-                self.y_trajectory = y_segment1 + y_segment2  
+                x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
+                x_segment2, y_segment2 = self.interpolate_spline(via_points[1:3], timesteps, tf/2)
+                x_segment3, y_segment3 = self.interpolate_spline(via_points[2:4], timesteps, tf/2)
+                x_segment4, y_segment4 = self.interpolate_spline(via_points[3:], timesteps, tf/2)
+                self.x_trajectory = x_segment1 + x_segment2 + x_segment3 + x_segment4 
+                self.y_trajectory = y_segment1 + y_segment2 + y_segment3 + y_segment4
             elif self.path == '3.2':
                 x_segment1, y_segment1 = self.interpolate_spline(via_points[:2], timesteps, tf/2)
                 x_segment2, y_segment2 = self.interpolate_spline(via_points[1:], timesteps, tf/2)
@@ -122,9 +127,20 @@ class CubicPolynomialPlanner(Node):
 
             # Combine the segments
 
-            self.yaw_trajectory = [math.atan2(self.y_trajectory[i+1] - self.y_trajectory[i], self.x_trajectory[i+1] - self.x_trajectory[i])
-                                for i in range(len(self.x_trajectory) - 1)]
+            yaw_trajectory = [
+                math.atan2(self.y_trajectory[i + 1] - self.y_trajectory[i], self.x_trajectory[i + 1] - self.x_trajectory[i])
+                for i in range(len(self.x_trajectory) - 1)
+            ]
+            start_index_segment2 = len(x_segment1) - 1  # Segment 2 starts at the end of segment 1
+            end_index_segment2 = start_index_segment2 + len(x_segment2)
+            
+            # Invert the yaw angles for segment 2
+            # for i in range(start_index_segment2, end_index_segment2):
+            #     yaw_trajectory[i] = -yaw_trajectory[i]  # Invert the yaw angle for this segment
 
+            for i in range(start_index_segment2, end_index_segment2):
+                yaw_trajectory[i] = (yaw_trajectory[i] + math.pi)  % (2 * math.pi)           
+            self.yaw_trajectory = yaw_trajectory
             # if self.path in ['1,1','3.1', '3.2']:
             #     self.yaw_trajectory = [(yaw + math.pi) % (2 * math.pi) for yaw in self.yaw_trajectory]
 
@@ -162,6 +178,7 @@ class CubicPolynomialPlanner(Node):
             # If initial pose is set, generate trajectory and publish it
             self.generate_trajectory(self.via_points, self.tf)
             self.publish_trajectory()
+            
             # self.plot_trajectory()
         self.actual_leader_x_positions.append(msg.pose.pose.position.x)
         self.actual_leader_y_positions.append(msg.pose.pose.position.y)
@@ -174,6 +191,31 @@ class CubicPolynomialPlanner(Node):
         self.latest_follower_x = msg.pose.pose.position.x
         self.latest_follower_y = msg.pose.pose.position.y
 
+    def publish_goal_pose(self):
+        if not self.x_trajectory or not self.y_trajectory:
+            self.get_logger().warn("No trajectory data available to set goal.")
+            return
+        
+        # Get the final point in the trajectory
+        goal_pose = PoseStamped()
+        goal_pose.header.stamp = self.get_clock().now().to_msg()
+        goal_pose.header.frame_id = 'map'
+
+        # The goal is the last point in the trajectory
+        goal_pose.pose.position.x = self.x_trajectory[-1]
+        goal_pose.pose.position.y = self.y_trajectory[-1]
+
+        # Using the last yaw from the trajectory
+        yaw = self.yaw_trajectory[-1]
+        quaternion = self.yaw_to_quaternion(yaw)
+        
+        goal_pose.pose.orientation.x = quaternion[0]
+        goal_pose.pose.orientation.y = quaternion[1]
+        goal_pose.pose.orientation.z = quaternion[2]
+        goal_pose.pose.orientation.w = quaternion[3]
+
+        self.publisher_goal_pose.publish(goal_pose)
+        self.get_logger().info(f"Published goal pose at x={goal_pose.pose.position.x}, y={goal_pose.pose.position.y}")
 
     def publish_trajectory(self):
         path_msg = Path()
@@ -236,10 +278,9 @@ def main(args=None):
     # planner.publish_trajectory()
     # signal.signal(signal.SIGINT, on_exit_signal_received)
 
-    
-
     def on_exit_signal_received(sig, frame):
         # Handle Ctrl+C interrupt
+        # planner.publish_goal_pose()
         planner.plot_trajectory()  # Plot trajectory before shutting down
         rclpy.shutdown()
 
