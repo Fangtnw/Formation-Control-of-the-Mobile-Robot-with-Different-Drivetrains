@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 32;                 //Max angle (degree)
+const double max_angle = 25;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -78,9 +78,9 @@ volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
 
-float k_p = 7.0;  // Proportional constant
+float k_p = 7.5;  // Proportional constant
 float k_i = 1.0;  // Integral constant
-float k_d = 0.01; // Derivative constant
+float k_d = 0.03; // Derivative constant
     
 // Define variables for PID control
 float integral = 0.0;
@@ -93,7 +93,7 @@ float turning_r = 0.0;
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
 const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
-const double PID_steer_param[] = { 2.2, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
+const double PID_steer_param[] = { 0, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
@@ -334,11 +334,11 @@ void loop() {
     if (abs(error) <= 3) {  // Stopping
         steerMotor.run("BRAKE");
     } else if (error > 3) { // Going forward
-        analogWrite(steerMotor.pinPWM_R, 200);  
+        analogWrite(steerMotor.pinPWM_R, pwm_steer);  
         analogWrite(steerMotor.pinPWM_L, 0);  
     } else if (error < -3) { // Going backward
         analogWrite(steerMotor.pinPWM_R, 0);  
-        analogWrite(steerMotor.pinPWM_L, 200);  
+        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
     }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
