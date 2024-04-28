@@ -52,8 +52,8 @@ class OdometryNode(Node):
     def encoder_vel_callback(self, msg):
         self.left_vel = -msg.linear.x
         self.right_vel = -msg.linear.y
-        #self.steering_angle = msg.vector.z
-        self.steering_angle = 0.0
+        self.Robot_Yaw = msg.vector.z
+        #self.steering_angle = 0.0
         self.avg_vel = (self.left_vel+self.right_vel)/2
 
     def imu_callback(self, msg):
