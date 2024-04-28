@@ -11,7 +11,7 @@ import tf2_ros
 from tf2_ros import TransformBroadcaster
 
 wheel_distance = 0.5
-length = 0.47
+length = 0.5
 
 class OdometryNode(Node):
     def __init__(self):
@@ -26,6 +26,7 @@ class OdometryNode(Node):
         self.angular_velocity = 0.0
         self.avg_vel = 0.0
         self.steering_angle = 0.0
+        self.turn = 0.0
 
         # Initialize the robot state variables
         self.Robot_X = 0.0
@@ -50,16 +51,16 @@ class OdometryNode(Node):
         self.right_encoder_ticks = msg.linear.y
 
     def encoder_vel_callback(self, msg):
-        self.left_vel = -msg.linear.x
-        self.right_vel = -msg.linear.y
-        self.Robot_Yaw = msg.vector.z
+        self.left_vel = msg.linear.x
+        self.right_vel = msg.linear.y
+        self.Robot_Yaw = msg.angular.z
         #self.steering_angle = 0.0
-        self.avg_vel = (self.left_vel+self.right_vel)/2
+        #self.avg_vel = (self.left_vel + self.right_vel)/ 2
 
     def imu_callback(self, msg):
         # self.Robot_Yaw = msg.vector.z
-        self.Robot_AngVel = msg.angular_velocity.z*0.017453
-        # pass
+        #self.Robot_AngVel = msg.angular_velocity.z*0.017453
+        pass
 
     def publish_odometry(self):
         odom_msg = Odometry()
@@ -114,8 +115,8 @@ class OdometryNode(Node):
         self.tf_broadcaster.sendTransform(transform)
 
     def forward_kinematic(self):
-        self.Robot_LinVel = (self.right_vel + self.left_vel) * 0.5
-        # self.Robot_AngVel = (self.right_vel - self.left_vel) / wheel_distance
+        self.Robot_LinVel = (self.left_vel + self.right_vel)* 0.5
+        self.Robot_AngVel = (self.right_vel - self.left_vel)* tan(self.Robot_Yaw) / wheel_distance
 
     def odom_compute(self, time_step):
         temp_tetra = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
