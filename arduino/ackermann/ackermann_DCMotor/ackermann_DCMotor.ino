@@ -78,7 +78,7 @@ volatile float pos_steer_right = 0;      //Steer motor encoder right position
 volatile float pos_ack = 0;
 volatile float rad = 0;
 
-float k_p = 7.5;  // Proportional constant
+float k_p = 1.0;  // Proportional constant
 float k_i = 1.0;  // Integral constant
 float k_d = 0.03; // Derivative constant
     
@@ -156,8 +156,11 @@ void handle_cmd() {
   // Check if speed_req is not equal to 0 to avoid division by zero
   if (speed_req != 0) {
     ang_desire_steer = (atan(angular_speed_req * wheel_length) / speed_req) * (180 / PI) * 0.52; 
+    ang_desire_steer = constrain(ang_desire_steer,-max_angle,max_angle);
     turning_r = wheel_length / sin(ang_desire_steer);
-
+    
+//    turning_r = constrain(turning_r,-wheelbase/2,wheelbase/2);
+    
     if (ang_desire_steer == 0) { 
       speed_req_right = speed_req;
       speed_req_left = speed_req;
@@ -212,6 +215,7 @@ void setup() {
 
   //Set DEG to 0 when start
   pos_steer_right = 0;
+  pos_ack = 0;
 
   
   //setting PID parameters
@@ -325,32 +329,34 @@ void loop() {
     //PID_steerMotor.Compute();                                                 
 //    // compute PWM value for steer motor. Check constant definition comments for more information.
     //PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -100, 100); // 
+    
     encode_err = ang_desire_steer - pos_ack; 
 
     // Compute PID control output
     error = encode_err;
-    pwm_steer = k_p * error;
+    pwm_steer =  abs(15 * error);
     integral += error;
-    pwm_steer += k_i * integral;
-    derivative = error - prev_error;
-    pwm_steer += k_d * derivative;
-    
+//    pwm_steer += k_i * integral;
+//    derivative = error - prev_error;
+//    pwm_steer += k_d * derivative;
+//    
     // Update previous error for next iteration
     prev_error = error;
     
     // Apply constraints to PWM value
-
-    pwm_steer = constrain(pwm_steer, 150, 255);
+    
+    pwm_steer = constrain(pwm_steer, 70, 255);
 
     xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
-    if (abs(error) <= 3) {  // Stopping
+    if (abs(error) == 0) {  // Stopping
         steerMotor.run("BRAKE");
-    } else if (error > 3) { // Going forward
+        pwm_steer = 0;
+    } else if (error > 01) { // Going forward
         analogWrite(steerMotor.pinPWM_R, pwm_steer);  
         analogWrite(steerMotor.pinPWM_L, 0);  
-    } else if (error < -3) { // Going backward
+    } else if (error < 0) { // Going backward
         analogWrite(steerMotor.pinPWM_R, 0);  
         analogWrite(steerMotor.pinPWM_L, pwm_steer);  
     }

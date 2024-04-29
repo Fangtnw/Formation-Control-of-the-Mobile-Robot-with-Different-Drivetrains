@@ -42,6 +42,8 @@ def generate_launch_description():
         package='coop_controller',
         executable='ack_odom',
         output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
+                    )
     )
     mec_bringup = ExecuteProcess(
         cmd=['ros2','launch','coop_robot_bringup','mec.launch.py']
@@ -158,13 +160,14 @@ def generate_launch_description():
     ld = LaunchDescription()
 
     # Add actions to the LaunchDescription
+    ld.add_action(mode_arg)
     ld.add_action(ydliar)
     # ld.add_action(xicro)
 
     ld.add_action(laser_to_base_footprint_tf)
     # ld.add_action(diff_odom_compute)
 
-    # ld.add_action(ack_odom_compute)
+    ld.add_action(ack_odom_compute)
     # ld.add_action(camera_to_base_footprint)
 
 

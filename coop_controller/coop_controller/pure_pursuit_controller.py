@@ -32,6 +32,8 @@ class PurePursuitController(Node):
         self.waypoints = None
         self.direction = 1
         self.prev_lookahead_to_robot = 0
+        self.lookahead_index_set = False
+        self.distance_error = 0
         # Adding logger for debugging
         self.get_logger().info("Pure Pursuit Controller initialized")
 
@@ -49,10 +51,14 @@ class PurePursuitController(Node):
     def control(self):
         if not self.current_pose or not self.waypoints:
             return
-    
-        closest_cusp_index = self.find_closest_cusp()
-        og_lookahead_index = self.find_lookahead_index()
 
+        # If lookahead index has not been set, find the closest waypoint
+        if not self.lookahead_index_set:
+            self.lookahead_index = self.find_closest_waypoint()[0]
+            self.lookahead_index_set = True  # Mark the initial index as set
+        
+        og_lookahead_index = self.find_lookahead_index(self.lookahead_index,self.distance_error)
+        closest_cusp_index = self.find_closest_cusp()
 
         if closest_cusp_index >= 0 and closest_cusp_index < og_lookahead_index:
             lookahead_index = closest_cusp_index
@@ -74,7 +80,7 @@ class PurePursuitController(Node):
         # Calculate error values
         delta_x = target_position.x - self.current_pose.position.x
         delta_y = target_position.y - self.current_pose.position.y
-        distance_error = math.sqrt(delta_x ** 2 + delta_y ** 2)
+        self.distance_error = math.sqrt(delta_x ** 2 + delta_y ** 2)
 
         current_yaw = self.quaternion_to_yaw(self.current_pose.orientation)
         desired_yaw = self.quaternion_to_yaw(target_orientation)
@@ -83,15 +89,15 @@ class PurePursuitController(Node):
         alpha = self.normalize_angle(alpha)
 
         # Steering calculation
-        steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), distance_error)
+        steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), self.distance_error)
         max_steering_angle = math.radians(35)
         steering_angle = max(min(steering_angle, max_steering_angle), -max_steering_angle)
         
-        if distance_error == 0 and lookahead_index < len(self.waypoints) - 1:
+        if self.distance_error == 0 and lookahead_index < len(self.waypoints) - 1:
             self.direction = self.direction * (-1)
 
         # Determine the desired linear and angular velocities
-        if lookahead_index == len(self.waypoints) - 1 and distance_error < 0.1:
+        if lookahead_index == len(self.waypoints) - 1 and self.distance_error < 0.1:
             linear_velocity = 0.0
             angular_velocity = 0.0
             steering_angle = 0.0  # Adjust steering angle for a smooth stop
@@ -107,7 +113,7 @@ class PurePursuitController(Node):
         cmd_vel_msg.angular.z = angular_velocity
         self.publisher_cmd_vel.publish(cmd_vel_msg)
 
-        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}, Distance = {}, Alpha = {}".format(linear_velocity, steering_angle,distance_error,alpha))
+        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}, Distance = {}, Alpha = {}".format(linear_velocity, steering_angle,self.distance_error,alpha))
 
 
     def find_closest_waypoint(self):
@@ -131,10 +137,7 @@ class PurePursuitController(Node):
         roll, pitch, yaw = tf_transformations.euler_from_quaternion(q)
         return yaw
     
-    def find_lookahead_index(self):
-        closest_index, closest_distance = self.find_closest_waypoint()
-        lookahead_index = closest_index
-        total_distance = 0
+    def find_lookahead_index(self,lookahead_index,total_distance):
         
         for i in range(len(self.waypoints) - 1):
             lookahead_index += 1
