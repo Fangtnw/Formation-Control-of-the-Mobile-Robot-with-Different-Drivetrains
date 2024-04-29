@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="AAAckermann_lated update">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.377672365616106 0.191340904613787 0.361389269217461"
+        rpy="0 0 0" />
+      <mass
+        value="4.49814568283799" />
+      <inertia
+        ixx="0.0181839157074767"
+        ixy="-7.37148197622945E-07"
+        ixz="-1.13302958356861E-05"
+        iyy="0.0490501696015112"
+        iyz="1.27098343080043E-07"
+        izz="0.0326062941739465" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="back_left">
+    <inertial>
+      <origin
+        xyz="1.11022302462516E-16 0.0257257517276274 -5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="4.2881704699239E-19"
+        ixz="-6.7762635780344E-20"
+        iyy="0.000452624182450972"
+        iyz="-2.39038653415574E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/back_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/back_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="back_left_joint"
+    type="continuous">
+    <origin
+      xyz="-0.472974166233064 0.26150000012373 -0.0700000000003574"
+      rpy="0 -0.499103249142133 0.000137993798726114" />
+    <parent
+      link="base_link" />
+    <child
+      link="back_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="back_right">
+    <inertial>
+      <origin
+        xyz="-1.10100817352077E-12 0.0271271666381976 -4.34874358745674E-13"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047142"
+        ixy="-1.61493650009258E-15"
+        ixz="6.7762635780344E-21"
+        iyy="0.000452624182450971"
+        iyz="-6.37965575295475E-16"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/back_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/back_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="back_right_joint"
+    type="continuous">
+    <origin
+      xyz="-0.473573116541797 -0.259095847310483 -0.0700000000003103"
+      rpy="0 0.376238226393869 3.13259128041529" />
+    <parent
+      link="base_link" />
+    <child
+      link="back_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="front_left">
+    <inertial>
+      <origin
+        xyz="5.55111512312578E-17 0.0257257525083612 2.77555756156289E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="1.80227445983964E-20"
+        ixz="0"
+        iyy="0.000452624182450971"
+        iyz="4.41329424203013E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/front_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/front_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00396464466087482 0.250000000000023 -0.0695000000001352"
+      rpy="3.14159265358979 0.391796412189509 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_left" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="front_right">
+    <inertial>
+      <origin
+        xyz="-1.2490009027033E-16 0.0257257525083613 -5.55111512312578E-17"
+        rpy="0 0 0" />
+      <mass
+        value="0.240470068076377" />
+      <inertia
+        ixx="0.000245137261047143"
+        ixy="-1.9265269650864E-20"
+        ixz="0"
+        iyy="0.000452624182450972"
+        iyz="-4.3727623063712E-20"
+        izz="0.000245137261047143" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/front_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/front_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_joint"
+    type="continuous">
+    <origin
+      xyz="-0.00396464466092106 -0.250000000000023 -0.0695000000001819"
+      rpy="0 0.467678189791487 3.14159265358979" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_right" />
+    <axis
+      xyz="0 1 0" />
+  </joint>
+  <link
+    name="flok_left">
+    <inertial>
+      <origin
+        xyz="2.02693118415859 1.38000039371729 0.274999999999999"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.33963216382618E-16"
+        ixz="1.28432955984215E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736584502108E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/flok_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/flok_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="flok_left_left"
+    type="fixed">
+    <origin
+      xyz="0.487035355337105 2.09693121112489 -1.35000039371762"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="flok_left" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+  <link
+    name="flok_right">
+    <inertial>
+      <origin
+        xyz="2.00693118415856 1.38000039371724 0.275"
+        rpy="0 0 0" />
+      <mass
+        value="0.524544939385195" />
+      <inertia
+        ixx="0.0132439651239288"
+        ixy="-2.33964152047577E-16"
+        ixz="1.28428319325877E-21"
+        iyy="0.0132439651530273"
+        iyz="-9.26736583010276E-23"
+        izz="4.2122916290778E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/flok_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://AAAckermann_lated update/meshes/flok_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="flok_right_joint"
+    type="fixed">
+    <origin
+      xyz="0.487035355339079 1.93693121112482 -1.35000039371706"
+      rpy="1.5707963267949 0 -1.5707963267949" />
+    <parent
+      link="base_link" />
+    <child
+      link="flok_right" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
