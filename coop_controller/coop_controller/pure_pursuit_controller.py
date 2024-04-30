@@ -21,9 +21,10 @@ class PurePursuitController(Node):
             '/diffdrive/odom',
             self.odom_callback,
             10)
+        
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.target_speed = 0.25 # Set your desired speed here
-        self.lookahead_distance = 0.5 # Set the lookahead distance here  1.1
+        self.lookahead_distance = 0.8 # Set the lookahead distance here  0.8 for back 0.6 for front
         self.kp = 1  # Proportional control gain
         self.wheel_base = 0.5
         # self.lookahead_to_robot = 0.0
@@ -33,7 +34,10 @@ class PurePursuitController(Node):
         self.direction = 1
         self.prev_lookahead_to_robot = 0
         self.lookahead_index_set = False
+        self.reverse_mode = False
         self.distance_error = 0
+        self.cusp_stop = False
+        self.cusp_pass = False
         # Adding logger for debugging
         self.get_logger().info("Pure Pursuit Controller initialized")
 
@@ -53,25 +57,34 @@ class PurePursuitController(Node):
             return
 
         # If lookahead index has not been set, find the closest waypoint
-        if not self.lookahead_index_set:
-            self.lookahead_index = self.find_closest_waypoint()[0]
-            self.lookahead_index_set = True  # Mark the initial index as set
+        # if not self.lookahead_index_set:
+        #     self.lookahead_index = self.find_closest_waypoint()[0]
+        #     self.lookahead_index_set = True  # Mark the initial index as set
         
-        og_lookahead_index = self.find_lookahead_index(self.lookahead_index,self.distance_error)
+        og_lookahead_index = self.find_lookahead_index()
         closest_cusp_index = self.find_closest_cusp()
 
-        if closest_cusp_index >= 0 and closest_cusp_index < og_lookahead_index:
+        if closest_cusp_index >= 0 and closest_cusp_index < og_lookahead_index and not self.cusp_stop and not self.cusp_pass:
             lookahead_index = closest_cusp_index
             self.get_logger().warn("found cusp")
-            # self.direction = True
+        #     # self.direction = True
+        elif self.cusp_stop == True:
+            # loookahead after the cusp index
+            lookahead_index = self.find_next_lookahead_index(closest_cusp_index)
+            self.get_logger().info("blind looking")
+            if self.distance_error < 0.2:
+                self.cusp_stop = False
+                self.cusp_pass = True
         else:
             lookahead_index = og_lookahead_index
+            self.get_logger().info("looking")
             # self.direction = False
 
             
         # Ensure the lookahead index is within bounds
         if lookahead_index < 0 or lookahead_index >= len(self.waypoints):
             lookahead_index = len(self.waypoints)-1
+            self.get_logger().info("Endpoint")
         
         # Determine the position and orientation for the lookahead index
         target_position = self.waypoints[lookahead_index].pose.position
@@ -90,30 +103,43 @@ class PurePursuitController(Node):
 
         # Steering calculation
         steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), self.distance_error)
-        max_steering_angle = math.radians(35)
+        max_steering_angle = math.radians(25)
         steering_angle = max(min(steering_angle, max_steering_angle), -max_steering_angle)
         
-        if self.distance_error == 0 and lookahead_index < len(self.waypoints) - 1:
-            self.direction = self.direction * (-1)
+        if ((self.distance_error == 0 and lookahead_index < len(self.waypoints) - 1) or (alpha > 1.57) )and not self.reverse_mode:
+            self.direction = self.direction * (-1) 
+            self.reverse_mode = True
+        elif ((self.distance_error == 0 and lookahead_index < len(self.waypoints) - 1) or (alpha > 1.57) )and self.reverse_mode:
+            self.direction = self.direction * (-1) 
+            self.reverse_mode = False            
 
         # Determine the desired linear and angular velocities
-        if lookahead_index == len(self.waypoints) - 1 and self.distance_error < 0.1:
+        if lookahead_index == len(self.waypoints) - 1 and delta_y < 0.1 and self.distance_error < 0.3:
+            linear_velocity = 0.0
+            angular_velocity = 0.0
+            steering_angle = 0.0  # Adjust steering angle for a smooth stop]
+            self.get_logger().warn("stop at goal")
+        elif lookahead_index < len(self.waypoints) - 1 and delta_x < -0.6 and self.cusp_stop == False:
             linear_velocity = 0.0
             angular_velocity = 0.0
             steering_angle = 0.0  # Adjust steering angle for a smooth stop
-        elif self.direction == -1:
-            linear_velocity = self.target_speed
-            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
-        else:
+            self.get_logger().warn("stop at cusp")
+            self.reverse_mode = True 
+            self.cusp_stop = True 
+        elif self.direction == -1 or self.reverse_mode is True:
+            self.lookahead_distance = 2.0
             linear_velocity = -self.target_speed
             angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
+        else:
+            linear_velocity = self.target_speed
+            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
 
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_velocity
         cmd_vel_msg.angular.z = angular_velocity
         self.publisher_cmd_vel.publish(cmd_vel_msg)
 
-        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}, Distance = {}, Alpha = {}".format(linear_velocity, steering_angle,self.distance_error,alpha))
+        self.get_logger().info("Control commands published: Linear Velocity = {}, Steering Angle = {}, Distance = {}, Alpha = {}".format(linear_velocity, steering_angle,self.distance_error,lookahead_index))
 
 
     def find_closest_waypoint(self):
@@ -137,17 +163,46 @@ class PurePursuitController(Node):
         roll, pitch, yaw = tf_transformations.euler_from_quaternion(q)
         return yaw
     
-    def find_lookahead_index(self,lookahead_index,total_distance):
+    def find_lookahead_index(self):
+        total_distance = 0
+        # Correctly unpack the tuple returned by find_closest_waypoint()
+        closest_index, _ = self.find_closest_waypoint()
+        lookahead_index = closest_index
         
-        for i in range(len(self.waypoints) - 1):
-            lookahead_index += 1
+        for i in range(lookahead_index, len(self.waypoints) - 1):
             total_distance += self.distance_between_points(
                 self.waypoints[i].pose.position,
                 self.waypoints[i + 1].pose.position
             )
+            
+            # Check if the total distance has reached or exceeded the lookahead distance
             if total_distance >= self.lookahead_distance:
                 return lookahead_index
-        return lookahead_index  
+            
+            # Increment the lookahead index after processing the current waypoint
+            lookahead_index += 1
+        
+        return lookahead_index
+
+    def find_next_lookahead_index(self,current_index):
+        total_distance = 0
+        # Correctly unpack the tuple returned by find_closest_waypoint()
+        lookahead_index = current_index
+        
+        for i in range(lookahead_index, len(self.waypoints) - 1):
+            total_distance += self.distance_between_points(
+                self.waypoints[i].pose.position,
+                self.waypoints[i + 1].pose.position
+            )
+            
+            # Check if the total distance has reached or exceeded the lookahead distance
+            if total_distance >= self.lookahead_distance:
+                return lookahead_index
+            
+            # Increment the lookahead index after processing the current waypoint
+            lookahead_index += 1
+        
+        return lookahead_index
     
     def find_closest_cusp(self):
         """Returns the index of the closest cusp to the robot, or -1 if no cusps are found."""

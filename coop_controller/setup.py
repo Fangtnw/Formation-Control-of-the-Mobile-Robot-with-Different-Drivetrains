@@ -29,7 +29,7 @@ setup(
             "dynamic_footprint = coop_controller.dynamic_footprint:main",
             "coop_planner = coop_controller.coop_planner:main",
             "pure_pursuit_controller = coop_controller.pure_pursuit_controller:main",
-            "rotate_controller = coop_controller.rotate_controller:main",
+            "trajectory_plotter = coop_controller.trajectory_plotter:main",
             "hybrid_astar = coop_controller.hybrid_astar:main",
         ],
     },

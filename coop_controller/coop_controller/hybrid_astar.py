@@ -11,21 +11,22 @@ import rclpy
 from rclpy.node import Node as rosNode
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PoseStamped
-from nav_msgs.msg import Path
+from nav_msgs.msg import Path, Odometry
+from tf_transformations import euler_from_quaternion
 
 class Car:
-    maxSteerAngle = 0.6
+    maxSteerAngle = math.radians(25)
     steerPresion = 10
-    wheelBase = 3
-    axleToFront = 14
-    axleToBack = 1.4
-    width = 4
+    wheelBase = 10
+    axleToFront = 40
+    axleToBack = 4
+    width = 12
 
 class Cost:
     reverse = 0
-    directionChange = 10
+    directionChange = 1000000
     steerAngle = 1
-    steerAngleChange = 5000
+    steerAngleChange = 1000000
     hybridCost = 50
 
 class Node:
@@ -562,19 +563,25 @@ class HybridAStarPlanner(rosNode):
             self.map_callback,
             10
         )
+        # self.subscription_odom = self.create_subscription(
+        #     Odometry,
+        #     '/diffdrive/odom',
+        #     self.odom_callback,
+        #     10)
         self.publisher_ = self.create_publisher(Path, '/plan', 10)  
         self.subscription  # prevent unused variable warning
         self.obstacle_map = None
         self.resolution = None
         self.map_received = False
+        self.start_received = False
 
     def map_callback(self, msg):
         self.get_logger().info("Received map")
         self.resolution = msg.info.resolution
         self.width = msg.info.width
         self.height = msg.info.height
-        self.map_origin_x = msg.info.origin.position.x
-        self.map_origin_y = msg.info.origin.position.y
+        self.map_origin_x = int(msg.info.origin.position.x)
+        self.map_origin_y = int(msg.info.origin.position.y)
 
         # Extract obstacle coordinates
         obstacles = []
@@ -582,38 +589,39 @@ class HybridAStarPlanner(rosNode):
             for x in range(self.width):
                 index = y * self.width + x
                 if msg.data[index] > 50:  # Assuming occupancy value > 50 is an obstacle
-                    world_x = self.map_origin_x + x * self.resolution
-                    world_y = self.map_origin_y + y * self.resolution
+                    world_x = self.map_origin_x + x 
+                    world_y = self.map_origin_y + y 
                     obstacles.append([world_x, world_y])
 
         self.obstacle_map = obstacles
         self.map_received = True
+        self.s = None
         # self.plot_map()
 
     def calculate_map_parameters(self):
         if not self.map_received:
             return None  # Exit if map is not received
 
-        obstacle_x = [obs[0] for obs in self.obstacle_map]
-        obstacle_y = [obs[1] for obs in self.obstacle_map]
+        obstacleX = [obs[0] for obs in self.obstacle_map]
+        obstacleY = [obs[1] for obs in self.obstacle_map]
 
-        map_min_x = int(round(min(obstacle_x) / self.resolution))
-        map_min_y = int(round(min(obstacle_y) / self.resolution))
-        map_max_x = int(round(max(obstacle_x) / self.resolution))
-        map_max_y = int(round(max(obstacle_x) / self.resolution))
+        mapMinX = int(round(min(obstacleX) ))
+        mapMinY = int(round(min(obstacleY) ))
+        mapMaxX = int(round(max(obstacleX) ))
+        mapMaxY = int(round(max(obstacleY) ))
 
-        obstacle_tree = kd.KDTree([[x, y] for x, y in zip(obstacle_x, obstacle_y)])
-
+        obstacle_tree = kd.KDTree([[x, y] for x, y in zip(obstacleX, obstacleY)])
+        # return MapParameters(mapMinX, mapMinY, mapMaxX, mapMaxY, xyResolution, yawResolution, ObstacleKDTree, obstacleX, obstacleY)  
         return MapParameters(
-            map_min_x,
-            map_min_y,
-            map_max_x,
-            map_max_y,
-            self.resolution,
-            math.radians(15),  # Assuming 15 degrees yaw resolution
-            obstacle_tree,
-            obstacle_x,
-            obstacle_y
+            mapMinX,
+            mapMinY,
+            mapMaxX,
+            mapMaxY,
+            xyResolution = 1,
+            yawResolution = math.radians(15),  # Assuming 15 degrees yaw resolution
+            ObstacleKDTree=obstacle_tree,
+            obstacleX = obstacleX,
+            obstacleY = obstacleY
         )
     
     def publish_path(self, x, y, yaw):
@@ -626,13 +634,13 @@ class HybridAStarPlanner(rosNode):
         for i in range(len(x)):
             pose = PoseStamped()
             pose.header.frame_id = "map"
-            pose.pose.position.x = y[i] /14 + 1.25
-            pose.pose.position.y = -x[i] /10 + 2.5
+            pose.pose.position.x = x[i] *0.05 - 0.15
+            pose.pose.position.y = y[i] *0.05 - 3
             pose.pose.position.z = 0.0  # Assuming the path is on a flat plane
 
             # Calculate orientation quaternion from yaw angle
-            adjusted_yaw = yaw[i] - math.pi / 2  # Adjust for coordinate system change
-            quaternion = self.yaw_to_quaternion(adjusted_yaw)
+            # adjusted_yaw = yaw[i] - math.pi / 2  # Adjust for coordinate system change
+            quaternion = self.yaw_to_quaternion(yaw[i])
             pose.pose.orientation = quaternion
 
             path.poses.append(pose)
@@ -660,6 +668,28 @@ class HybridAStarPlanner(rosNode):
         # Show the plot
         plt.legend()
         plt.show()
+        
+    def odom_callback(self, msg):
+        if not self.start_received:
+            self.get_logger().info("Received start")
+
+            # Extract position (x, y) and orientation (yaw)
+            x = msg.pose.pose.position.x
+            y = msg.pose.pose.position.y
+            
+            quaternion = (
+                msg.pose.pose.orientation.x,
+                msg.pose.pose.orientation.y,
+                msg.pose.pose.orientation.z,
+                msg.pose.pose.orientation.w
+            )
+            
+            euler = euler_from_quaternion(quaternion)
+            yaw = euler[2]  # Yaw value in radians
+            
+            # Store the start position and yaw
+            self.s = [x, y, yaw]
+            self.start_received = True  # Set flag to
 
 def main(args=None):
     rclpy.init(args=args)
@@ -669,19 +699,29 @@ def main(args=None):
     # s = [40, 5, np.deg2rad(90)]
     # g = [10, 52.5, np.deg2rad(0)]
 
-    s = [40, 23, np.deg2rad(-90)]
-    g = [10, 52.5, np.deg2rad(0)]
+    # s = [40, 23, np.deg2rad(-90)]
+    # g = [10, 52.5, np.deg2rad(0)]
+    # s = [60, 30, np.deg2rad(0)]
+    # Wait until both map and start are received
+    while not planner.map_received:
+        planner.get_logger().info("Waiting for map ...")
+        rclpy.spin_once(planner, timeout_sec=1)
 
-    # while not planner.map_received:
-    #     planner.get_logger().info("Waiting for map...")
-    #     rclpy.spin_once(planner, timeout_sec=1)
+
+    # s = [1, 30, np.deg2rad(0)]
+    # g = [103, 120, np.deg2rad(-90)]
+
+    s = [39, 30, np.deg2rad(180)]
+    g = [103, 120, np.deg2rad(-90)]
 
     # Get Obstacle Map
-    obstacleX, obstacleY = map()
-
+    # obstacleX, obstacleY = map()
+    obstacleX = [obs[0] for obs in planner.obstacle_map]
+    obstacleY = [obs[1] for obs in planner.obstacle_map]
+    # planner.plot_map()
     # # Calculate map Paramaters
-    mapParameters = calculateMapParameters(obstacleX, obstacleY, 3, np.deg2rad(15.0))
-    # mapParameters = planner.calculate_map_parameters()
+    # mapParameters = calculateMapParameters(obstacleX, obstacleY, 3, np.deg2rad(15.0))
+    mapParameters = planner.calculate_map_parameters()
     # # Run Hybrid A*
     x, y, yaw = run(s, g, mapParameters, plt)
     planner.publish_path(x, y, yaw)
@@ -704,7 +744,9 @@ def main(args=None):
     #     plt.ylim(min(obstacleY), max(obstacleY))
     #     drawCar(x[k], y[k], yaw[k])
     #     plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
-    #     plt.title("Hybrid A* Path  - Ackermann front")
+    #     plt.title("Hybrid A* Footprint  - Ackermann back")
+    #     plt.axis('equal')
+    #     plt.axis('off')
 
 
     # # Draw Animated Car
@@ -717,6 +759,8 @@ def main(args=None):
         drawCar(x[k], y[k], yaw[k])
         plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
         plt.title("Hybrid A* Path - Ackermann front ")
+        plt.axis('equal')
+        plt.axis('off')
         plt.pause(0.001)
     
     plt.show()

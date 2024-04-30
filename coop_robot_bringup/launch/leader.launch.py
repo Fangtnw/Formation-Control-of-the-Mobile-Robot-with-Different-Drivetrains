@@ -108,16 +108,24 @@ def generate_launch_description():
 
 
 
-    slam_toolbox_localize = ExecuteProcess(
+    slam_toolbox_localize1 = ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
              'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim_mapper_params_online_async.yaml'],
         output='screen',
-        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "sim"'])
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "sim1"'])
+                    )
+    )
+
+    slam_toolbox_localize2 = ExecuteProcess(
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim2_mapper_params_online_async.yaml'],
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "sim2"'])
                     )
     )
 
     slam_toolbox= ExecuteProcess(
-        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
+        cmd=['ros2', 'launch', 'slam_toolbox', 'localization_launch.py',
              'slam_params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
@@ -138,7 +146,7 @@ def generate_launch_description():
 
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/sim_map_2.2.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/sim_map_2.4.yaml'],
         output='screen',
     )
 
@@ -187,7 +195,8 @@ def generate_launch_description():
 
     # ld.add_action(map_server)
     # ld.add_action(lifecycle_map_server)
-    ld.add_action(slam_toolbox_localize)
+    ld.add_action(slam_toolbox_localize1)
+    ld.add_action(slam_toolbox_localize2)
     # ld.add_action(amcl)
     # ld.add_action(lifecycle_amcl)
 

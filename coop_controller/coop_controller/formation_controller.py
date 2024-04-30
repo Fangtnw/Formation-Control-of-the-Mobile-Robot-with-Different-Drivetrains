@@ -137,11 +137,8 @@ class FormationController(Node):
                 else:
                     linear_vel_x = self.kp_x * error_x
                     angular_vel = self.kp_yaw * error_yaw
-
                 
                   # Apply direction factor for yaw
-
-
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
 
