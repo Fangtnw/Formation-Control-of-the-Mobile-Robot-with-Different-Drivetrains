@@ -81,7 +81,7 @@ class ArUcoDetector(Node):
             self.get_logger().info("Detected ArUco markers")
             for i, id in enumerate(ids):
                 if id == 145:  # Example ArUco ID, update with your specific ID
-                    self.get_logger().info("Found ArUco marker with ID 154")
+                    self.get_logger().info("Found ArUco marker with ID 145")
                     rvec, tvec, _ = cv2.aruco.estimatePoseSingleMarkers(
                         corners[i], 0.1, self.camera_matrix, self.dist_coeff)
                     
