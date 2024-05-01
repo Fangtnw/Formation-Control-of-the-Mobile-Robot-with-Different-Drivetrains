@@ -574,6 +574,9 @@ class HybridAStarPlanner(rosNode):
         self.resolution = None
         self.map_received = False
         self.start_received = False
+        self.s_x = 0
+        self.s_y = 0
+        self.s_yaw = 0
 
     def map_callback(self, msg):
         self.get_logger().info("Received map")
@@ -595,7 +598,7 @@ class HybridAStarPlanner(rosNode):
 
         self.obstacle_map = obstacles
         self.map_received = True
-        self.s = None
+        
         # self.plot_map()
 
     def calculate_map_parameters(self):
@@ -674,8 +677,9 @@ class HybridAStarPlanner(rosNode):
             self.get_logger().info("Received start")
 
             # Extract position (x, y) and orientation (yaw)
-            x = msg.pose.pose.position.x
-            y = msg.pose.pose.position.y
+            self.s_x = (int(msg.pose.pose.position.x) /self.resolution ) +self.map_origin_x
+            
+            self.s_y = (int(msg.pose.pose.position.y) /self.resolution ) +self.map_origin_y
             
             quaternion = (
                 msg.pose.pose.orientation.x,
@@ -685,10 +689,10 @@ class HybridAStarPlanner(rosNode):
             )
             
             euler = euler_from_quaternion(quaternion)
-            yaw = euler[2]  # Yaw value in radians
+            self.s_yaw = int(euler[2])  # Yaw value in radians
             
             # Store the start position and yaw
-            self.s = [x, y, yaw]
+            # self.s = [x, y, yaw]
             self.start_received = True  # Set flag to
 
 def main(args=None):
@@ -703,16 +707,17 @@ def main(args=None):
     # g = [10, 52.5, np.deg2rad(0)]
     # s = [60, 30, np.deg2rad(0)]
     # Wait until both map and start are received
-    while not planner.map_received:
+    while not planner.map_received and not planner.start_received:
         planner.get_logger().info("Waiting for map ...")
         rclpy.spin_once(planner, timeout_sec=1)
 
 
     # s = [1, 30, np.deg2rad(0)]
-    # g = [103, 120, np.deg2rad(-90)]
-
-    s = [39, 30, np.deg2rad(180)]
+    s = [planner.s_x,planner.s_y,planner.s_yaw]
     g = [103, 120, np.deg2rad(-90)]
+
+    # s = [39, 30, np.deg2rad(180)]
+    # g = [103, 120, np.deg2rad(-90)]
 
     # Get Obstacle Map
     # obstacleX, obstacleY = map()

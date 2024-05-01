@@ -62,11 +62,11 @@ class OdometryNode(Node):
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
-        odom_msg.header.frame_id = 'diff_odom_raw'
+        odom_msg.header.frame_id = 'odom'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Set the child_frame_id to "base_link"
-        odom_msg.child_frame_id = "base_footprint_diff"
+        odom_msg.child_frame_id = "base_footprint"
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
@@ -100,10 +100,10 @@ class OdometryNode(Node):
         # Publish odometry message
         self.odom_pub.publish(odom_msg)
 
-        map_to_odom_transform = TransformStamped()
-        map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
-        map_to_odom_transform.header.frame_id = 'map'
-        map_to_odom_transform.child_frame_id = 'odom_diff'
+        # map_to_odom_transform = TransformStamped()
+        # map_to_odom_transform.header.stamp = self.get_clock().now().to_msg()
+        # map_to_odom_transform.header.frame_id = 'odom'
+        # map_to_odom_transform.child_frame_id = 'odom_diff'
         # map_to_odom_transform.transform.translation.x = self.Robot_X
         # map_to_odom_transform.transform.translation.y = self.Robot_Y
         # map_to_odom_transform.transform.translation.z = 0.0
@@ -115,8 +115,8 @@ class OdometryNode(Node):
         transform = TransformStamped()
         transform.header = Header()
         transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = 'odom_diff'
-        transform.child_frame_id = 'base_footprint_diff'
+        transform.header.frame_id = 'odom'
+        transform.child_frame_id = 'base_footprint'
         transform.transform.translation.x = self.Robot_X
         transform.transform.translation.y = self.Robot_Y
         transform.transform.translation.z = 0.0

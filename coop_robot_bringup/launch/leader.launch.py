@@ -125,7 +125,7 @@ def generate_launch_description():
     )
 
     slam_toolbox= ExecuteProcess(
-        cmd=['ros2', 'launch', 'slam_toolbox', 'localization_launch.py',
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
              'slam_params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
@@ -169,13 +169,13 @@ def generate_launch_description():
 
     # Add actions to the LaunchDescription
     ld.add_action(mode_arg)
-    ld.add_action(ydliar)
+    # ld.add_action(ydliar)
     # ld.add_action(xicro)
 
     ld.add_action(laser_to_base_footprint_tf)
-    # ld.add_action(diff_odom_compute)
+    ld.add_action(diff_odom_compute)
 
-    ld.add_action(ack_odom_compute)
+    # ld.add_action(ack_odom_compute)
     # ld.add_action(camera_to_base_footprint)
 
 
@@ -191,12 +191,12 @@ def generate_launch_description():
     # ld.add_action(nav2)
     
     ld.add_action(slam_toolbox)
-    ld.add_action(nav2_sim)
+    # ld.add_action(nav2_sim)
 
     # ld.add_action(map_server)
     # ld.add_action(lifecycle_map_server)
-    ld.add_action(slam_toolbox_localize1)
-    ld.add_action(slam_toolbox_localize2)
+    # ld.add_action(slam_toolbox_localize1)
+    # ld.add_action(slam_toolbox_localize2)
     # ld.add_action(amcl)
     # ld.add_action(lifecycle_amcl)
 
