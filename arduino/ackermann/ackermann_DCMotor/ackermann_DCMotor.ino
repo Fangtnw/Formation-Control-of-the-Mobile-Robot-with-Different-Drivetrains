@@ -24,6 +24,8 @@ const int PIN_ENCOD_B_MOTOR_RIGHT = 18;         //B channel for encoder of right
 const int PIN_ENCOD_A_STEER_RIGHT = 3;              //A channel for encoder of right servo motor         
 const int PIN_ENCOD_B_STEER_RIGHT = 2;              //B channel for encoder of right servo motor 
 
+const int LIMIT_SWITCH = 7;  
+
 //Define Value of Parameter
 const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
@@ -256,17 +258,20 @@ void setup() {
   digitalWrite(PIN_ENCOD_B_STEER_RIGHT, HIGH);
   attachInterrupt(1, encoderRightServo, RISING);
 
+  pinMode(LIMIT_SWITCH, INPUT_PULLUP );
 }
 
 void loop() {
   xicro.Spin_node();
   
   if((millis()-lastMilli) >= LOOPTIME)   
-  {                                                                           // enter timed loopf
+  {                          // enter timed loopf
     lastMilli = millis();
     handle_cmd();
     byte status = mpu.begin();
-    
+
+    limitswitch();
+
     ang_desire_steer = constrain(ang_desire_steer, -max_angle, max_angle);
 
     if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
@@ -488,6 +493,12 @@ void encoderRightMotor() {
 void encoderRightServo() {
   if (digitalRead(PIN_ENCOD_A_STEER_RIGHT) == digitalRead(PIN_ENCOD_B_STEER_RIGHT)) pos_steer_right--;
   else pos_steer_right++;
+}
+
+void limitswitch() {
+  if (digitalRead(LIMIT_SWITCH) == LOW){
+    pos_steer_right = 0;
+  }
 }
 
 
