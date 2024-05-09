@@ -19,8 +19,8 @@ slam_toolbox:
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
-    # map_file_name: /home/fang/mappy.yaml
-    # # map_start_pose: [0.0, 0.0, 0.0]
+    map_file_name: '222'
+    map_start_pose: [-4.8, -1.7, 0.0]
     # map_start_at_dock: False
 
     debug_logging: false

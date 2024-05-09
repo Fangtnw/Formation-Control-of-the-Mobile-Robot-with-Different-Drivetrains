@@ -35,6 +35,8 @@ def generate_launch_description():
     diff_odom_compute = Node(
         package='coop_controller',
         executable='diffdrive_odom',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
+                    ),
         output='screen',
     )
 
@@ -91,7 +93,9 @@ def generate_launch_description():
                     executable='static_transform_publisher',
                     name='static_tf_pub_laser',
                     output='screen',
-                    arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','laser_frame'],
+                    arguments=['-0.025', '0', '0','0', '0', '0', '1','base_footprint','laser_frame'],
+                    condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
+                    )
                     )
     
     camera_to_base_footprint = Node(package='tf2_ros',
@@ -126,7 +130,7 @@ def generate_launch_description():
 
     slam_toolbox= ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
-             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml'],
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/mapper_params_online_async.yaml','use_sim_time:=true'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
                     )
@@ -146,23 +150,27 @@ def generate_launch_description():
 
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=coop_ws/src/coop_robot_bringup/map/sim_map_2.4.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=ros_map_editor/222.yaml'],
         output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
 
     lifecycle_map_server = ExecuteProcess(
         cmd=['ros2', 'run', 'nav2_util', 'lifecycle_bringup', 'map_server'],
         output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
 
     amcl = ExecuteProcess(
         cmd=['ros2', 'run', 'nav2_amcl', 'amcl'],
         output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
 
     lifecycle_amcl = ExecuteProcess(
         cmd=['ros2', 'run', 'nav2_util', 'lifecycle_bringup', 'amcl'],
         output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
 
     ld = LaunchDescription()
@@ -173,7 +181,7 @@ def generate_launch_description():
     # ld.add_action(xicro)
 
     ld.add_action(laser_to_base_footprint_tf)
-    ld.add_action(diff_odom_compute)
+    # ld.add_action(diff_odom_compute)
 
     # ld.add_action(ack_odom_compute)
     # ld.add_action(camera_to_base_footprint)
@@ -190,15 +198,15 @@ def generate_launch_description():
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2)
     
-    ld.add_action(slam_toolbox)
-    # ld.add_action(nav2_sim)
+    # ld.add_action(slam_toolbox)
+    ld.add_action(nav2_sim)
 
-    # ld.add_action(map_server)
-    # ld.add_action(lifecycle_map_server)
-    # ld.add_action(slam_toolbox_localize1)
-    # ld.add_action(slam_toolbox_localize2)
-    # ld.add_action(amcl)
-    # ld.add_action(lifecycle_amcl)
+    ld.add_action(map_server)
+    ld.add_action(lifecycle_map_server)
+    ld.add_action(slam_toolbox_localize1)
+    ld.add_action(slam_toolbox_localize2)
+    ld.add_action(amcl)
+    ld.add_action(lifecycle_amcl)
 
     return ld
 

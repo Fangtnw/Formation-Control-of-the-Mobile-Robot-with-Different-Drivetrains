@@ -13,21 +13,24 @@ from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path, Odometry
 from tf_transformations import euler_from_quaternion
+import time 
+
+downsample = 1
 
 class Car:
     maxSteerAngle = math.radians(25)
     steerPresion = 10
-    wheelBase = 10
-    axleToFront = 40
-    axleToBack = 4
-    width = 12
+    wheelBase = (50/5)/downsample
+    axleToFront = (200/5)/downsample
+    axleToBack = (20/5)/downsample
+    width = (60/5)/downsample
 
 class Cost:
     reverse = 0
-    directionChange = 1000000
-    steerAngle = 1
-    steerAngleChange = 1000000
-    hybridCost = 50
+    directionChange = 100000
+    steerAngle = 0
+    steerAngleChange = 100000
+    hybridCost = 0
 
 class Node:
     def __init__(self, gridIndex, traj, steeringAngle, direction, cost, parentIndex):
@@ -270,20 +273,44 @@ def obstaclesMap(obstacleX, obstacleY, xyResolution):
 
     return obstacles
 
-def holonomicNodeIsValid(neighbourNode, obstacles, mapParameters):
+# def holonomicNodeIsValid(neighbourNode, obstacles, mapParameters):
 
-    # Check if Node is out of map bounds
-    if neighbourNode.gridIndex[0]<= mapParameters.mapMinX or \
-       neighbourNode.gridIndex[0]>= mapParameters.mapMaxX or \
-       neighbourNode.gridIndex[1]<= mapParameters.mapMinY or \
-       neighbourNode.gridIndex[1]>= mapParameters.mapMaxY:
+#     # Check if Node is out of map bounds
+#     if neighbourNode.gridIndex[0]<= mapParameters.mapMinX or \
+#        neighbourNode.gridIndex[0]>= mapParameters.mapMaxX or \
+#        neighbourNode.gridIndex[1]<= mapParameters.mapMinY or \
+#        neighbourNode.gridIndex[1]>= mapParameters.mapMaxY:
+#         return False
+
+#     # Check if Node on obstacle
+#     if obstacles[neighbourNode.gridIndex[0]][neighbourNode.gridIndex[1]]:
+#         return False
+
+#     return True
+
+def holonomicNodeIsValid(neighbourNode, obstacles, mapParameters):
+    # Check if the node is out of map bounds
+    if (neighbourNode.gridIndex[0] < mapParameters.mapMinX or
+        neighbourNode.gridIndex[0] > mapParameters.mapMaxX or
+        neighbourNode.gridIndex[1] < mapParameters.mapMinY or
+        neighbourNode.gridIndex[1] > mapParameters.mapMaxY):
         return False
 
-    # Check if Node on obstacle
+    # Ensure indices are within valid range for the obstacles list
+    if (neighbourNode.gridIndex[0] < 0 or
+        neighbourNode.gridIndex[1] < 0 or
+        neighbourNode.gridIndex[0] >= len(obstacles) or
+        neighbourNode.gridIndex[1] >= len(obstacles[0])):
+        return False
+    
+    # Check if the node is on an obstacle
     if obstacles[neighbourNode.gridIndex[0]][neighbourNode.gridIndex[1]]:
         return False
 
+    # If none of the above conditions are met, the node is valid
     return True
+
+
 
 def holonomicCostsWithObstacles(goalNode, mapParameters):
 
@@ -453,7 +480,8 @@ def backtrack(startNode, goalNode, closedSet, plt):
     return x[::-1], y[::-1], yaw[::-1]
 
 def run(s, g, mapParameters, plt):
-
+    print("start")
+    start_time = time.time()
     # Compute Grid Index for start and Goal node
     sGridIndex = [round(s[0] / mapParameters.xyResolution), \
                   round(s[1] / mapParameters.xyResolution), \
@@ -461,31 +489,33 @@ def run(s, g, mapParameters, plt):
     gGridIndex = [round(g[0] / mapParameters.xyResolution), \
                   round(g[1] / mapParameters.xyResolution), \
                   round(g[2]/mapParameters.yawResolution)]
-
+    print("pass1")
     # Generate all Possible motion commands to car
     motionCommand = motionCommands()
+    print("pass2")
 
     # Create start and end Node
     startNode = Node(sGridIndex, [s], 0, 1, 0 , tuple(sGridIndex))
     goalNode = Node(gGridIndex, [g], 0, 1, 0, tuple(gGridIndex))
-
+    print("pass3")
     # Find Holonomic Heuristric
     holonomicHeuristics = holonomicCostsWithObstacles(goalNode, mapParameters)
-
+    print("pass4")
     # Add start node to open Set
     openSet = {index(startNode):startNode}
     closedSet = {}
-
+    print("pass5")
     # Create a priority queue for acquiring nodes based on their cost's
     costQueue = heapdict()
 
     # Add start mode into priority queue
     costQueue[index(startNode)] = max(startNode.cost , Cost.hybridCost * holonomicHeuristics[startNode.gridIndex[0]][startNode.gridIndex[1]])
     counter = 0
-
+    print("pass6")
     # Run loop while path is found or open set is empty
     while True:
         counter +=1
+        print("Loop: {}".format(counter))
         # Check if openSet is empty, if empty no solution available
         if not openSet:
             return None
@@ -524,7 +554,7 @@ def run(s, g, mapParameters, plt):
             # Draw Simulated Node
             x,y,z =zip(*simulatedNode.traj)
             
-            # plt.plot(x, y, linewidth=0.3, color='g')
+            plt.plot(x, y, linewidth=0.3, color='g')
 
             # Check if simulated node is already in closed set
             simulatedNodeIndex = index(simulatedNode)
@@ -542,6 +572,9 @@ def run(s, g, mapParameters, plt):
     # Backtrack
     x, y, yaw = backtrack(startNode, goalNode, closedSet, plt)
 
+    end_time = time.time()    
+    computation_time = end_time - start_time
+    print("Computation time:", computation_time, "seconds")
     return x, y, yaw
 
 def drawCar(x, y, yaw, color='black'):
@@ -552,13 +585,15 @@ def drawCar(x, y, yaw, color='black'):
                      [math.sin(yaw), math.cos(yaw)]])
     car = np.dot(rotationZ, car)
     car += np.array([[x], [y]])
-    plt.plot(car[0, :], car[1, :], color)
+    plt.plot(car[0, :], car[1, :], color, linewidth=0.1)
+    # plt.plot(car[0, :], car[1, :], color)
 
 class HybridAStarPlanner(rosNode):
     def __init__(self):
         super().__init__("hybrid_astar_planner")
         self.subscription = self.create_subscription(
             OccupancyGrid,
+            # "/global_costmap/costmap",
             "/map",
             self.map_callback,
             10
@@ -583,23 +618,23 @@ class HybridAStarPlanner(rosNode):
         self.resolution = msg.info.resolution
         self.width = msg.info.width
         self.height = msg.info.height
-        self.map_origin_x = int(msg.info.origin.position.x)
-        self.map_origin_y = int(msg.info.origin.position.y)
+        self.map_origin_x = msg.info.origin.position.x
+        self.map_origin_y = msg.info.origin.position.y
 
         # Extract obstacle coordinates
         obstacles = []
         for y in range(self.height):
             for x in range(self.width):
                 index = y * self.width + x
-                if msg.data[index] > 50:  # Assuming occupancy value > 50 is an obstacle
-                    world_x = self.map_origin_x + x 
-                    world_y = self.map_origin_y + y 
+                if msg.data[index] > 0:  # Assuming occupancy value > 50 is an obstacle
+                    world_x = round((self.map_origin_x + x)/downsample) 
+                    world_y = round((self.map_origin_y + y)/downsample)
                     obstacles.append([world_x, world_y])
 
         self.obstacle_map = obstacles
         self.map_received = True
         
-        # self.plot_map()
+        self.plot_map()
 
     def calculate_map_parameters(self):
         if not self.map_received:
@@ -620,8 +655,8 @@ class HybridAStarPlanner(rosNode):
             mapMinY,
             mapMaxX,
             mapMaxY,
-            xyResolution = 1,
-            yawResolution = math.radians(15),  # Assuming 15 degrees yaw resolution
+            xyResolution = 5,
+            yawResolution = math.radians(1),  
             ObstacleKDTree=obstacle_tree,
             obstacleX = obstacleX,
             obstacleY = obstacleY
@@ -637,8 +672,8 @@ class HybridAStarPlanner(rosNode):
         for i in range(len(x)):
             pose = PoseStamped()
             pose.header.frame_id = "map"
-            pose.pose.position.x = x[i] *0.05 - 0.15
-            pose.pose.position.y = y[i] *0.05 - 3
+            pose.pose.position.x = x[i] * self.resolution + self.map_origin_x + 0.65
+            pose.pose.position.y = y[i] * self.resolution + self.map_origin_y + 0.25
             pose.pose.position.z = 0.0  # Assuming the path is on a flat plane
 
             # Calculate orientation quaternion from yaw angle
@@ -666,10 +701,13 @@ class HybridAStarPlanner(rosNode):
         # Plot obstacles
         obstacle_x = [obs[0] for obs in self.obstacle_map]
         obstacle_y = [obs[1] for obs in self.obstacle_map]
+        # plt.plot(obstacle_x, obstacle_y, "sk", label="Obstacles")
         plt.plot(obstacle_x, obstacle_y, "sk", label="Obstacles")
-
+        plt.axis('equal')
         # Show the plot
         plt.legend()
+        plt.grid()
+        
         plt.show()
         
     def odom_callback(self, msg):
@@ -700,10 +738,7 @@ def main(args=None):
     planner = HybridAStarPlanner()
 
     # Set Start, Goal x, y, theta
-    # s = [40, 5, np.deg2rad(90)]
-    # g = [10, 52.5, np.deg2rad(0)]
-
-    # s = [40, 23, np.deg2rad(-90)]
+    # s downsample = [40, 23, np.deg2rad(-90)]
     # g = [10, 52.5, np.deg2rad(0)]
     # s = [60, 30, np.deg2rad(0)]
     # Wait until both map and start are received
@@ -712,12 +747,27 @@ def main(args=None):
         rclpy.spin_once(planner, timeout_sec=1)
 
 
-    # s = [1, 30, np.deg2rad(0)]
-    s = [planner.s_x,planner.s_y,planner.s_yaw]
-    g = [103, 120, np.deg2rad(-90)]
 
-    # s = [39, 30, np.deg2rad(180)]
-    # g = [103, 120, np.deg2rad(-90)]
+    # s = [1, 30, np.deg2rad(0)]
+    # s = [planner.s_x,planner.s_y,planner.s_yaw]
+    # s = [210,210,np.deg2rad(45)]
+    # g = [297,407,np.deg2rad(45)]
+
+    # s = [88,66, np.deg2rad(218)]
+    # g = [120,235, np.deg2rad(-55)]
+
+
+    #realmap point
+    s = [88,66, np.deg2rad(45)]  #back
+    # s = [88,66, np.deg2rad(225)] #front
+    g = [120,235, np.deg2rad(-55)]
+
+    #simulation point
+    # s = [1, 32, np.deg2rad(0)]
+    # g = [103, 120, np.deg2rad(-90)] #back
+
+    # s = [39, 32, np.deg2rad(180)]
+    # g = [102, 120, np.deg2rad(-90)]  #front
 
     # Get Obstacle Map
     # obstacleX, obstacleY = map()
@@ -742,16 +792,18 @@ def main(args=None):
 
 
     # Draw Path, Map and Car Footprint
-    # plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
-    # plt.plot(obstacleX, obstacleY, "sk")
+    # plt.plot(x, y, linewidth=0.5, color='r', zorder=0)
+    # plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
+    # # plt.plot(obstacleX, obstacleY, "sk")
     # for k in np.arange(0, len(x), 2):
     #     plt.xlim(min(obstacleX), max(obstacleX)) 
     #     plt.ylim(min(obstacleY), max(obstacleY))
     #     drawCar(x[k], y[k], yaw[k])
     #     plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
-    #     plt.title("Hybrid A* Footprint  - Ackermann back")
+    #     plt.title("Hybrid A* Footprint  - Ackermann front")
     #     plt.axis('equal')
-    #     plt.axis('off')
+        
+        # plt.axis('off')
 
 
     # # Draw Animated Car
@@ -759,15 +811,18 @@ def main(args=None):
         plt.cla()
         plt.xlim(min(obstacleX), max(obstacleX)) 
         plt.ylim(min(obstacleY), max(obstacleY))
-        plt.plot(obstacleX, obstacleY, "sk")
+        plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
+        # plt.plot(obstacleX, obstacleY, "sk")
         plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
         drawCar(x[k], y[k], yaw[k])
         plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)
         plt.title("Hybrid A* Path - Ackermann front ")
         plt.axis('equal')
-        plt.axis('off')
+        # plt.axis('off')
         plt.pause(0.001)
-    
+
+    # plt.legend()
+    plt.grid()
     plt.show()
 
     rclpy.shutdown()

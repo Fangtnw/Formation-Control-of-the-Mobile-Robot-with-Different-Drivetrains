@@ -9,8 +9,8 @@ import numpy as np
 import math
 import tf_transformations
 
-max_vx = 0.3
-max_rz= 1.0
+max_vx = 0.1
+max_rz= 0.5
 
 class FormationController(Node):
     def __init__(self,follower_type):
@@ -143,25 +143,28 @@ class FormationController(Node):
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
 
             elif self.follower_type == 'aruco':
-                error_x = (tx - 0.8)
+                error_x = (tx - 1.6)
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
+                linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) 
+                # linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
                 error_y = ty
                 self.integral_error_y += error_y  # Accumulate error for integral term
-                linear_vel_y = self.kp_y * error_y + self.ki_y * self.integral_error_y
+                # linear_vel_y = self.kp_y * error_y + self.ki_y * self.integral_error_y
+                linear_vel_y = (self.kp_y * error_y) + (-self.leader_w * self.kl_yw)
 
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 linear_vel_y = max(min(linear_vel_y, max_vx), -max_vx)
 
-                if abs(error_x) < 0.1 and abs(error_y) < 0.1:
+                if abs(error_x) < 0.8 and abs(error_y) < 0.5:
                     # Adjust yaw with damping, considering previous direction:
                     # if self.direction == 1.0 and abs(yaw) < abs(self.previous_yaw):   # Check turn direction
                     #     self.direction = -1.0 
                     # elif self.direction == -1.0 and abs(yaw) < abs(self.previous_yaw):   # Check turn direction
                     #     self.direction = 1.0
-                    error_yaw = yaw
+                    error_yaw = yaw 
                     self.integral_error_yaw += error_yaw  # Accumulate error for integral term
-                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
+                    # angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
+                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  + (self.leader_w * self.kl_yaw) 
                     # angular_vel = 0.0
                 else:
                     angular_vel = 0.0  # Prioritize x, y if they are large

@@ -24,7 +24,7 @@ class PurePursuitController(Node):
         
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.target_speed = 0.25 # Set your desired speed here
-        self.lookahead_distance = 0.8 # Set the lookahead distance here  0.8 for back 0.6 for front
+        self.lookahead_distance = 0.5 # Set the lookahead distance here  0.8 for back 0.5 for front
         self.kp = 1  # Proportional control gain
         self.wheel_base = 0.5
         # self.lookahead_to_robot = 0.0
@@ -127,12 +127,12 @@ class PurePursuitController(Node):
             self.reverse_mode = True 
             self.cusp_stop = True 
         elif self.direction == -1 or self.reverse_mode is True:
-            self.lookahead_distance = 2.0
-            linear_velocity = -self.target_speed
-            angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
-        else:
+            self.lookahead_distance = 2.5
             linear_velocity = self.target_speed
             angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
+        else:
+            linear_velocity = -self.target_speed
+            angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
 
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_velocity

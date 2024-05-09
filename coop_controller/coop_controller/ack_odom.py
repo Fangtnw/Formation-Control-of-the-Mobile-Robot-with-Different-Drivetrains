@@ -11,8 +11,11 @@ import tf2_ros
 from tf2_ros import TransformBroadcaster
 import math
 
-wheel_distance = 0.5
-length = 0.5
+WHEEL_DISTANCE = 0.5
+LENGTH = 0.5
+IMU_WEIGHT = 0.6  # Relative weight for IMU
+ODOMETRY_WEIGHT = 0.4  # Relative weight for odometry
+TIME_STEP = 0.1  # Time step for the update rate
 
 class OdometryNode(Node):
     def __init__(self):
@@ -60,10 +63,15 @@ class OdometryNode(Node):
 
     def imu_callback(self, msg):
         # self.Robot_Yaw = msg.vector.z
-        #self.Robot_AngVel = msg.angular_velocity.z*0.017453
+        self.Robot_AngVel_imu = msg.angular_velocity.z*0.017453  #degree/s to rad/s
         pass
 
     def publish_odometry(self):
+        
+        self.forward_kinematic()
+        self.fuse_angular_velocity()
+        self.odom_compute()
+
         odom_msg = Odometry()
 
         # Set the frame_id field in the Odometry message
@@ -75,9 +83,6 @@ class OdometryNode(Node):
 
         # Perform your odometry calculations here using encoder ticks, velocities, and IMU data
         # Replace the following placeholder values with your calculations
-        time_step = 0.1  # replace with your actual time step
-        self.forward_kinematic()
-        self.odom_compute(time_step)
 
         odom_msg.pose.pose.position.x = self.Robot_X
         odom_msg.pose.pose.position.y = self.Robot_Y
@@ -115,16 +120,23 @@ class OdometryNode(Node):
         transform.transform.rotation.w = cos(self.Robot_Yaw / 2)
         self.tf_broadcaster.sendTransform(transform)
 
+    def fuse_angular_velocity(self):
+        # Fused angular velocity using weighted average
+        wheel_ang_vel = self.Robot_AngVel_wheel
+        imu_ang_vel = self.Robot_AngVel_imu
+        # Combine angular velocities
+        self.Robot_AngVel = (IMU_WEIGHT * imu_ang_vel) + (ODOMETRY_WEIGHT * wheel_ang_vel)
+
+
     def forward_kinematic(self):
         self.Robot_LinVel = (self.left_vel + self.right_vel)* 0.5
-        
-        self.Robot_AngVel = (self.right_vel + self.left_vel)*0.5* tan(math.radians(self.steering_angle)) / wheel_distance
+        self.Robot_AngVel_wheel = (self.right_vel + self.left_vel)*0.5* tan(math.radians(self.steering_angle)) / WHEEL_DISTANCE
 
-    def odom_compute(self, time_step):
-        temp_tetra = self.Robot_Yaw + (self.Robot_AngVel * time_step * 0.5)
-        self.Robot_X = self.Robot_X + cos(temp_tetra) * self.Robot_LinVel * time_step
-        self.Robot_Y = self.Robot_Y + sin(temp_tetra) * self.Robot_LinVel * time_step
-        self.Robot_Yaw = self.Robot_Yaw + self.Robot_AngVel * time_step
+    def odom_compute(self):
+        temp_thetha = self.Robot_Yaw + (self.Robot_AngVel * TIME_STEP * 0.5)
+        self.Robot_X += cos(temp_thetha) * self.Robot_LinVel * TIME_STEP
+        self.Robot_Y += sin(temp_thetha) * self.Robot_LinVel * TIME_STEP
+        self.Robot_Yaw += self.Robot_AngVel * TIME_STEP
 
 def main(args=None):
     rclpy.init(args=args)

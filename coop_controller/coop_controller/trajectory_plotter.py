@@ -6,7 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import signal
 from scipy.spatial import distance
-
+import tf_transformations
 
 class TrajectoryPlotter(Node):
     def __init__(self):
@@ -22,22 +22,33 @@ class TrajectoryPlotter(Node):
 
         self.leader_x_positions = []
         self.leader_y_positions = []
+        self.leader_yaws = []
+
         self.follower_x_positions = []
         self.follower_y_positions = []
+        self.follower_yaws = []
+
         self.path_x_positions = []
         self.path_y_positions = []
+        self.path_yaws = [] 
 
     def diffdrive_odom_callback(self, msg):
         self.leader_x_positions.append(msg.pose.pose.position.x)
         self.leader_y_positions.append(msg.pose.pose.position.y)
+        self.leader_yaws.append(self.quaternion_to_yaw(msg.pose.pose.orientation))
 
     def mec_odom_callback(self, msg):
         self.follower_x_positions.append(msg.pose.pose.position.x)
         self.follower_y_positions.append(msg.pose.pose.position.y)
+        self.follower_yaws.append(self.quaternion_to_yaw(msg.pose.pose.orientation))
+
 
     def path_callback(self, msg):
         self.path_x_positions = [pose.pose.position.x for pose in msg.poses]
         self.path_y_positions = [pose.pose.position.y for pose in msg.poses]
+        self.path_yaws = [
+            self.quaternion_to_yaw(pose.pose.orientation) for pose in msg.poses
+        ]
 
     def cmd_vel_callback(self, msg):
         # Check if the robot is moving or has stopped
@@ -77,26 +88,72 @@ class TrajectoryPlotter(Node):
             )
             return total_operate_time
         return None
+    def calculate_last_point_error(self):
+        if not self.path_x_positions or not self.leader_x_positions or not self.follower_x_positions:
+            return None
 
+        # Get the last position of the leader, follower, and reference path
+        leader_last = (self.leader_x_positions[-1], self.leader_y_positions[-1], self.leader_yaws[-1])
+        follower_last = (self.follower_x_positions[-1], self.follower_y_positions[-1], self.follower_yaws[-1])
+
+        # Use the closest path point as the reference
+        path_last_idx = np.argmin([
+            distance.euclidean((x, y), (self.leader_x_positions[-1], self.leader_y_positions[-1]))
+            for x, y in zip(self.path_x_positions, self.path_y_positions)
+        ])
+
+        path_last = (
+            self.path_x_positions[path_last_idx], 
+            self.path_y_positions[path_last_idx], 
+            self.path_yaws[path_last_idx]
+        )
+
+        # Calculate errors in x, y, and yaw for the leader and follower
+        def calc_positional_error(point1, point2):
+            # Calculate the x, y, and yaw errors between two points
+            x_error = point1[0] - point2[0]
+            y_error = point1[1] - point2[1]
+            yaw_error = point1[2] - point2[2]
+            return {'x_error': x_error, 'y_error': y_error, 'yaw_error': yaw_error}
+
+        leader_error = calc_positional_error(leader_last, path_last)
+        follower_error = calc_positional_error(follower_last, path_last)
+
+        return leader_error, follower_error
+
+    def calculate_total_operate_time(self):
+        if len(self.start_times) == len(self.end_times):
+            total_operate_time = sum(
+                end - start for start, end in zip(self.start_times, self.end_times)
+            )
+            return total_operate_time
+        return None
+    
     def plot_trajectory(self):
         plt.figure(figsize=(8, 6))
         plt.plot(
             self.path_x_positions, 
             self.path_y_positions, 
             label='Planned Path', 
-            color='blue'
+            color='blue',
+            linewidth=2,  
+            linestyle='-'  
         )
         plt.plot(
             self.leader_x_positions, 
             self.leader_y_positions, 
             label='Leader Trajectory', 
-            color='orange'
+            color='orange',
+            linewidth=2,  
+            linestyle='--'  
         )
         plt.plot(
             self.follower_x_positions, 
             self.follower_y_positions, 
             label='Follower Trajectory', 
-            color='green'
+            color='green',
+            linewidth=2,  
+            linestyle='--'  
         )
 
         # Calculate total operating time
@@ -124,8 +181,8 @@ class TrajectoryPlotter(Node):
         plt.axis('equal')
 
         # Displaying error metrics and total operating time
-        plt.text(0.05, 0.95, f"Operate time: {total_operate_time:.2f} seconds", 
-                 transform=plt.gca().transAxes, va='top')
+        # plt.text(0.05, 0.95, f"Operate time: {total_operate_time:.2f} seconds", 
+        #          transform=plt.gca().transAxes, va='top')
 
         plt.show()
 
@@ -143,6 +200,28 @@ class TrajectoryPlotter(Node):
         if total_operate_time is not None:
             print("Total operate time:", total_operate_time, "seconds")
 
+        last_point_errors = self.calculate_last_point_error()
+        if last_point_errors:
+            leader_error, follower_error = last_point_errors
+
+            print("Last Point Errors:")
+            print("  Leader:")
+            print(f"    - X Error: {leader_error['x_error']:.2f}")
+            print(f"    - Y Error: {leader_error['y_error']:.2f}")
+            print(f"    - Yaw Error: {leader_error['yaw_error']:.2f}")
+
+            print("  Follower:")
+            print(f"    - X Error: {follower_error['x_error']:.2f}")
+            print(f"    - Y Error: {follower_error['y_error']:.2f}")
+            print(f"    - Yaw Error: {follower_error['yaw_error']:.2f}")
+
+
+
+    def quaternion_to_yaw(self, quaternion):
+        # Convert quaternion to yaw angle
+        q = [quaternion.x, quaternion.y, quaternion.z, quaternion.w]
+        roll, pitch, yaw = tf_transformations.euler_from_quaternion(q)
+        return yaw
 
 def main(args=None):
     rclpy.init(args=args)

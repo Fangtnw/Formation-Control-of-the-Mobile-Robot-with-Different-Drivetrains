@@ -164,9 +164,12 @@ void handle_cmd() {
     if (ang_desire_steer == 0) { 
       speed_req_right = speed_req;
       speed_req_left = speed_req;
-    } else {
-      speed_req_right = (speed_req * turning_r) / (turning_r - (wheelbase / 2));
-      speed_req_left = (speed_req * turning_r) / (turning_r + (wheelbase / 2));
+    } else if (ang_desire_steer >= 0){
+      speed_req_right = (speed_req * (abs(turning_r) + (wheelbase / 2))) / abs(turning_r);
+      speed_req_left = (speed_req * (abs(turning_r) - (wheelbase / 2))) / abs(turning_r);
+    }else if (ang_desire_steer <= 0){
+      speed_req_right = (speed_req * (abs(turning_r) - (wheelbase / 2))) / abs(turning_r);
+      speed_req_left = (speed_req * (abs(turning_r) + (wheelbase / 2))) / abs(turning_r);
     }
   } else {
     ang_desire_steer = 0;
