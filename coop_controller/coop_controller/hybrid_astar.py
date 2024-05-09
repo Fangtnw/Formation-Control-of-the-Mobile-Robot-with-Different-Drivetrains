@@ -27,9 +27,9 @@ class Car:
 
 class Cost:
     reverse = 0
-    directionChange = 100000
+    directionChange = 1000 #100000
     steerAngle = 0
-    steerAngleChange = 100000
+    steerAngleChange = 100000 #100000
     hybridCost = 0
 
 class Node:
@@ -672,8 +672,8 @@ class HybridAStarPlanner(rosNode):
         for i in range(len(x)):
             pose = PoseStamped()
             pose.header.frame_id = "map"
-            pose.pose.position.x = x[i] * self.resolution + self.map_origin_x + 0.65
-            pose.pose.position.y = y[i] * self.resolution + self.map_origin_y + 0.25
+            pose.pose.position.x = x[i] * self.resolution + self.map_origin_x #+ 0.65
+            pose.pose.position.y = y[i] * self.resolution + self.map_origin_y #+ 0.25
             pose.pose.position.z = 0.0  # Assuming the path is on a flat plane
 
             # Calculate orientation quaternion from yaw angle
@@ -758,16 +758,16 @@ def main(args=None):
 
 
     #realmap point
-    s = [88,66, np.deg2rad(45)]  #back
-    # s = [88,66, np.deg2rad(225)] #front
-    g = [120,235, np.deg2rad(-55)]
+    # s = [88,66, np.deg2rad(45)]  #back
+    # # s = [88,66, np.deg2rad(225)] #front
+    # g = [120,235, np.deg2rad(-55)]
 
     #simulation point
     # s = [1, 32, np.deg2rad(0)]
     # g = [103, 120, np.deg2rad(-90)] #back
 
-    # s = [39, 32, np.deg2rad(180)]
-    # g = [102, 120, np.deg2rad(-90)]  #front
+    s = [39, 32, np.deg2rad(180)]
+    g = [102, 120, np.deg2rad(-90)]  #front
 
     # Get Obstacle Map
     # obstacleX, obstacleY = map()

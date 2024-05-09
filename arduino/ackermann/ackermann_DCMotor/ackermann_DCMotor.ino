@@ -92,6 +92,11 @@ float error = 0.0;
 float derivative = 0.0; 
 float turning_r = 0.0;
 
+bool initial_set = false;
+bool limit_trig = false;
+bool set_zero =false;
+double direction = 0;
+
 //PID Parameters
 const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
 const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
@@ -124,7 +129,6 @@ class motor{
         analogWrite(pinPWM, speedInput);
 //        analogWrite(pinPWM_R, speedInput);  
 //        analogWrite(pinPWM_L, speedInput);        
-      
     }
 
     void run(const String runInput){
@@ -271,6 +275,48 @@ void loop() {
     byte status = mpu.begin();
 
     limitswitch();
+    
+    if (ang_desire_steer == 0 && initial_set == false){
+      initial_set = true;
+      set_zero = true;
+      direction = sgn(error);
+        }
+    else {
+      direction = 0;
+      set_zero == false;
+      }
+
+    encode_err = ang_desire_steer - pos_ack; 
+
+    // Compute PID control output
+    error = encode_err;
+    pwm_steer =  abs(15 * error);
+    integral += error;
+//    pwm_steer += k_i * integral;
+//    derivative = error - prev_error;
+//    pwm_steer += k_d * derivative;
+//    
+    // Update previous error for next iteration
+    prev_error = error;
+    
+    // Apply constraints to PWM value
+    
+    pwm_steer = constrain(pwm_steer, 70, 255);
+
+    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+    
+    // Perform action based on error direction
+    if ((abs(error) == 0 && set_zero == false) || (set_zero == true && limit_trig == true)) {  // Stopping
+        steerMotor.run("BRAKE");
+        pwm_steer = 0;
+        initial_set = false;
+    } else if ((error > 0  && set_zero == false) || (error > 0 && direction > 0)) { // Going forward  direction = +++
+        analogWrite(steerMotor.pinPWM_R, pwm_steer);  
+        analogWrite(steerMotor.pinPWM_L, 0);  
+    } else if ((error < 0 && set_zero == false)|| (error < 0 && direction < 0)) { // Going backward
+        analogWrite(steerMotor.pinPWM_R, 0);  
+        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
+    }
 
     ang_desire_steer = constrain(ang_desire_steer, -max_angle, max_angle);
 
@@ -338,36 +384,7 @@ void loop() {
 //    // compute PWM value for steer motor. Check constant definition comments for more information.
     //PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -100, 100); // 
     
-    encode_err = ang_desire_steer - pos_ack; 
 
-    // Compute PID control output
-    error = encode_err;
-    pwm_steer =  abs(15 * error);
-    integral += error;
-//    pwm_steer += k_i * integral;
-//    derivative = error - prev_error;
-//    pwm_steer += k_d * derivative;
-//    
-    // Update previous error for next iteration
-    prev_error = error;
-    
-    // Apply constraints to PWM value
-    
-    pwm_steer = constrain(pwm_steer, 70, 255);
-
-    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
-    
-    // Perform action based on error direction
-    if (abs(error) == 0) {  // Stopping
-        steerMotor.run("BRAKE");
-        pwm_steer = 0;
-    } else if (error > 01) { // Going forward
-        analogWrite(steerMotor.pinPWM_R, pwm_steer);  
-        analogWrite(steerMotor.pinPWM_L, 0);  
-    } else if (error < 0) { // Going backward
-        analogWrite(steerMotor.pinPWM_R, 0);  
-        analogWrite(steerMotor.pinPWM_L, pwm_steer);  
-    }
     
     if((millis()-lastMilli) >= LOOPTIME){         //write an error if execution time of the loop in longer than the specified looptime
       Serial.println(" TOO LONG ");
@@ -498,11 +515,14 @@ void encoderRightServo() {
 void limitswitch() {
   if (digitalRead(LIMIT_SWITCH) == LOW){
     pos_steer_right = 0;
+    pos_ack=0;
+    limit_trig = true;
   }
+  else {
+    limit_trig = false;
+    }
 }
 
-
-  
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }

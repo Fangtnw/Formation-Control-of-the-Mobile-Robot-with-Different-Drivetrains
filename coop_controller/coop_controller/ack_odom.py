@@ -126,7 +126,9 @@ class OdometryNode(Node):
         imu_ang_vel = self.Robot_AngVel_imu
         # Combine angular velocities
         self.Robot_AngVel = (IMU_WEIGHT * imu_ang_vel) + (ODOMETRY_WEIGHT * wheel_ang_vel)
-
+        print("imu ={}".format(imu_ang_vel))
+        print("wheel = {}".format(wheel_ang_vel))
+        print("fuse={}".format(self.Robot_AngVel))
 
     def forward_kinematic(self):
         self.Robot_LinVel = (self.left_vel + self.right_vel)* 0.5

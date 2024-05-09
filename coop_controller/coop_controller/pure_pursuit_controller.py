@@ -117,7 +117,7 @@ class PurePursuitController(Node):
         if lookahead_index == len(self.waypoints) - 1 and delta_y < 0.1 and self.distance_error < 0.3:
             linear_velocity = 0.0
             angular_velocity = 0.0
-            steering_angle = 0.0  # Adjust steering angle for a smooth stop]
+            steering_angle = 0.0  
             self.get_logger().warn("stop at goal")
         elif lookahead_index < len(self.waypoints) - 1 and delta_x < -0.6 and self.cusp_stop == False:
             linear_velocity = 0.0
