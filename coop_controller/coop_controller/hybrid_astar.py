@@ -18,7 +18,7 @@ import time
 downsample = 1
 
 class Car:
-    maxSteerAngle = math.radians(25)
+    maxSteerAngle = math.radians(10)
     steerPresion = 10
     wheelBase = (50/5)/downsample
     axleToFront = (200/5)/downsample
@@ -27,9 +27,9 @@ class Car:
 
 class Cost:
     reverse = 0
-    directionChange = 1000 #100000
+    directionChange = 100000 #100000
     steerAngle = 0
-    steerAngleChange = 100000 #100000
+    steerAngleChange = 100000000 #100000
     hybridCost = 0
 
 class Node:
@@ -762,12 +762,17 @@ def main(args=None):
     # # s = [88,66, np.deg2rad(225)] #front
     # g = [120,235, np.deg2rad(-55)]
 
+
+    s = [228,228, np.deg2rad(45)]  #back
+    # s = [228,228, np.deg2rad(225)] #front
+    g = [304,400, np.deg2rad(-55)]
+
     #simulation point
     # s = [1, 32, np.deg2rad(0)]
     # g = [103, 120, np.deg2rad(-90)] #back
 
-    s = [39, 32, np.deg2rad(180)]
-    g = [102, 120, np.deg2rad(-90)]  #front
+    # s = [39, 32, np.deg2rad(180)]
+    # g = [102, 120, np.deg2rad(-90)]  #front
 
     # Get Obstacle Map
     # obstacleX, obstacleY = map()

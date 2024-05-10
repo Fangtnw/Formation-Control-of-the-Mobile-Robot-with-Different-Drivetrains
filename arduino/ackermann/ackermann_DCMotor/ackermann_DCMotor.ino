@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 25;                 //Max angle (degree)
+const double max_angle = 10;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -275,24 +275,24 @@ void loop() {
     byte status = mpu.begin();
 
     limitswitch();
-    
-    if (ang_desire_steer == 0 && initial_set == false){
-      initial_set = true;
-      set_zero = true;
-      direction = sgn(error);
-        }
-    else {
+        
+    if (angular_speed_req != 0 ){    
       direction = 0;
       set_zero == false;
+        }
+    else if (angular_speed_req == 0 && initial_set == false){
+//      set_zero = true;
+      direction = sgn(error);
+      initial_set = true;
       }
 
     encode_err = ang_desire_steer - pos_ack; 
 
     // Compute PID control output
     error = encode_err;
-    pwm_steer =  abs(15 * error);
+    pwm_steer =  abs(18 * error);
     integral += error;
-//    pwm_steer += k_i * integral;
+//    pwm_steer += 1 * integral;
 //    derivative = error - prev_error;
 //    pwm_steer += k_d * derivative;
 //    
@@ -301,19 +301,19 @@ void loop() {
     
     // Apply constraints to PWM value
     
-    pwm_steer = constrain(pwm_steer, 70, 255);
+    pwm_steer = constrain(pwm_steer, 120, 255);
 
     xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
-    if ((abs(error) == 0 && set_zero == false) || (set_zero == true && limit_trig == true)) {  // Stopping
+    if ((abs(error) <= 1  && !set_zero) || (set_zero  && limit_trig && direction == 0)) {  // Stopping
         steerMotor.run("BRAKE");
         pwm_steer = 0;
         initial_set = false;
-    } else if ((error > 0  && set_zero == false) || (error > 0 && direction > 0)) { // Going forward  direction = +++
+    } else if ((error > 1  && !set_zero) || (set_zero  && direction > 0)) { // Going forward  direction = +++
+        analogWrite(steerMotor.pinPWM_L, 0); 
         analogWrite(steerMotor.pinPWM_R, pwm_steer);  
-        analogWrite(steerMotor.pinPWM_L, 0);  
-    } else if ((error < 0 && set_zero == false)|| (error < 0 && direction < 0)) { // Going backward
+    } else if ((error < -1 && !set_zero)|| (set_zero  && direction < 0)) { // Going backward
         analogWrite(steerMotor.pinPWM_R, 0);  
         analogWrite(steerMotor.pinPWM_L, pwm_steer);  
     }
@@ -515,7 +515,6 @@ void encoderRightServo() {
 void limitswitch() {
   if (digitalRead(LIMIT_SWITCH) == LOW){
     pos_steer_right = 0;
-    pos_ack=0;
     limit_trig = true;
   }
   else {

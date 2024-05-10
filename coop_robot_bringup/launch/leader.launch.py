@@ -181,7 +181,7 @@ def generate_launch_description():
     # ld.add_action(xicro)
 
     ld.add_action(laser_to_base_footprint_tf)
-    # ld.add_action(diff_odom_compute)
+    ld.add_action(diff_odom_compute)
 
     # ld.add_action(ack_odom_compute)
     # ld.add_action(camera_to_base_footprint)
@@ -198,7 +198,7 @@ def generate_launch_description():
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2)
     
-    # ld.add_action(slam_toolbox)
+    ld.add_action(slam_toolbox)
     ld.add_action(nav2_sim)
 
     ld.add_action(map_server)
