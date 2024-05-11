@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 13;                 //Max angle (degree)
+const double max_angle = 14;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -301,31 +301,29 @@ void loop() {
     
     // Apply constraints to PWM value
     
-    pwm_steer = constrain(pwm_steer, 120, 255);
+    pwm_steer = constrain(pwm_steer, 180, 255);
 
     xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
     
     // Perform action based on error direction
     if (set_zero == 1){
-      if (!limit_trig && direction > 0){
+      if (limit_trig == 1){
+        steerMotor.run("BRAKE");
+        pwm_steer = 0;
+      }
+      else if (limit_trig == 0 && direction > 0){
         analogWrite(steerMotor.pinPWM_L, 0); 
         analogWrite(steerMotor.pinPWM_R, pwm_steer); 
       }
-      else if (!limit_trig && direction < 0){
+      else if (limit_trig == 0 && direction < 0){
         analogWrite(steerMotor.pinPWM_R, 0);  
         analogWrite(steerMotor.pinPWM_L, pwm_steer); 
-      }
-      else if (limit_trig){
-        steerMotor.run("BRAKE");
-        pwm_steer = 0;
-        initial_set = 0;
       }
     }
     else{
       if (abs(error) <= 1  && set_zero == 0) {  // Stopping;;  Left bool: Stop when turn left/right Right bool: Stop when req 0
         steerMotor.run("BRAKE");
         pwm_steer = 0;
-        initial_set = 0;
       } 
       else if (error > 1  && set_zero == 0) { // Going forward  direction = +++
         analogWrite(steerMotor.pinPWM_L, 0); 
@@ -336,6 +334,7 @@ void loop() {
         analogWrite(steerMotor.pinPWM_L, pwm_steer); 
       } 
     }
+
 
     ang_desire_steer = constrain(ang_desire_steer, -max_angle, max_angle);
 
@@ -400,7 +399,7 @@ void loop() {
 
     ang_cmd_steer = constrain(ang_cmd_steer, -max_speed, max_speed);
     //PID_steerMotor.Compute();                                                 
-//    // compute PWM value for steer motor. Check constant definition comments for more information.
+    // compute PWM value for steer motor. Check constant definition comments for more information.
     //PWM_steerMotor = constrain(((ang_req_steer+sgn(ang_req_steer)*min_speed_cmd)/speed_to_pwm_ratio) + (ang_cmd_steer/speed_to_pwm_ratio), -100, 100); // 
     
 
@@ -444,13 +443,14 @@ void publishSpeed(double time) {
     xicro.Publisher_ack_speed_cmd.message.linear.z = ang_desire_steer;
     xicro.publish_ack_speed_cmd();
   
-//    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
-//    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
-//    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
+    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
+    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
 
-    xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
-    xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
-    xicro.Publisher_ack_PWM_cmd.message.angular.z = direction;
+//    xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
+//    xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
+//    xicro.Publisher_ack_PWM_cmd.message.linear.z = direction;
+//    xicro.Publisher_ack_PWM_cmd.message.angular.x = limit_trig;
 
     
           
@@ -538,10 +538,11 @@ void encoderRightServo() {
 void limitswitch() {
   if (digitalRead(LIMIT_SWITCH) == LOW){
     pos_steer_right = 0;
-    limit_trig = true;
+    limit_trig = 1;
+    direction = 0;
   }
   else {
-    limit_trig = false;
+    limit_trig = 0;
     }
 }
 
