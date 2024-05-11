@@ -13,8 +13,8 @@ import math
 
 WHEEL_DISTANCE = 0.5
 LENGTH = 0.5
-IMU_WEIGHT = 0.6  # Relative weight for IMU
-ODOMETRY_WEIGHT = 0.4  # Relative weight for odometry
+IMU_WEIGHT = 0.25  # Relative weight for IMU
+ODOMETRY_WEIGHT = 0.75 # Relative weight for odometry
 TIME_STEP = 0.1  # Time step for the update rate
 
 class OdometryNode(Node):
@@ -126,8 +126,8 @@ class OdometryNode(Node):
         imu_ang_vel = self.Robot_AngVel_imu
         # Combine angular velocities
         self.Robot_AngVel = (IMU_WEIGHT * imu_ang_vel) + (ODOMETRY_WEIGHT * wheel_ang_vel)
-        print("imu ={:.2f}".format(imu_ang_vel))
-        print("wheel = {:.2f}".format(wheel_ang_vel))
+        print("----imu ={:.2f}".format(imu_ang_vel))
+        print("____wheel = {:.2f}".format(wheel_ang_vel))
         print("fuse={:.2f}".format(self.Robot_AngVel))
 
     def forward_kinematic(self):
@@ -136,8 +136,8 @@ class OdometryNode(Node):
 
     def odom_compute(self):
         temp_thetha = self.Robot_Yaw + (self.Robot_AngVel * TIME_STEP * 0.5) #robot heading
-        self.Robot_X += cos(temp_thetha) * self.Robot_LinVel * TIME_STEP
-        self.Robot_Y += sin(temp_thetha) * self.Robot_LinVel * TIME_STEP
+        self.Robot_X += cos(temp_thetha) * self.Robot_LinVel * TIME_STEP *0.85
+        self.Robot_Y += sin(temp_thetha) * self.Robot_LinVel * TIME_STEP 
         self.Robot_Yaw += self.Robot_AngVel * TIME_STEP
 
 def main(args=None):
