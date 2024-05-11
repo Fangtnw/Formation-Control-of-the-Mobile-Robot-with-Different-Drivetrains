@@ -39,7 +39,7 @@ class OdometryNode(Node):
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
 
-        self.odom_pub = self.create_publisher(Odometry, 'ack_odom_raw', 100)
+        self.odom_pub = self.create_publisher(Odometry, '/ack/odom', 100)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
@@ -55,8 +55,8 @@ class OdometryNode(Node):
         self.right_encoder_ticks = msg.linear.x
 
     def encoder_vel_callback(self, msg):
-        self.left_vel = -msg.linear.y
-        self.right_vel =  -msg.linear.x
+        self.left_vel = msg.linear.y
+        self.right_vel =  msg.linear.x
         self.steering_angle = -msg.angular.y
         #self.steering_angle = 0.0
         #self.avg_vel = (self.left_vel + self.right_vel)/ 2
@@ -64,7 +64,7 @@ class OdometryNode(Node):
     def imu_callback(self, msg):
         # self.Robot_Yaw = msg.vector.z
         self.Robot_AngVel_imu = msg.angular_velocity.z*0.017453  #degree/s to rad/s
-        pass
+        # pass
 
     def publish_odometry(self):
         
@@ -126,16 +126,16 @@ class OdometryNode(Node):
         imu_ang_vel = self.Robot_AngVel_imu
         # Combine angular velocities
         self.Robot_AngVel = (IMU_WEIGHT * imu_ang_vel) + (ODOMETRY_WEIGHT * wheel_ang_vel)
-        print("imu ={}".format(imu_ang_vel))
-        print("wheel = {}".format(wheel_ang_vel))
-        print("fuse={}".format(self.Robot_AngVel))
+        print("imu ={:.2f}".format(imu_ang_vel))
+        print("wheel = {:.2f}".format(wheel_ang_vel))
+        print("fuse={:.2f}".format(self.Robot_AngVel))
 
     def forward_kinematic(self):
         self.Robot_LinVel = (self.left_vel + self.right_vel)* 0.5
         self.Robot_AngVel_wheel = (self.right_vel + self.left_vel)*0.5* tan(math.radians(self.steering_angle)) / WHEEL_DISTANCE
 
     def odom_compute(self):
-        temp_thetha = self.Robot_Yaw + (self.Robot_AngVel * TIME_STEP * 0.5)
+        temp_thetha = self.Robot_Yaw + (self.Robot_AngVel * TIME_STEP * 0.5) #robot heading
         self.Robot_X += cos(temp_thetha) * self.Robot_LinVel * TIME_STEP
         self.Robot_Y += sin(temp_thetha) * self.Robot_LinVel * TIME_STEP
         self.Robot_Yaw += self.Robot_AngVel * TIME_STEP

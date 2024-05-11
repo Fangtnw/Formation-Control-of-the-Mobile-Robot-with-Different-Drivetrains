@@ -102,7 +102,14 @@ def generate_launch_description():
                     executable='static_transform_publisher',
                     name='static_tf_pub_laser',
                     output='screen',
-                    arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','camera_frame'],
+                    arguments=['0', '0', '0','0', '0', '0', '1','camera_frame','base_footprint_mec'],
+                    )
+
+    aruco_to_base_footprint = Node(package='tf2_ros',
+                    executable='static_transform_publisher',
+                    name='static_tf_pub_laser',
+                    output='screen',
+                    arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','aruco_frame'],
                     )
 
     rviz = ExecuteProcess(
@@ -181,11 +188,11 @@ def generate_launch_description():
     # ld.add_action(xicro)
 
     ld.add_action(laser_to_base_footprint_tf)
-    ld.add_action(diff_odom_compute)
+    # ld.add_action(diff_odom_compute)
 
-    # ld.add_action(ack_odom_compute)
+    ld.add_action(ack_odom_compute)
     # ld.add_action(camera_to_base_footprint)
-
+    # ld.add_action(aruco_to_base_footprint)
 
     # ld.add_action(mec_bringup)
     # ld.add_action(diff_bringup)
@@ -198,7 +205,7 @@ def generate_launch_description():
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2)
     
-    ld.add_action(slam_toolbox)
+    # ld.add_action(slam_toolbox)
     ld.add_action(nav2_sim)
 
     ld.add_action(map_server)

@@ -9,7 +9,7 @@ import numpy as np
 import math
 import tf_transformations
 
-max_vx = 0.1
+max_vx = 0.2
 max_rz= 0.5
 
 class FormationController(Node):
@@ -39,9 +39,8 @@ class FormationController(Node):
         self.ki_yaw = 0  # Initialize for integral term
 
         self.kl_x = 1
-        self.kl_xw = 5
-        self.kl_yw = 5
-        self.kl_yaw = 1
+        self.kl_yw = -1
+        self.kl_yaw = -1
 
         # Variables to store integral errors for PI control
         self.integral_error_x = 0
@@ -143,7 +142,7 @@ class FormationController(Node):
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
 
             elif self.follower_type == 'aruco':
-                error_x = (tx - 1.6)
+                error_x = (tx - 1.0)
                 self.integral_error_x += error_x  # Accumulate error for integral term
                 linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) 
                 # linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
@@ -182,10 +181,10 @@ class FormationController(Node):
             self.get_logger().info(
                 f"Follower_command: x:{linear_vel_x:.2f}, z:{angular_vel:.2f} "
             )
-            self.publisher.publish(cmd_msg)
+            
             self.previous_ty = ty 
             self.previous_yaw = yaw 
-
+            self.publisher.publish(cmd_msg)
         except Exception as e:
             self.get_logger().error(f"Error looking up transform: {str(e)}")
             return

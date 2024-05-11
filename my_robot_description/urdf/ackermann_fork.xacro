@@ -574,7 +574,7 @@
 
         <!-- Remap the default topic -->
         <remapping>/cmd_vel:=/cmd_vel</remapping>
-        <remapping>odom:=/diffdrive/odom</remapping>
+        <remapping>odom:=/ack/odom</remapping>
 
       </ros>
 

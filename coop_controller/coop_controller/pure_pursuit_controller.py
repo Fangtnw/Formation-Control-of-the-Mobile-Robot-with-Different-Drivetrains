@@ -6,10 +6,11 @@ import math
 import numpy as np
 import tf_transformations
 import sys
+import argparse
 
 
 class PurePursuitController(Node):
-    def __init__(self):
+    def __init__(self,lookahead_distance=0.5, mode='reverse'):
         super().__init__('pure_pursuit_controller')
         self.subscription_plan = self.create_subscription(
             Path,
@@ -18,12 +19,16 @@ class PurePursuitController(Node):
             10)
         self.subscription_odom = self.create_subscription(
             Odometry,
-            '/diffdrive/odom',
+            '/ack/odom',
             self.odom_callback,
             10)
         
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 10)
         self.target_speed = 0.25 # Set your desired speed here
+
+        self.lookahead_distance = lookahead_distance
+        self.mode = mode
+
         self.lookahead_distance = 0.5 # Set the lookahead distance here  0.8 for back 0.5 for front
         self.kp = 1  # Proportional control gain
         self.wheel_base = 0.5
@@ -38,6 +43,7 @@ class PurePursuitController(Node):
         self.distance_error = 0
         self.cusp_stop = False
         self.cusp_pass = False
+        self.max_steering_angle = math.radians(25)
         # Adding logger for debugging
         self.get_logger().info("Pure Pursuit Controller initialized")
 
@@ -103,8 +109,8 @@ class PurePursuitController(Node):
 
         # Steering calculation
         steering_angle = math.atan2(2 * self.wheel_base * np.sin(alpha), self.distance_error)
-        max_steering_angle = math.radians(25)
-        steering_angle = max(min(steering_angle, max_steering_angle), -max_steering_angle)
+        
+        steering_angle = max(min(steering_angle, self.max_steering_angle), -self.max_steering_angle)
         
         if ((self.distance_error == 0 and lookahead_index < len(self.waypoints) - 1) or (alpha > 1.57) )and not self.reverse_mode:
             self.direction = self.direction * (-1) 
@@ -130,7 +136,10 @@ class PurePursuitController(Node):
             self.lookahead_distance = 2.5
             linear_velocity = self.target_speed
             angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
-        else:
+        elif self.mode == 'forward':
+            linear_velocity = self.target_speed
+            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle)
+        elif self.mode == 'reverse':
             linear_velocity = -self.target_speed
             angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
 
@@ -242,8 +251,17 @@ class PurePursuitController(Node):
         return angle
     
 def main(args=None):
+    parser = argparse.ArgumentParser(description='Pure Pursuit Controller')
+
+    # Add arguments for lookahead distance and mode
+    parser.add_argument('--lookahead', type=float, default=0.5, help='Set the lookahead distance')
+    parser.add_argument('--mode', choices=['forward', 'reverse'], default='forward', help='Select mode: forward or reverse')
+
+    # Parse arguments
+    args = parser.parse_args(args)
+    
     rclpy.init(args=args)
-    pure_pursuit_controller = PurePursuitController()
+    pure_pursuit_controller = PurePursuitController(lookahead_distance=args.lookahead, mode=args.mode)
     try:
         while rclpy.ok():
             rclpy.spin_once(pure_pursuit_controller)
@@ -253,6 +271,5 @@ def main(args=None):
 
     pure_pursuit_controller.destroy_node()
     rclpy.shutdown()
-
 if __name__ == '__main__':
     main()

@@ -598,20 +598,20 @@ class HybridAStarPlanner(rosNode):
             self.map_callback,
             10
         )
-        # self.subscription_odom = self.create_subscription(
-        #     Odometry,
-        #     '/diffdrive/odom',
-        #     self.odom_callback,
-        #     10)
+        self.subscription_odom = self.create_subscription(
+            Odometry,
+            '/ack/odom',
+            self.odom_callback,
+            10)
         self.publisher_ = self.create_publisher(Path, '/plan', 10)  
         self.subscription  # prevent unused variable warning
         self.obstacle_map = None
         self.resolution = None
         self.map_received = False
         self.start_received = False
-        self.s_x = 0
-        self.s_y = 0
-        self.s_yaw = 0
+        self.s_x = None
+        self.s_y = None
+        self.s_yaw = None
 
     def map_callback(self, msg):
         self.get_logger().info("Received map")
@@ -656,7 +656,7 @@ class HybridAStarPlanner(rosNode):
             mapMaxX,
             mapMaxY,
             xyResolution = 5,
-            yawResolution = math.radians(1),  
+            yawResolution = math.radians(5),  
             ObstacleKDTree=obstacle_tree,
             obstacleX = obstacleX,
             obstacleY = obstacleY
@@ -711,13 +711,13 @@ class HybridAStarPlanner(rosNode):
         plt.show()
         
     def odom_callback(self, msg):
-        if not self.start_received:
+        if not self.start_received and self.map_received:
             self.get_logger().info("Received start")
 
             # Extract position (x, y) and orientation (yaw)
-            self.s_x = (int(msg.pose.pose.position.x) /self.resolution ) +self.map_origin_x
+            self.s_x = (abs(msg.pose.pose.position.x) /self.resolution ) + self.map_origin_x
             
-            self.s_y = (int(msg.pose.pose.position.y) /self.resolution ) +self.map_origin_y
+            self.s_y = (abs(msg.pose.pose.position.y) /self.resolution ) + self.map_origin_y
             
             quaternion = (
                 msg.pose.pose.orientation.x,
@@ -731,6 +731,7 @@ class HybridAStarPlanner(rosNode):
             
             # Store the start position and yaw
             # self.s = [x, y, yaw]
+            # print(self.s_x)
             self.start_received = True  # Set flag to
 
 def main(args=None):
@@ -742,37 +743,30 @@ def main(args=None):
     # g = [10, 52.5, np.deg2rad(0)]
     # s = [60, 30, np.deg2rad(0)]
     # Wait until both map and start are received
-    while not planner.map_received and not planner.start_received:
+    while not (planner.map_received) or not (planner.start_received) or (planner.s_x is None) :
         planner.get_logger().info("Waiting for map ...")
         rclpy.spin_once(planner, timeout_sec=1)
 
-
-
-    # s = [1, 30, np.deg2rad(0)]
-    # s = [planner.s_x,planner.s_y,planner.s_yaw]
-    # s = [210,210,np.deg2rad(45)]
-    # g = [297,407,np.deg2rad(45)]
-
-    # s = [88,66, np.deg2rad(218)]
-    # g = [120,235, np.deg2rad(-55)]
-
-
     #realmap point
     # s = [88,66, np.deg2rad(45)]  #back
-    # # s = [88,66, np.deg2rad(225)] #front
+    # s = [88,66, np.deg2rad(225)] #front
     # g = [120,235, np.deg2rad(-55)]
 
-
-    s = [228,228, np.deg2rad(45)]  #back
-    # s = [228,228, np.deg2rad(225)] #front
-    g = [304,400, np.deg2rad(-55)]
+    #realrealrealmap point
+    # s = [228,228, np.deg2rad(45)]  #back
+    # # s = [228,228, np.deg2rad(225)] #front
+    # g = [304,400, np.deg2rad(-55)]
 
     #simulation point
     # s = [1, 32, np.deg2rad(0)]
-    # g = [103, 120, np.deg2rad(-90)] #back
+    # g = [20, 32, np.deg2rad(0)] #back
 
-    # s = [39, 32, np.deg2rad(180)]
-    # g = [102, 120, np.deg2rad(-90)]  #front
+    s = [39, 32, np.deg2rad(180)]
+    print(planner.s_x)
+    print(planner.s_y)
+    print(planner.s_yaw)
+    # s = [planner.s_x,planner.s_y, -planner.s_yaw]
+    g = [102, 120, np.deg2rad(-90)]  #front
 
     # Get Obstacle Map
     # obstacleX, obstacleY = map()
