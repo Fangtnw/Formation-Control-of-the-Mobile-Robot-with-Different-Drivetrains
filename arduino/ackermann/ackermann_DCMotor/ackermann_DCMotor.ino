@@ -12,7 +12,7 @@ unsigned int noCommLoops = 0;                 //main loop without communication 
 unsigned long lastMilli = 0;
 
 //Servo Angle 
-const double max_angle = 14;                 //Max angle (degree)
+const double max_angle = 20;                 //Max angle (degree)
 
 //Encoder PIN (Require 1 interrupt pin per Encoder -> PIN 2,3,18,19,20,21)
 const int PIN_ENCOD_A_MOTOR_LEFT = 17;               //A channel for encoder of left motor                    
@@ -30,7 +30,7 @@ const int LIMIT_SWITCH = 7;
 const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
-const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
+const double encoder_cpr = 360;               //Encoder ticks or counts per rotation
 const double speed_to_pwm_ratio = 0.00582;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
@@ -162,7 +162,7 @@ void handle_cmd() {
   // Check if speed_req is not equal to 0 to avoid division by zero
   if (speed_req != 0) {
     ang_desire_steer = (atan(angular_speed_req * wheel_length) / speed_req) * (180 / PI) * 0.52; 
-    ang_desire_steer = constrain(ang_desire_steer,-max_angle,max_angle);
+    ang_desire_steer = constrain(ang_desire_steer,-max_angle, max_angle);
     turning_r = wheel_length / sin(ang_desire_steer);
     
 //    turning_r = constrain(turning_r,-wheelbase/2,wheelbase/2);
@@ -184,7 +184,7 @@ void handle_cmd() {
     speed_req_left = 0;
   }
   
-  pos_ack = (pos_steer_right / encoder_cpr) * 360;    // Convert encoder tick to degree value
+  pos_ack = pos_steer_right;    // Convert encoder tick to degree value
 }
 
 motor leftMotor, rightMotor, steerMotor;
@@ -443,14 +443,14 @@ void publishSpeed(double time) {
     xicro.Publisher_ack_speed_cmd.message.linear.z = ang_desire_steer;
     xicro.publish_ack_speed_cmd();
   
-    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
-    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
-    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+//    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
+//    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
+//    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
 
-//    xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
-//    xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
-//    xicro.Publisher_ack_PWM_cmd.message.linear.z = direction;
-//    xicro.Publisher_ack_PWM_cmd.message.angular.x = limit_trig;
+   xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
+   xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
+   xicro.Publisher_ack_PWM_cmd.message.linear.z = direction;
+   xicro.Publisher_ack_PWM_cmd.message.angular.x = limit_trig;
 
     
           
