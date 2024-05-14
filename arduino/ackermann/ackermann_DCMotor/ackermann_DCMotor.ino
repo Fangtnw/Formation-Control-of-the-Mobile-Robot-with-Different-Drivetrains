@@ -30,7 +30,7 @@ const int LIMIT_SWITCH = 7;
 const double radius = 0.06;                     //Wheel radius, in m
 const double wheelbase = 0.5;               //Wheelbase, in m
 const double wheel_length = 0.5;               //Wheelbase, in m
-const double encoder_cpr = 360;               //Encoder ticks or counts per rotation
+const double encoder_cpr = 600;               //Encoder ticks or counts per rotation
 const double speed_to_pwm_ratio = 0.00582;    //Ratio to convert speed (in m/s) to PWM value. It was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the slope of the linear function).
 const double min_speed_cmd = 0.0882;          //(min_speed_cmd/speed_to_pwm_ratio) is the minimum command value needed for the motor to start moving. This value was obtained by plotting the wheel speed in relation to the PWM motor command (the value is the constant of the linear function).
 
@@ -71,7 +71,8 @@ float linear_acceleration_covariance[9]={1,0,0,0,1,0,0,0,1};
 double theta = 0;
 
 int PWM_leftMotor = 0;                     //PWM command for left motor
-int PWM_rightMotor = 0;                    //PWM command for right motor 
+int PWM_rightMotor = 0;                   //PWM command for right motor 
+int PWM_leftMotor_1 = 0;                     //PWM command for left motor
 
 volatile float pos_left = 0;       //Left motor encoder position
 volatile float pos_right = 0;      //Right motor encoder position
@@ -98,13 +99,11 @@ double set_zero = 0;
 double direction = 0;
 
 //PID Parameters
-const double PID_left_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for left motor PID
-const double PID_right_param[] = { 2.2, 5, 0 }; //Respectively Kp, Ki and Kd for right motor PID
-const double PID_steer_param[] = { 0, 0, 0 }; //Respectively Kp, Ki and Kd for servo motor PID
+const double PID_left_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for left motor PID
+const double PID_right_param[] = { 1, 0, 0 }; //Respectively Kp, Ki and Kd for right motor PID
 
 PID PID_leftMotor(&speed_act_left, &speed_cmd_left, &speed_req_left, PID_left_param[0], PID_left_param[1], PID_left_param[2], DIRECT);          //Setting up the PID for left motor
 PID PID_rightMotor(&speed_act_right, &speed_cmd_right, &speed_req_right, PID_right_param[0], PID_right_param[1], PID_right_param[2], DIRECT);   //Setting up the PID for right motor
-PID PID_steerMotor(&ang_act_steer, &ang_cmd_steer, &ang_req_steer, PID_steer_param[0], PID_steer_param[1], PID_steer_param[2], DIRECT);    //Setting up the PID for Servo
 
 //const unsigned long print_interval = 1000; // 1 second
 //unsigned long previous_print_time = 0;
@@ -166,23 +165,22 @@ void handle_cmd() {
     turning_r = wheel_length / sin(ang_desire_steer);
     
 //    turning_r = constrain(turning_r,-wheelbase/2,wheelbase/2);
-    
-    if (ang_desire_steer == 0) { 
-      speed_req_right = speed_req;
-      speed_req_left = speed_req;
-    } else if (ang_desire_steer >= 0){
+    if (ang_desire_steer > 0){
       speed_req_right = (speed_req * (abs(turning_r) + (wheelbase / 2))) / abs(turning_r);
       speed_req_left = (speed_req * (abs(turning_r) - (wheelbase / 2))) / abs(turning_r);
-    }else if (ang_desire_steer <= 0){
+    }else if (ang_desire_steer < 0){
       speed_req_right = (speed_req * (abs(turning_r) - (wheelbase / 2))) / abs(turning_r);
       speed_req_left = (speed_req * (abs(turning_r) + (wheelbase / 2))) / abs(turning_r);
-    }
+    }else if (ang_desire_steer == 0){ 
+      speed_req_right = speed_req;
+      speed_req_left = speed_req;}
   } else {
     ang_desire_steer = 0;
     turning_r = 0;
     speed_req_right = 0;
     speed_req_left = 0;
   }
+
   
   pos_ack = pos_steer_right;    // Convert encoder tick to degree value
 }
@@ -230,14 +228,11 @@ void setup() {
   //setting PID parameters
   PID_leftMotor.SetSampleTime(95);
   PID_rightMotor.SetSampleTime(95);
-  PID_steerMotor.SetSampleTime(95);
   PID_leftMotor.SetOutputLimits(-max_speed, max_speed);
   PID_rightMotor.SetOutputLimits(-max_speed, max_speed);
-  PID_steerMotor.SetOutputLimits(-max_speed, max_speed);
 
   PID_leftMotor.SetMode(AUTOMATIC);
   PID_rightMotor.SetMode(AUTOMATIC);
-  PID_steerMotor.SetMode(AUTOMATIC);
   
   //Define Encoder **Interrupt PIN: 0 = PIN2, 1 = PIN3, 2 = PIN21, 3 = PIN20, 4 = PIN19, 5 = PIN18**
   
@@ -338,14 +333,14 @@ void loop() {
 
     ang_desire_steer = constrain(ang_desire_steer, -max_angle, max_angle);
 
-    if (abs(pos_left) < 5){                                                   //Avoid taking in account small disturbances
+    if (abs(pos_left) < 3){                                                   //Avoid taking in account small disturbances
       speed_act_left = 0;
     }
     else {
       speed_act_left=((pos_left/encoder_cpr)*2*PI)*(1000/LOOPTIME)*radius;           // calculate speed of left wheel
     }
     
-    if (abs(pos_right) < 5){                                                  //Avoid taking in account small disturbances
+    if (abs(pos_right) < 3){                                                  //Avoid taking in account small disturbances
       speed_act_right = 0;
     }
     else {
@@ -443,14 +438,15 @@ void publishSpeed(double time) {
     xicro.Publisher_ack_speed_cmd.message.linear.z = ang_desire_steer;
     xicro.publish_ack_speed_cmd();
   
-//    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
-//    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
-//    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+    xicro.Publisher_ack_PWM_cmd.message.linear.x = PWM_leftMotor;
+    xicro.Publisher_ack_PWM_cmd.message.linear.y = PWM_rightMotor;
+    xicro.Publisher_ack_PWM_cmd.message.angular.z = pwm_steer;
+    
 
-   xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
-   xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
-   xicro.Publisher_ack_PWM_cmd.message.linear.z = direction;
-   xicro.Publisher_ack_PWM_cmd.message.angular.x = limit_trig;
+//     xicro.Publisher_ack_PWM_cmd.message.linear.x = set_zero;
+//     xicro.Publisher_ack_PWM_cmd.message.linear.y = initial_set;
+//     xicro.Publisher_ack_PWM_cmd.message.linear.z = direction;
+//     xicro.Publisher_ack_PWM_cmd.message.angular.x = limit_trig;
 
     
           
