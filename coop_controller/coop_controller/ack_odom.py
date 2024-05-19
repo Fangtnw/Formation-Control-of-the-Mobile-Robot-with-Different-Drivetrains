@@ -15,7 +15,7 @@ WHEEL_DISTANCE = 0.5
 LENGTH = 0.5
 IMU_WEIGHT = 0.25  # Relative weight for IMU
 ODOMETRY_WEIGHT = 0.75 # Relative weight for odometry
-TIME_STEP = 0.1  # Time step for the update rate
+TIME_STEP = 0.01  # Time step for the update rate
 
 class OdometryNode(Node):
     def __init__(self):
@@ -31,6 +31,7 @@ class OdometryNode(Node):
         self.avg_vel = 0.0
         self.steering_angle = 0.0
         self.turn = 0.0
+        self.Robot_AngVel_imu = 0.0
 
         # Initialize the robot state variables
         self.Robot_X = 0.0
@@ -39,7 +40,7 @@ class OdometryNode(Node):
         self.Robot_LinVel = 0.0
         self.Robot_AngVel = 0.0
 
-        self.odom_pub = self.create_publisher(Odometry, '/ack/odom', 100)
+        self.odom_pub = self.create_publisher(Odometry, '/ack/odom', 1)
         # self.encoder_ticks_sub = self.create_subscription(
         #     Vector3Stamped, 'encoder_ticks', self.encoder_ticks_callback, 100)
         self.encoder_vel_sub = self.create_subscription(
@@ -48,7 +49,7 @@ class OdometryNode(Node):
             Imu, 'ack_imu_raw', self.imu_callback, 1)
 
         self.tf_broadcaster = TransformBroadcaster(self)
-        self.timer = self.create_timer(0.1, self.publish_odometry)
+        self.timer = self.create_timer(TIME_STEP, self.publish_odometry)
 
     def encoder_ticks_callback(self, msg):
         self.left_encoder_ticks = msg.linear.y

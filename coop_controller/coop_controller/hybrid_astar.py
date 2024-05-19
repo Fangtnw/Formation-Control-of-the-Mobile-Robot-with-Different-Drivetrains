@@ -14,22 +14,26 @@ from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Path, Odometry
 from tf_transformations import euler_from_quaternion
 import time 
+import tf2_ros
+from rclpy.duration import Duration
+import tf2_geometry_msgs
+from geometry_msgs.msg import Quaternion
 
 downsample = 1
 
 class Car:
-    maxSteerAngle = math.radians(10)
+    maxSteerAngle = math.radians(20)
     steerPresion = 10
     wheelBase = (50/5)/downsample
     axleToFront = (200/5)/downsample
     axleToBack = (20/5)/downsample
-    width = (60/5)/downsample
+    width = (60/8)/downsample
 
 class Cost:
     reverse = 0
     directionChange = 100000 #100000
-    steerAngle = 0
-    steerAngleChange = 100000000 #100000
+    steerAngle = 100000000000000
+    steerAngleChange = 0 #100000
     hybridCost = 0
 
 class Node:
@@ -585,8 +589,8 @@ def drawCar(x, y, yaw, color='black'):
                      [math.sin(yaw), math.cos(yaw)]])
     car = np.dot(rotationZ, car)
     car += np.array([[x], [y]])
-    plt.plot(car[0, :], car[1, :], color, linewidth=0.1)
-    # plt.plot(car[0, :], car[1, :], color)
+    # plt.plot(car[0, :], car[1, :], color, linewidth=0.1)
+    plt.plot(car[0, :], car[1, :], color)
 
 class HybridAStarPlanner(rosNode):
     def __init__(self):
@@ -612,6 +616,8 @@ class HybridAStarPlanner(rosNode):
         self.s_x = None
         self.s_y = None
         self.s_yaw = None
+        self.tf_buffer = tf2_ros.Buffer(Duration(seconds=0.5))
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
 
     def map_callback(self, msg):
         self.get_logger().info("Received map")
@@ -656,7 +662,7 @@ class HybridAStarPlanner(rosNode):
             mapMaxX,
             mapMaxY,
             xyResolution = 5,
-            yawResolution = math.radians(5),  
+            yawResolution = math.radians(1),  
             ObstacleKDTree=obstacle_tree,
             obstacleX = obstacleX,
             obstacleY = obstacleY
@@ -672,8 +678,8 @@ class HybridAStarPlanner(rosNode):
         for i in range(len(x)):
             pose = PoseStamped()
             pose.header.frame_id = "map"
-            pose.pose.position.x = x[i] * self.resolution + self.map_origin_x #+ 0.65
-            pose.pose.position.y = y[i] * self.resolution + self.map_origin_y #+ 0.25
+            pose.pose.position.x = x[i] *0.0515 + self.map_origin_x   #workshop0.05152
+            pose.pose.position.y = y[i] *0.0515 + self.map_origin_y 
             pose.pose.position.z = 0.0  # Assuming the path is on a flat plane
 
             # Calculate orientation quaternion from yaw angle
@@ -685,12 +691,19 @@ class HybridAStarPlanner(rosNode):
         self.publisher_.publish(path)
         
         
+    # def yaw_to_quaternion(self, yaw):
+    #     # Convert yaw to quaternion (for 2D, only the z-axis rotation is needed)
+    #     q = PoseStamped().pose.orientation
+    #     q.w = math.cos(yaw / 2)
+    #     q.z = math.sin(yaw / 2)
+    #     return q
+
     def yaw_to_quaternion(self, yaw):
         # Convert yaw to quaternion (for 2D, only the z-axis rotation is needed)
-        q = PoseStamped().pose.orientation
-        q.w = math.cos(yaw / 2)
-        q.z = math.sin(yaw / 2)
-        return q
+        quaternion = Quaternion()
+        quaternion.w = math.cos(yaw / 2)
+        quaternion.z = math.sin(yaw / 2)
+        return quaternion
 
     def plot_map(self):
         plt.figure()  # Create a new plot
@@ -712,41 +725,65 @@ class HybridAStarPlanner(rosNode):
         
     def odom_callback(self, msg):
         if not self.start_received and self.map_received:
-            self.get_logger().info("Received start")
+            self.get_logger().info("Received odom")
+            self.current_pose_odom = msg.pose.pose
+            if self.current_pose_odom is not None:
+                try:
+                    transform = self.tf_buffer.lookup_transform('map', 'odom', rclpy.time.Time(), Duration(seconds=0.1))
+                    transformed_msg = tf2_geometry_msgs.do_transform_pose(self.current_pose_odom, transform)
+                    if transformed_msg is not None:
+                        self.s_x = (abs(transformed_msg.position.x+abs(self.map_origin_x)))/0.0515  
+                        self.s_y = (abs(transformed_msg.position.y+abs(self.map_origin_y)))/0.0515  
+                        quaternion = (
+                            transformed_msg.orientation.x,
+                            transformed_msg.orientation.y,
+                            transformed_msg.orientation.z,
+                            transformed_msg.orientation.w
+                        )
+                        # adjusted_yaw = yaw[i]   # Adjust for coordinate system change
+                        euler = euler_from_quaternion(quaternion)
+                        origin_yaw = (0,0,0,1)
+                        
+                        self.s_yaw = (euler[2])  # Yaw value in radians            
+                        self.start_received = True 
+                        self.get_logger().info("Received start point")
+                except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                    self.get_logger().warn('Transform lookup failed')
+
+
 
             # Extract position (x, y) and orientation (yaw)
-            self.s_x = (abs(msg.pose.pose.position.x) /self.resolution ) + self.map_origin_x
+            # self.s_x = (abs(msg.pose.pose.position.x) /self.resolution ) + self.map_origin_x
             
-            self.s_y = (abs(msg.pose.pose.position.y) /self.resolution ) + self.map_origin_y
+            # self.s_y = (abs(msg.pose.pose.position.y) /self.resolution ) + self.map_origin_y
             
-            quaternion = (
-                msg.pose.pose.orientation.x,
-                msg.pose.pose.orientation.y,
-                msg.pose.pose.orientation.z,
-                msg.pose.pose.orientation.w
-            )
+            # quaternion = (
+            #     msg.pose.pose.orientation.x,
+            #     msg.pose.pose.orientation.y,
+            #     msg.pose.pose.orientation.z,
+            #     msg.pose.pose.orientation.w
+            # )
             
-            euler = euler_from_quaternion(quaternion)
-            self.s_yaw = int(euler[2])  # Yaw value in radians
+            # euler = euler_from_quaternion(quaternion)
+            # self.s_yaw = int(euler[2])  # Yaw value in radians
             
             # Store the start position and yaw
             # self.s = [x, y, yaw]
             # print(self.s_x)
-            self.start_received = True  # Set flag to
+            # self.start_received = True  # Set flag to
 
 def main(args=None):
     rclpy.init(args=args)
     planner = HybridAStarPlanner()
 
     # Set Start, Goal x, y, theta
-    # s downsample = [40, 23, np.deg2rad(-90)]
-    # g = [10, 52.5, np.deg2rad(0)]
-    # s = [60, 30, np.deg2rad(0)]
     # Wait until both map and start are received
     while not (planner.map_received) or not (planner.start_received) or (planner.s_x is None) :
         planner.get_logger().info("Waiting for map ...")
         rclpy.spin_once(planner, timeout_sec=1)
 
+
+    s = [(planner.s_x), (planner.s_y) , (planner.s_yaw)]
     #realmap point
     # s = [88,66, np.deg2rad(45)]  #back
     # s = [88,66, np.deg2rad(225)] #front
@@ -758,16 +795,36 @@ def main(args=None):
     # g = [304,400, np.deg2rad(-55)]
 
     #simulation point
-    # s = [1, 32, np.deg2rad(0)]
-    # g = [20, 32, np.deg2rad(0)] #back
+    # s = [5, 32, np.deg2rad(0)]
+    # # g = [20, 32, np.deg2rad(0)] #back
 
-    s = [39, 32, np.deg2rad(180)]
-    print(planner.s_x)
-    print(planner.s_y)
-    print(planner.s_yaw)
-    # s = [planner.s_x,planner.s_y, -planner.s_yaw]
-    g = [102, 120, np.deg2rad(-90)]  #front
+    # s = [39, 32, np.deg2rad(180)]
+    # # s = [planner.s_x,planner.s_y, -planner.s_yaw]
+    # g = [103, 120, np.deg2rad(-90)]  #front
 
+
+#ack cb5
+    print("s=.2f{} .2f{} .2f{}".format,(planner.s_x),planner.s_y, planner.s_yaw)
+    
+    # s = [66, 38, np.deg2rad(0)]
+    # g = [96, 54, np.deg2rad(25)]
+    # g = [75, 55, np.deg2rad(-25)]
+    # g = [35, 38, np.deg2rad(-205)]
+###30 51
+
+#cb5_hallway
+    # s = [122, 263, np.deg2rad(90)]
+    # g = [110, 305, np.deg2rad(90)]
+    
+    
+    # g = [25, 324, np.deg2rad(0)]  #main goal
+
+#cb_lift
+    g = [270, 80, np.deg2rad(90)]
+
+#workshop
+    # g = [145, 265, np.deg2rad(0)]
+    # g = [190, 264, np.deg2rad(180)]
     # Get Obstacle Map
     # obstacleX, obstacleY = map()
     obstacleX = [obs[0] for obs in planner.obstacle_map]
@@ -810,8 +867,8 @@ def main(args=None):
         plt.cla()
         plt.xlim(min(obstacleX), max(obstacleX)) 
         plt.ylim(min(obstacleY), max(obstacleY))
-        plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
-        # plt.plot(obstacleX, obstacleY, "sk")
+        # plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
+        plt.plot(obstacleX, obstacleY, "sk")
         plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
         drawCar(x[k], y[k], yaw[k])
         plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)

@@ -88,8 +88,8 @@ class ArUcoDetector(Node):
                     if rvec is not None and tvec is not None and tvec.any():  # Check if tvec is not empty
                         transform = TransformStamped()
                         transform.header.stamp = self.get_clock().now().to_msg()
-                        transform.header.frame_id = self.camera_frame
-                        transform.child_frame_id = self.aruco_frame
+                        transform.header.frame_id = self.aruco_frame
+                        transform.child_frame_id = self.camera_frame
                         transform.transform.translation.y = -tvec[0][0][0]
                         transform.transform.translation.z = -tvec[0][0][1]
                         transform.transform.translation.x = tvec[0][0][2]
@@ -100,10 +100,11 @@ class ArUcoDetector(Node):
 
                         # quat = tf_transformations.quaternion_from_euler(roll,pitch,yaw)
                         # Quaternion format     
-                        transform.transform.rotation.y = -quat[0] 
-                        transform.transform.rotation.z = -quat[1] 
-                        transform.transform.rotation.x = quat[2] 
+                        transform.transform.rotation.y = quat[0] 
+                        transform.transform.rotation.z = quat[1] 
+                        transform.transform.rotation.x = -quat[2] 
                         transform.transform.rotation.w = quat[3] 
+                        inverse_transform = self.invert_transform(transform)
                         self.get_logger().info("Publishing ArUco transform")
                         self.tf_broadcaster.sendTransform(transform)
                         break
@@ -115,7 +116,41 @@ class ArUcoDetector(Node):
     #     self.camera_matrix = np.array(msg.k).reshape((3, 3))
     #     self.dist_coeff = np.array(msg.d)
 
+    def invert_transform(self, transform):
+        inverse_transform = TransformStamped()
+        inverse_transform.header.stamp = self.get_clock().now().to_msg()
+        inverse_transform.header.frame_id = transform.child_frame_id  # Swap the frames
+        inverse_transform.child_frame_id = transform.header.frame_id
 
+        translation = np.array([transform.transform.translation.x,
+                                transform.transform.translation.y,
+                                transform.transform.translation.z])
+        
+        quat = np.array([transform.transform.rotation.x,
+                         transform.transform.rotation.y,
+                         transform.transform.rotation.z,
+                         transform.transform.rotation.w])
+
+        # Inverse the rotation (conjugate of the quaternion)
+        inverse_quat = np.array([quat[0], quat[1], quat[2], -quat[3]])
+        inverse_rotation = R.from_quat(inverse_quat)
+
+        # Inverse the translation
+        inverse_translation = -inverse_rotation.apply(translation)
+
+        # Assign the inverse translation and rotation to the transform
+        inverse_transform.transform.translation.x = inverse_translation[0]
+        inverse_transform.transform.translation.y = inverse_translation[1]
+        inverse_transform.transform.translation.z = inverse_translation[2]
+
+        inverse_quat = inverse_rotation.as_quat()
+        inverse_transform.transform.rotation.x = inverse_quat[0]
+        inverse_transform.transform.rotation.y = inverse_quat[1]
+        inverse_transform.transform.rotation.z = inverse_quat[2]
+        inverse_transform.transform.rotation.w = inverse_quat[3]
+
+        return inverse_transform
+    
 def main(args=None):
     rclpy.init(args=args)
     aruco_detector = ArUcoDetector()

@@ -98,18 +98,22 @@ def generate_launch_description():
                     )
                     )
     
-    camera_to_base_footprint = Node(package='tf2_ros',
+    camera_to_mec_footprint = Node(package='tf2_ros',
                     executable='static_transform_publisher',
                     name='static_tf_pub_laser',
                     output='screen',
                     arguments=['0', '0', '0','0', '0', '0', '1','camera_frame','base_footprint_mec'],
+                    condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
+                    )
                     )
 
-    aruco_to_base_footprint = Node(package='tf2_ros',
+    aruco_from_base_footprint = Node(package='tf2_ros',
                     executable='static_transform_publisher',
                     name='static_tf_pub_laser',
                     output='screen',
                     arguments=['0', '0', '0','0', '0', '0', '1','base_footprint','aruco_frame'],
+                    condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
+                    )
                     )
 
     rviz = ExecuteProcess(
@@ -121,7 +125,7 @@ def generate_launch_description():
 
     slam_toolbox_localize1 = ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
-             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim_mapper_params_online_async.yaml'],
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim_mapper_params_online_async.yaml','use_sim_time:=true'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "sim1"'])
                     )
@@ -129,9 +133,17 @@ def generate_launch_description():
 
     slam_toolbox_localize2 = ExecuteProcess(
         cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
-             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim2_mapper_params_online_async.yaml'],
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/sim2_mapper_params_online_async.yaml','use_sim_time:=True'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "sim2"'])
+                    )
+    )
+
+    slam_toolbox_localize_real = ExecuteProcess(
+        cmd=['ros2', 'launch', 'slam_toolbox', 'online_async_launch.py',
+             'slam_params_file:=coop_ws/src/coop_robot_bringup/config/localize_mapper_params_online_async.yaml','use_sim_time:=true'],
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"'])
                     )
     )
 
@@ -145,7 +157,7 @@ def generate_launch_description():
 
 
     nav2= ExecuteProcess(
-        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'use_sim_time:=true'],
+        cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'use_sim_time:=false'],
         output='screen',
     )
 
@@ -157,7 +169,7 @@ def generate_launch_description():
 
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=ros_map_editor/222.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=cb5_ack.yaml'],
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
@@ -191,8 +203,8 @@ def generate_launch_description():
     # ld.add_action(diff_odom_compute)
 
     ld.add_action(ack_odom_compute)
-    # ld.add_action(camera_to_base_footprint)
-    # ld.add_action(aruco_to_base_footprint)
+    ld.add_action(camera_to_mec_footprint)
+    ld.add_action(aruco_from_base_footprint)
 
     # ld.add_action(mec_bringup)
     # ld.add_action(diff_bringup)
@@ -203,17 +215,18 @@ def generate_launch_description():
     ld.add_action(rviz)
 
     # ld.add_action(slam_toolbox)
-    # ld.add_action(nav2)
+    ld.add_action(nav2)
     
     # ld.add_action(slam_toolbox)
-    ld.add_action(nav2_sim)
+    # ld.add_action(nav2_sim)
 
-    ld.add_action(map_server)
-    ld.add_action(lifecycle_map_server)
+    # ld.add_action(map_server)
+    # ld.add_action(lifecycle_map_server)
     ld.add_action(slam_toolbox_localize1)
     ld.add_action(slam_toolbox_localize2)
-    ld.add_action(amcl)
-    ld.add_action(lifecycle_amcl)
+    ld.add_action(slam_toolbox_localize_real)
+    # ld.add_action(amcl)
+    # ld.add_action(lifecycle_amcl)
 
     return ld
 
