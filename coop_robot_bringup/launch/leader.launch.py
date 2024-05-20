@@ -202,7 +202,7 @@ def generate_launch_description():
     ld.add_action(laser_to_base_footprint_tf)
     # ld.add_action(diff_odom_compute)
 
-    ld.add_action(ack_odom_compute)
+    # ld.add_action(ack_odom_compute)
     ld.add_action(camera_to_mec_footprint)
     ld.add_action(aruco_from_base_footprint)
 

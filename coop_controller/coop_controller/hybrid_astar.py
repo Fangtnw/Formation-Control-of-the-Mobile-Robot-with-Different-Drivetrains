@@ -27,13 +27,13 @@ class Car:
     wheelBase = (50/5)/downsample
     axleToFront = (200/5)/downsample
     axleToBack = (20/5)/downsample
-    width = (60/8)/downsample
+    width = (60/5)/downsample
 
 class Cost:
     reverse = 0
     directionChange = 100000 #100000
-    steerAngle = 100000000000000
-    steerAngleChange = 0 #100000
+    steerAngle = 0
+    steerAngleChange = 100000 #100000
     hybridCost = 0
 
 class Node:
