@@ -30,7 +30,7 @@ class PurePursuitController(Node):
         self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 1)
         self.publisher_lookahead_point = self.create_publisher(PointStamped, '/lookahead_point', 1)  # Add this line
         self.timer = self.create_timer(0.01, self.control)
-        self.tf_buffer = tf2_ros.Buffer(Duration(seconds=0.01))
+        self.tf_buffer = tf2_ros.Buffer(Duration(seconds=10))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         self.target_speed = 0.3 # Set your desired speed here
         self.visited_cusps = set()
@@ -53,7 +53,10 @@ class PurePursuitController(Node):
         self.cusp_stop = 0
         self.cusp_pass = 0
         self.cusp_found = 0
+        self.cusp_indices = []
+        self.prev_closest_index = 0
         self.max_steering_angle = math.radians(20)
+        
         # Adding logger for debugging
         self.get_logger().info("Pure Pursuit Controller initialized")
 
@@ -61,14 +64,15 @@ class PurePursuitController(Node):
         # Extract waypoints from the received Path message   
         self.waypoints = msg.poses
         self.get_logger().info("Received new plan with {} waypoints".format(len(self.waypoints)))
-        
+        self.cusp_indices = self.find_closest_cusp()
+        self.get_logger().info("Cusp indices: {}".format(self.cusp_indices))
         
     def odom_callback(self, msg):
         # Extract current pose from the received Odometry message
         self.current_pose_odom = msg.pose.pose
         try:
             # Get the transform from the odom frame to the map frame
-            transform = self.tf_buffer.lookup_transform('map', 'odom', rclpy.time.Time(), Duration(seconds=0.01))
+            transform = self.tf_buffer.lookup_transform('map', 'odom', rclpy.time.Time())
             # Transform the current pose from odom frame to map frame
             self.current_pose = tf2_geometry_msgs.do_transform_pose(self.current_pose_odom, transform)
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
@@ -89,15 +93,19 @@ class PurePursuitController(Node):
         #     self.lookahead_index_set = True  # Mark the initial index as set
         # self.waypoints = transformed_waypoints
         og_lookahead_index = self.find_lookahead_index()
-        closest_cusp_index = self.find_closest_cusp()
+        closest_index, _ = self.find_closest_waypoint()
+        closest_cusp_index = self.cusp_indices[0] if self.cusp_indices else -1
 
-        if closest_cusp_index >= 0 and closest_cusp_index <= og_lookahead_index and self.cusp_stop == 0:
+        if closest_cusp_index >= 0 and closest_cusp_index < og_lookahead_index :
             self.lookahead_index = closest_cusp_index
             self.get_logger().warn("found cusp")
         else:
             self.lookahead_index = og_lookahead_index
             self.get_logger().warn("normal look")
-            self.cusp_stop = 0
+        
+        if self.cusp_indices and closest_index+5 >= self.cusp_indices[0]:
+            self.cusp_indices.pop(0)
+            # self.cusp_stop = 0
             # self.cusp_stop = False
             # self.direction = False
         # Ensure the lookahead index is within bounds
@@ -105,6 +113,9 @@ class PurePursuitController(Node):
             self.lookahead_index = len(self.waypoints)-1
             self.get_logger().info("Endpoint")
         
+        # if closest_index > closest_cusp_index and self.cusp_stop == 1:
+        #     self.cusp_stop =0
+
         # Determine the position and orientation for the lookahead index
         target_position = self.waypoints[self.lookahead_index].pose.position
         target_orientation = self.waypoints[self.lookahead_index].pose.orientation
@@ -118,6 +129,7 @@ class PurePursuitController(Node):
         # Calculate error values
         delta_x = target_position.x - self.current_pose.position.x
         delta_y = target_position.y - self.current_pose.position.y
+        
         self.distance_error = math.sqrt(delta_x ** 2 + delta_y ** 2)
 
         current_yaw = self.quaternion_to_yaw(self.current_pose.orientation)
@@ -127,40 +139,53 @@ class PurePursuitController(Node):
         path_yaw = math.atan2(delta_y, delta_x)
         alpha = self.normalize_angle(path_yaw - current_yaw)
 
+        target_point = PointStamped()
+        target_point.header.frame_id = "map"
+        target_point.point = target_position
+
+        try:
+            transform = self.tf_buffer.lookup_transform("base_footprint", "map", rclpy.time.Time())
+            target_point_base = tf2_geometry_msgs.do_transform_point(target_point, transform)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+            self.get_logger().error('Failed to get transform: {}'.format(e))
+            return
+
+        # Use the x-coordinate of the target point in the base_footprint frame to set the direction
+        self.direction = 1.0 if target_point_base.point.x >= 0.0 else -1.0
+
         # Steering calculation
         steering_angle = math.atan2(2 * self.wheel_base * math.sin(alpha), self.distance_error)
         steering_angle = max(min(steering_angle, self.max_steering_angle), -self.max_steering_angle) 
-        self.direction = 1 if not self.reverse_mode else -1
+        # self.direction = 1 if not self.reverse_mode else -1
 
         # Determine the desired linear and angular velocities
-        if self.lookahead_index == len(self.waypoints) - 1 and (delta_y < 0.1 or self.distance_error < 0.1):
+        if self.lookahead_index == len(self.waypoints) - 1 and (self.distance_error < 0.1):
             linear_velocity = 0.0
             angular_velocity = 0.0
             self.get_logger().warn("stop at goal")
-        elif self.lookahead_index == closest_cusp_index and self.distance_error < 0.1 and self.cusp_stop == 0:
-            linear_velocity = 0.0
-            angular_velocity = 0.0
-             # Adjust steering angle for a smooth stop
-            self.get_logger().error("stop at cusp")
-            self.reverse_mode = not self.reverse_mode 
-            self.cusp_stop = 1
+        # elif self.lookahead_index == closest_cusp_index and self.distance_error < 0.1 and self.cusp_stop == 0:
+        #     linear_velocity = 0.0
+        #     angular_velocity = 0.0
+        #      # Adjust steering angle for a smooth stop
+        #     self.get_logger().error("stop at cusp")
+        #     # self.reverse_mode = not self.reverse_mode 
+        #     self.cusp_stop = 1
         # elif self.direction == -1 or self.reverse_mode is True:
             # self.lookahead_distance = 0.3
         #     linear_velocity = -self.target_speed
         #     angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
-        elif self.mode == 'forward':
+        else:
             linear_velocity = self.target_speed * self.direction
-            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle) 
-        elif self.mode == 'reverse':
-            linear_velocity = -self.target_speed * self.direction
-            angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle) 
+            angular_velocity = linear_velocity * math.tan(steering_angle) / self.wheel_base
+        #     linear_velocity = -self.target_speed * self.direction
+        #     angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle) 
 
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_velocity
         cmd_vel_msg.angular.z = angular_velocity
         self.publisher_cmd_vel.publish(cmd_vel_msg)
 
-        self.get_logger().info("Error = {:.2f},cusp = {:.2f},look= {}".format(self.distance_error,closest_cusp_index,self.lookahead_index))
+        self.get_logger().info("Error = {:.2f},cusp = {:.2f},look= {}".format(closest_index,closest_cusp_index,self.lookahead_index))
 
 
     def find_closest_waypoint(self):
@@ -175,6 +200,19 @@ class PurePursuitController(Node):
 
         return closest_index, closest_distance
 
+    # def find_closest_waypoint(self):
+    #     closest_index = self.prev_closest_index  # Start from the previous closest index
+    #     closest_distance = float('inf')
+
+    #     for i in range(self.prev_closest_index, len(self.waypoints)):
+    #         distance = self.distance_between_points(self.current_pose.position, self.waypoints[i].pose.position)
+    #         if distance < closest_distance:
+    #             closest_distance = distance
+    #             closest_index = i
+
+    #     self.prev_closest_index = closest_index  # Update the previous closest index
+    #     return closest_index, closest_distance
+    
     def distance_between_points(self, point1, point2):
         return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)
 
@@ -184,26 +222,6 @@ class PurePursuitController(Node):
         roll, pitch, yaw = tf_transformations.euler_from_quaternion(q)
         return yaw
     
-    # def find_lookahead_index(self):
-    #     total_distance = 0
-    #     # Correctly unpack the tuple returned by find_closest_waypoint()
-    #     closest_index, _ = self.find_closest_waypoint()
-    #     lookahead_index = closest_index
-        
-    #     for i in range(lookahead_index, len(self.waypoints) - 1):
-    #         total_distance += self.distance_between_points(
-    #             self.waypoints[i].pose.position,
-    #             self.waypoints[i + 1].pose.position
-    #         )
-            
-    #         # Check if the total distance has reached or exceeded the lookahead distance
-    #         if total_distance >= self.lookahead_distance:
-    #             return lookahead_index
-            
-    #         # Increment the lookahead index after processing the current waypoint
-    #         lookahead_index += 1
-        
-    #     return lookahead_index
 
     def find_lookahead_index(self):
         closest_index, _ = self.find_closest_waypoint()  # Find the closest waypoint
@@ -220,31 +238,32 @@ class PurePursuitController(Node):
 
     
     def find_closest_cusp(self):
-        if not self.waypoints or len(self.waypoints) < 3 :
+        if not self.waypoints or len(self.waypoints) < 3:
             return -1
-        closest_cusp_index = -1
-        closest_index_distance = float('inf')  # Track the distance of the closest cusp index
-        closest_distance = float('inf')
-        closest_index, _ = self.find_closest_waypoint()
 
+        closest_index, _ = self.find_closest_waypoint()
+        closest_cusp_index = -1
+        cusp_indices = []
+
+        # Find all cusp points
         for i in range(1, len(self.waypoints) - 1):
-            if i < closest_index: 
-                continue
             oa_x = self.waypoints[i].pose.position.x - self.waypoints[i - 1].pose.position.x
             oa_y = self.waypoints[i].pose.position.y - self.waypoints[i - 1].pose.position.y
             ab_x = self.waypoints[i + 1].pose.position.x - self.waypoints[i].pose.position.x
             ab_y = self.waypoints[i + 1].pose.position.y - self.waypoints[i].pose.position.y
 
             dot_product = (oa_x * ab_x) + (oa_y * ab_y)
-            
+
             if dot_product < 0:
-                closest_cusp_index = i
-                # if closest_cusp_index <= self.lookahead_index:
-                return closest_cusp_index
-                # else:
-                #     return -1
-            
-        return closest_cusp_index
+                cusp_indices.append(i)
+
+        # Find the closest cusp point that is beyond the closest waypoint index
+        # for cusp_index in cusp_indices:
+        #     if cusp_index > closest_index:
+        #         closest_cusp_index = cusp_index
+        #         break
+
+        return cusp_indices
 
     
     def normalize_angle(self, angle):
