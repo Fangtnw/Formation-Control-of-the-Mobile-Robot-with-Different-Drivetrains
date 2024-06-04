@@ -23,16 +23,16 @@ class PurePursuitController(Node):
             10)
         self.subscription_odom = self.create_subscription(
             Odometry,
-            '/ack/odom',
+            '/ack/odom',    #odometry/filtered /ack/odom
             self.odom_callback,
             10)
     
-        self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel', 1)
+        self.publisher_cmd_vel = self.create_publisher(Twist, '/cmd_vel_pure', 1)
         self.publisher_lookahead_point = self.create_publisher(PointStamped, '/lookahead_point', 1)  # Add this line
-        self.timer = self.create_timer(0.01, self.control)
+        self.timer = self.create_timer(0.1, self.control)
         self.tf_buffer = tf2_ros.Buffer(Duration(seconds=10))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
-        self.target_speed = 0.3 # Set your desired speed here
+        self.target_speed = 0.15 # Set your desired speed here
         self.visited_cusps = set()
         self.lookahead_distance = lookahead_distance
         self.mode = mode
@@ -42,20 +42,18 @@ class PurePursuitController(Node):
         self.wheel_base = 0.5
         # self.lookahead_to_robot = 0.0
         self.lookahead_index = None
-        self.prev_lookahead_to_robot = 0.0
         self.current_pose = None
         self.waypoints = None
         self.direction = 1
         self.prev_lookahead_to_robot = 0
-        self.lookahead_index_set = False
-        self.reverse_mode = False
         self.distance_error = 0
         self.cusp_stop = 0
-        self.cusp_pass = 0
-        self.cusp_found = 0
         self.cusp_indices = []
         self.prev_closest_index = 0
-        self.max_steering_angle = math.radians(20)
+        self.max_steering_angle = math.radians(40)
+        self.cusp_reached = False
+        self.cusp_timer = None
+        self.prev_closest_index 
         
         # Adding logger for debugging
         self.get_logger().info("Pure Pursuit Controller initialized")
@@ -80,7 +78,6 @@ class PurePursuitController(Node):
             return
         # pass
 
-
     def control(self):
    
         if not self.current_pose or not self.waypoints:
@@ -90,7 +87,7 @@ class PurePursuitController(Node):
         # If lookahead index has not been set, find the closest waypoint
         # if not self.lookahead_index_set:
         #     self.lookahead_index = self.find_closest_waypoint()[0]
-        #     self.lookahead_index_set = True  # Mark the initial index as set
+        #     self.lookahead_index_set = True  # Mark the initial index as setkkk
         # self.waypoints = transformed_waypoints
         og_lookahead_index = self.find_lookahead_index()
         closest_index, _ = self.find_closest_waypoint()
@@ -103,15 +100,11 @@ class PurePursuitController(Node):
             self.lookahead_index = og_lookahead_index
             self.get_logger().warn("normal look")
         
-        if self.cusp_indices and closest_index+5 >= self.cusp_indices[0]:
+        if self.cusp_indices and (closest_index + 5 >= self.cusp_indices[0]) :
+            self.cusp_reached = True
             self.cusp_indices.pop(0)
-            # self.cusp_stop = 0
-            # self.cusp_stop = False
-            # self.direction = False
-        # Ensure the lookahead index is within bounds
-        if self.lookahead_index < 0 or self.lookahead_index >= len(self.waypoints):
-            self.lookahead_index = len(self.waypoints)-1
-            self.get_logger().info("Endpoint")
+            self.get_logger().info("Cusp reached. Starting 3-second timer.")
+            self.cusp_timer = self.create_timer(5.0, self.reset_cusp_reached)
         
         # if closest_index > closest_cusp_index and self.cusp_stop == 1:
         #     self.cusp_stop =0
@@ -156,30 +149,22 @@ class PurePursuitController(Node):
         # Steering calculation
         steering_angle = math.atan2(2 * self.wheel_base * math.sin(alpha), self.distance_error)
         steering_angle = max(min(steering_angle, self.max_steering_angle), -self.max_steering_angle) 
-        # self.direction = 1 if not self.reverse_mode else -1
 
-        # Determine the desired linear and angular velocities
-        if self.lookahead_index == len(self.waypoints) - 1 and (self.distance_error < 0.1):
+        if self.lookahead_index == len(self.waypoints) - 1 and (self.distance_error < 0.15):
             linear_velocity = 0.0
             angular_velocity = 0.0
             self.get_logger().warn("stop at goal")
-        # elif self.lookahead_index == closest_cusp_index and self.distance_error < 0.1 and self.cusp_stop == 0:
-        #     linear_velocity = 0.0
-        #     angular_velocity = 0.0
-        #      # Adjust steering angle for a smooth stop
-        #     self.get_logger().error("stop at cusp")
-        #     # self.reverse_mode = not self.reverse_mode 
-        #     self.cusp_stop = 1
-        # elif self.direction == -1 or self.reverse_mode is True:
-            # self.lookahead_distance = 0.3
-        #     linear_velocity = -self.target_speed
-        #     angular_velocity = -linear_velocity / self.wheel_base * math.tan(steering_angle)
+        elif self.cusp_reached:
+            linear_velocity = self.target_speed * self.direction *-1.0
+            angular_velocity = 0.0
+            self.get_logger().warn("Passing through cusp ")
         else:
             linear_velocity = self.target_speed * self.direction
             angular_velocity = linear_velocity * math.tan(steering_angle) / self.wheel_base
-        #     linear_velocity = -self.target_speed * self.direction
-        #     angular_velocity = linear_velocity / self.wheel_base * math.tan(steering_angle) 
-
+        
+        if self.lookahead_index < 0 or self.lookahead_index >= len(self.waypoints):
+            self.lookahead_index = len(self.waypoints) - 1
+            self.get_logger().info("Endpoint")
         cmd_vel_msg = Twist()
         cmd_vel_msg.linear.x = linear_velocity
         cmd_vel_msg.angular.z = angular_velocity
@@ -187,22 +172,28 @@ class PurePursuitController(Node):
 
         self.get_logger().info("Error = {:.2f},cusp = {:.2f},look= {}".format(closest_index,closest_cusp_index,self.lookahead_index))
 
-
-    def find_closest_waypoint(self):
-        closest_index = 0
-        closest_distance = float('inf')
-
-        for i, waypoint in enumerate(self.waypoints):
-            distance = self.distance_between_points(self.current_pose.position, waypoint.pose.position)
-            if distance < closest_distance:  
-                closest_distance = distance
-                closest_index = i
-
-        return closest_index, closest_distance
+    def reset_cusp_reached(self):
+        self.cusp_reached = False
+        self.cusp_timer.cancel()
+        
+        self.get_logger().info("3-second timer completed. Resuming normal operation.")
+        self.cusp_timer = None
 
     # def find_closest_waypoint(self):
-    #     closest_index = self.prev_closest_index  # Start from the previous closest index
+    #     closest_index = 0
     #     closest_distance = float('inf')
+
+    #     for i, waypoint in enumerate(self.waypoints):
+    #         distance = self.distance_between_points(self.current_pose.position, waypoint.pose.position)
+    #         if distance < closest_distance:  
+    #             closest_distance = distance
+    #             closest_index = i
+
+    #     return closest_index, closest_distance
+    
+    # def find_closest_waypoint(self):
+    #     closest_distance = float('inf')
+    #     closest_index = self.prev_closest_index 
 
     #     for i in range(self.prev_closest_index, len(self.waypoints)):
     #         distance = self.distance_between_points(self.current_pose.position, self.waypoints[i].pose.position)
@@ -212,6 +203,28 @@ class PurePursuitController(Node):
 
     #     self.prev_closest_index = closest_index  # Update the previous closest index
     #     return closest_index, closest_distance
+    
+    def find_closest_waypoint(self):
+        closest_distance = float('inf')
+        closest_index = self.prev_closest_index
+        max_index_jump = 25  # Define the maximum allowable jump in indices
+
+        for i in range(self.prev_closest_index, len(self.waypoints)):
+            distance = self.distance_between_points(self.current_pose.position, self.waypoints[i].pose.position)
+            if distance < closest_distance:
+                closest_distance = distance
+                closest_index = i
+
+        # Apply the max index jump threshold
+        if abs(closest_index - self.prev_closest_index) > max_index_jump:
+            if closest_index > self.prev_closest_index:
+                closest_index = self.prev_closest_index 
+            else:
+                closest_index = i
+
+        self.prev_closest_index = closest_index  # Update the previous closest index
+        return closest_index, closest_distance
+
     
     def distance_between_points(self, point1, point2):
         return math.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)

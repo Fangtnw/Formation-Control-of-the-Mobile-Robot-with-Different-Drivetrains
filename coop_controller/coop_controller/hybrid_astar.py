@@ -31,9 +31,9 @@ class Car:
 
 class Cost:
     reverse = 0
-    directionChange = 100000 #100000
+    directionChange = 1000 #100000
     steerAngle = 0
-    steerAngleChange = 100000 #100000
+    steerAngleChange = 1000000#100000
     hybridCost = 0
 
 class Node:
@@ -597,14 +597,14 @@ class HybridAStarPlanner(rosNode):
         super().__init__("hybrid_astar_planner")
         self.subscription = self.create_subscription(
             OccupancyGrid,
-            # "/global_costmap/costmap",
-            "/map",
+            "/global_costmap/costmap",
+            # "/map",   #/map 
             self.map_callback,
             10
         )
         self.subscription_odom = self.create_subscription(
             Odometry,
-            '/ack/odom',
+            '/ack/odom',  #odometry/filtered /ack/odom
             self.odom_callback,
             10)
         self.publisher_ = self.create_publisher(Path, '/plan', 10)  
@@ -678,8 +678,8 @@ class HybridAStarPlanner(rosNode):
         for i in range(len(x)):
             pose = PoseStamped()
             pose.header.frame_id = "map"
-            pose.pose.position.x = x[i] *0.0515 + self.map_origin_x   #workshop0.05152
-            pose.pose.position.y = y[i] *0.0515 + self.map_origin_y 
+            pose.pose.position.x = x[i] *0.052 + self.map_origin_x   #workshop0.05152
+            pose.pose.position.y = y[i] *0.052 + self.map_origin_y 
             pose.pose.position.z = 0.0  # Assuming the path is on a flat plane
 
             # Calculate orientation quaternion from yaw angle
@@ -732,8 +732,8 @@ class HybridAStarPlanner(rosNode):
                     transform = self.tf_buffer.lookup_transform('map', 'odom', rclpy.time.Time(), Duration(seconds=0.1))
                     transformed_msg = tf2_geometry_msgs.do_transform_pose(self.current_pose_odom, transform)
                     if transformed_msg is not None:
-                        self.s_x = (abs(transformed_msg.position.x+abs(self.map_origin_x)))/0.0515  
-                        self.s_y = (abs(transformed_msg.position.y+abs(self.map_origin_y)))/0.0515  
+                        self.s_x = (abs(transformed_msg.position.x+abs(self.map_origin_x)))/0.052  
+                        self.s_y = (abs(transformed_msg.position.y+abs(self.map_origin_y)))/0.052  
                         quaternion = (
                             transformed_msg.orientation.x,
                             transformed_msg.orientation.y,
@@ -799,7 +799,7 @@ def main(args=None):
     # # g = [20, 32, np.deg2rad(0)] #back
 
     # s = [39, 32, np.deg2rad(180)]
-    # # s = [planner.s_x,planner.s_y, -planner.s_yaw]
+    # s = [planner.s_x,planner.s_y, -planner.s_yaw]
     # g = [103, 120, np.deg2rad(-90)]  #front
 
 
@@ -820,11 +820,19 @@ def main(args=None):
     # g = [25, 324, np.deg2rad(0)]  #main goal
 
 #cb_lift
-    g = [270, 80, np.deg2rad(90)]
+    # g = [270, 80, np.deg2rad(90)]
 
 #workshop
     # g = [145, 265, np.deg2rad(0)]
-    # g = [190, 264, np.deg2rad(180)]
+    # g = [144, 415, np.deg2rad(-3)]  #553 422  415
+    # g = [160, 522, np.deg2rad(-3)]  #403 522
+
+
+    g = [158.5, 549, np.deg2rad(0)]  #latest real amcl
+
+    # g = [190, 392, np.deg2rad(-2)]  #403 522 wide2
+    
+    
     # Get Obstacle Map
     # obstacleX, obstacleY = map()
     obstacleX = [obs[0] for obs in planner.obstacle_map]
@@ -867,8 +875,8 @@ def main(args=None):
         plt.cla()
         plt.xlim(min(obstacleX), max(obstacleX)) 
         plt.ylim(min(obstacleY), max(obstacleY))
-        # plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
-        plt.plot(obstacleX, obstacleY, "sk")
+        plt.plot(obstacleX, obstacleY, "sk",markersize=0.3)
+        # plt.plot(obstacleX, obstacleY, "sk")
         plt.plot(x, y, linewidth=1.5, color='r', zorder=0)
         drawCar(x[k], y[k], yaw[k])
         plt.arrow(x[k], y[k], 1*math.cos(yaw[k]), 1*math.sin(yaw[k]), width=.1)

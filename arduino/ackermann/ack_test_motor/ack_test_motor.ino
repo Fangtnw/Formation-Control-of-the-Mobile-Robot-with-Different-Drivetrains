@@ -1,12 +1,12 @@
 // Motor 1
-const int motor1INA = 9;
-const int motor1INB = 8;
-const int motor1PWM = 10;
+const int motor1INA = 12;
+const int motor1INB = 13;
+const int motor1PWM = 11;
 
 // Motor 2
-const int motor2INA = 12;
-const int motor2INB = 13;
-const int motor2PWM = 11;
+const int motor2INA = 8;
+const int motor2INB = 9;
+const int motor2PWM = 10;
 
 
 
@@ -37,12 +37,12 @@ void moveMotorsForward() {
   // Motor 1
   digitalWrite(motor1INA, HIGH);
   digitalWrite(motor1INB, LOW);
-  analogWrite(motor1PWM, 70);  // 255 is the maximum PWM value for full speed
+  analogWrite(motor1PWM, 20);  // 255 is the maximum PWM value for full speed
 
   // Motor 2
   digitalWrite(motor2INA, HIGH);
   digitalWrite(motor2INB, LOW);
-  analogWrite(motor2PWM, 70);
+  analogWrite(motor2PWM, 20);
 }
 
 void moveMotorsBackward() {

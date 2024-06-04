@@ -54,13 +54,13 @@ def generate_launch_description():
     diff_bringup = ExecuteProcess(
         cmd=['ros2','launch','coop_robot_bringup','pi_diff.launch.py']
     )
-    diff_robot_localization_odom = Node(
+    ekf_odom = Node(
             package='robot_localization',
             executable='ekf_node',
             name='ekf_filter_node',
             output='screen',
-            remappings=[('/odometry/filtered', '/diffdrive/odom')],
-            ros_arguments=['--params-file','coop_ws/src/coop_robot_bringup/config/ekf_diff.yaml'],  # Replace with the actual path
+            # remappings=[('/odometry/filtered', '/diffdrive/odom')],
+            ros_arguments=['--params-file','coop_ws/src/coop_robot_bringup/config/ekf.yaml'],  # Replace with the actual path
         )
     
     # imu_to_base_link_tf = ExecuteProcess(
@@ -117,7 +117,7 @@ def generate_launch_description():
                     )
 
     rviz = ExecuteProcess(
-        cmd=['ros2', 'run', 'rviz2', 'rviz2', '-d', '/opt/ros/humble/share/nav2_bringup/rviz/nav2_default_view.rviz'],
+        cmd=['ros2', 'run', 'rviz2', 'rviz2', '-d', 'coop_view.rviz'],   #/opt/ros/humble/share/nav2_bringup/rviz/nav2_default_view.rviz
         output='screen',
     )
 
@@ -169,7 +169,7 @@ def generate_launch_description():
 
 
     map_server = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=cb5_ack.yaml'],
+        cmd=['ros2', 'run', 'nav2_map_server', 'map_server', '--ros-args', '-p', 'yaml_filename:=workshop_real.yaml'],   #real wide2
         output='screen',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
@@ -180,12 +180,26 @@ def generate_launch_description():
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
 
-    amcl = ExecuteProcess(
-        cmd=['ros2', 'run', 'nav2_amcl', 'amcl'],
+    # amcl = ExecuteProcess(
+    #     cmd=['ros2', 'run', 'nav2_amcl', 'amcl', '--params_file','coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
+    #     output='screen',
+    #     condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
+    # )
+
+    amcl =Node(
+        package='nav2_amcl',
+        executable='amcl',
+        # cmd=['ros2', 'run', 'nav2_amcl', 'amcl', '--params_file','coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
         output='screen',
+        parameters=['coop_ws/src/coop_robot_bringup/config/nav2_params.yaml'],
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('mode'), '" == "real"']))
     )
+    # nav2= ExecuteProcess(
+    #     cmd=['ros2', 'launch', 'nav2_bringup', 'navigation_launch.py', 'params_file:=coop_ws/src/coop_robot_bringup/config/nav2_params.yaml' ,'use_sim_time:=false'],
+    #     output='screen',
+    # )
 
+    
     lifecycle_amcl = ExecuteProcess(
         cmd=['ros2', 'run', 'nav2_util', 'lifecycle_bringup', 'amcl'],
         output='screen',
@@ -202,7 +216,9 @@ def generate_launch_description():
     ld.add_action(laser_to_base_footprint_tf)
     # ld.add_action(diff_odom_compute)
 
+    # ld.add_action(ack_to_mec_tf)
     # ld.add_action(ack_odom_compute)
+    # ld.add_action(ekf_odom)
     ld.add_action(camera_to_mec_footprint)
     ld.add_action(aruco_from_base_footprint)
 
@@ -220,13 +236,13 @@ def generate_launch_description():
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2_sim)
 
-    # ld.add_action(map_server)
-    # ld.add_action(lifecycle_map_server)
+    ld.add_action(map_server)
+    ld.add_action(lifecycle_map_server)
     ld.add_action(slam_toolbox_localize1)
     ld.add_action(slam_toolbox_localize2)
-    ld.add_action(slam_toolbox_localize_real)
-    # ld.add_action(amcl)
-    # ld.add_action(lifecycle_amcl)
+    # ld.add_action(slam_toolbox_localize_real)
+    ld.add_action(amcl)
+    ld.add_action(lifecycle_amcl)
 
     return ld
 

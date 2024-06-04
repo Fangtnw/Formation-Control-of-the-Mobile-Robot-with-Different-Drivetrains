@@ -26,27 +26,40 @@ class ArUcoDetector(Node):
             'image_raw',
             self.image_callback,
             qos_profile=QoSProfile(
-                depth=10,  # This sets the history depth to 1 (optional)
+                depth=1,  # This sets the history depth to 1 (optional)
                 reliability=rclpy.qos.ReliabilityPolicy.BEST_EFFORT,  # Set reliability level
                 durability=rclpy.qos.DurabilityPolicy.VOLATILE,  # Optional, adjust if needed
-                history=rclpy.qos.HistoryPolicy.KEEP_LAST
+                history=rclpy.qos.HistoryPolicy.KEEP_LAST,
+                lifespan=rclpy.duration.Duration(seconds=0.1) 
                   # Sets the deadline to 1/10 seconds for 10 Hz
             )
         )
         self.camera_matrix = np.array([
             
-        # [678.32644258, 0.0, 291.36114031],
-        # [0.0, 666.95790955, 233.72386481],
-        # [0.0, 0.0, 1.0]
+# [633.73045716,   0.0,         350.21328015],
+#  [  0.0,         643.64092683, 300.82583886],
+#  [  0.0,           0.0,           1.0        ]
 
-        [509.186325 , 0.0, 345.35379696],
-        [  0.0 , 615.39364127, 306.27040277],
-        [  0.0 , 0.0 , 1.0        ]
+    [593.99689349,   0.0         ,370.17478652],
+    [  0.0,         596.41119583, 248.01189512],
+    [  0.0,           0.0,           1.0,        ]
+
+
+        # [509.186325 , 0.0, 345.35379696],
+        # [  0.0 , 615.39364127, 306.27040277],
+        # [  0.0 , 0.0 , 1.0        ]
 
             ])
+        
 
-        # self.dist_coeff = np.array([ 1.94117292, -3.75643948,  0.013334,    0.40815147,  3.84220463])
-        self.dist_coeff = np.array([-0.54810353, 0.89866936, 0.02231926, 0.01317876, -2.36918976])
+
+# ([-0.44709562  0.36708006 -0.01366672 -0.00444425 -0.34651477])
+
+        self.dist_coeff = np.array([-0.533307,    0.48569588, -0.00631618, -0.02238948, -0.38499538])
+        # self.dist_coeff = np.array([-0.54810353, 0.89866936, 0.02231926, 0.01317876, -2.36918976])
+        # self.dist_coeff = np.array([-0.44709562,  0.36708006, -0.01366672, -0.00444425, -0.34651477])
+
+        
 
 
         # self.camera_info_sub = self.create_subscription(
@@ -154,10 +167,15 @@ class ArUcoDetector(Node):
 def main(args=None):
     rclpy.init(args=args)
     aruco_detector = ArUcoDetector()
-    rclpy.spin(aruco_detector)
-    aruco_detector.destroy_node()
-    rclpy.shutdown()
 
+    # Use a MultiThreadedExecutor to allow callbacks to run concurrently
+    executor = rclpy.executors.MultiThreadedExecutor()
+    executor.add_node(aruco_detector)
+    try:
+        executor.spin()
+    finally:
+        aruco_detector.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

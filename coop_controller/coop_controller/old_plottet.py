@@ -48,10 +48,6 @@ class TrajectoryPlotter(Node):
         self.follower_y_positions = []
         self.follower_yaws = []
 
-        self.leader_follower_x_positions =[]
-        self.leader_follower_y_positions = []
-        self.leader_follower_yaws = []
-
         self.path_x_positions = []
         self.path_y_positions = []
         self.path_yaws = [] 
@@ -61,15 +57,9 @@ class TrajectoryPlotter(Node):
 
         self.leader_encoder = []
         self.follower_encoder = []
-
-
-        self.leader_times = []
-        self.follower_times = []
         
         self.tf_buffer = tf2_ros.Buffer(Duration(seconds=2))
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
-
-        self.reference_time = self.get_clock().now().nanoseconds / 1e9
 
     def ack_odom_callback(self, msg):
         self.current_pose_ack = msg.pose.pose
@@ -90,7 +80,6 @@ class TrajectoryPlotter(Node):
             self.follower_yaws.append(self.quaternion_to_yaw(transform.transform.rotation))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             self.get_logger().warn('Transform MEC lookup failed')
-
             # pass
     
     def mec_odom_callback(self, msg):
@@ -105,42 +94,28 @@ class TrajectoryPlotter(Node):
         ]
 
     def cmd_vel_callback(self, msg):
-        if self.reference_time is None:
-            self.reference_time = self.get_clock().now().nanoseconds / 1e9
-        
-        try:
-            transform = self.tf_buffer.lookup_transform('base_footprint', 'base_footprint_mec', rclpy.time.Time())
-            # transformed_msg = tf2_geometry_msgs.do_transform_pose(self.current_pose_mec, transform)
-            self.leader_follower_x_positions.append(transform.transform.translation.x)
-            self.leader_follower_y_positions.append(transform.transform.translation.y)
-            self.leader_follower_yaws.append(self.quaternion_to_yaw(transform.transform.rotation))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-            self.get_logger().warn('Transform MEC lookup failed')
-
-        current_time = self.get_clock().now().nanoseconds / 1e9 - self.reference_time
-        self.leader_velocities.append((current_time, msg.linear.x, msg.angular.z))
-        self.leader_times.append(current_time)  # Recording the time for leader
-
+        # Check if the robot is moving or has stopped
         is_currently_moving = (msg.linear.x != 0.0 or msg.angular.z != 0.0)
-
+        current_time = self.get_clock().now().nanoseconds / 1e9  # Time in seconds
+        self.leader_velocities.append((current_time, msg.linear.x, msg.angular.z))
+  
+        # If robot wasn't moving but now is, record the start time
         if not self.is_moving and is_currently_moving:
             self.is_moving = True
-            start_time = current_time
-            self.start_times.append(start_time)
+            start_time = self.get_clock().now().nanoseconds / 1e9  # Time in seconds
+            self.start_times.append(start_time)  # Append to start times list
             self.get_logger().info("Robot started moving at time: {:.2f} seconds".format(start_time))
         
+        # If robot was moving but has stopped, record the end time
         elif self.is_moving and not is_currently_moving:
             self.is_moving = False
-            end_time = current_time
-            self.end_times.append(end_time)
+            end_time = self.get_clock().now().nanoseconds / 1e9
+            self.end_times.append(end_time)  # Append to end times list
             self.get_logger().info("Robot stopped moving at time: {:.2f} seconds".format(end_time))
 
-
     def cmd_vel_follower_callback(self, msg):
-        current_time = self.get_clock().now().nanoseconds / 1e9 - self.reference_time  # Adjust to use the same reference time
+        current_time = self.get_clock().now().nanoseconds / 1e9  # Time in seconds
         self.follower_velocities.append((current_time, msg.linear.x, msg.linear.y, msg.angular.z))
-        self.follower_times.append(current_time)  # Recording the time for follower
-
 
     def mec_encoder_vel_callback(self, msg):
         current_time = self.get_clock().now().nanoseconds / 1e9  # Time in seconds
@@ -157,22 +132,16 @@ class TrajectoryPlotter(Node):
         self.leader_steering_angle = -msg.angular.y
         self.leader_encoder.append((current_time, msg.linear.y, msg.linear.x, -msg.angular.y))
 
-    def calculate_errors(self, x_positions, y_positions, reference_x, reference_y, times):
-        if not self.path_x_positions:
-            return {'dist': [], 'mae': 0, 'rmse': 0, 'max_error': 0, 'min_error': 0}
-        
+    def calculate_errors(self, x_positions, y_positions, reference_x, reference_y):
         distances = [
-            (time, min(distance.euclidean((x, y), (rx, ry)) for rx, ry in zip(reference_x, reference_y)))
-            for time, (x, y) in zip(times, zip(x_positions, y_positions))
+            min(distance.euclidean((x, y), (rx, ry)) for rx, ry in zip(reference_x, reference_y))
+            for x, y in zip(x_positions, y_positions)
         ]
-        error_values = [dist for time, dist in distances]
-        
         return {
-            'dist': distances,
-            'mae': np.mean(error_values),
-            'rmse': np.sqrt(np.mean(np.square(error_values))),
-            'max_error': np.max(error_values),
-            'min_error': np.min(error_values),
+            'cte': np.mean(distances),  # Mean Cross track Error
+            'rmse': np.sqrt(np.mean(np.square(distances))),  # Root Mean Square Error
+            'max_error': np.max(distances),  # Maximum Error
+            'min_error': np.min(distances),  # Minimum Error
         }
     
     def calculate_cross_track_error(self, x_positions, y_positions, reference_x, reference_y):
@@ -227,7 +196,7 @@ class TrajectoryPlotter(Node):
 
     def calculate_leader_follower_error(self):
         if not self.leader_x_positions or not self.follower_x_positions:
-            return {'dist': [], 'mae': 0, 'rmse': 0, 'max_error': 0, 'min_error': 0}
+            return None
 
         # Calculate the positional errors between the leader and follower
         positional_errors = [
@@ -236,7 +205,6 @@ class TrajectoryPlotter(Node):
         ]
 
         return {
-            'dist': positional_errors,
             'mae': np.mean(positional_errors),  # Mean Absolute Error
             'rmse': np.sqrt(np.mean(np.square(positional_errors))),  # Root Mean Square Error
             'max_error': np.max(positional_errors),  # Maximum Error
@@ -287,8 +255,7 @@ class TrajectoryPlotter(Node):
                 self.leader_x_positions, 
                 self.leader_y_positions, 
                 self.path_x_positions, 
-                self.path_y_positions,
-                 self.leader_times
+                self.path_y_positions
             )
             leader_cross_track_errors = self.calculate_cross_track_error(
                 self.leader_x_positions, 
@@ -307,8 +274,7 @@ class TrajectoryPlotter(Node):
                     self.follower_x_positions, 
                     self.follower_y_positions, 
                     self.path_x_positions, 
-                    self.path_y_positions,
-                     self.follower_times
+                    self.path_y_positions
                 )
                 follower_cross_track_errors = self.calculate_cross_track_error(
                     self.follower_x_positions, 
@@ -360,57 +326,38 @@ class TrajectoryPlotter(Node):
         plt.show()
 
     def save_velocities_to_csv(self):
+        # Use the helper function to get a unique filename
         unique_filename = get_unique_filename('experiment', 'csv')
         with open(unique_filename, 'w', newline='') as csvfile:
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow([
                 'Time (s)', 'Leader Linear X', 'Leader Angular Z', 'Leader Left Vel', 'Leader Right Vel', 'Leader Steering Angle', 
                 'Follower Linear X', 'Follower Linear Y', 'Follower Angular Z', 'Follower Motor1 Vel', 'Follower Motor2 Vel', 'Follower Motor3 Vel', 'Follower Motor4 Vel',
-                'Leader Dist', 'Leader MAE', 'Leader RMSE', 'Leader Max Error', 'Leader Min Error',
-                'Follower Dist', 'Follower MAE', 'Follower RMSE', 'Follower Max Error', 'Follower Min Error',
-                'Formation Dist', 'Formation MAE', 'Formation RMSE', 'Formation Max Error', 'Formation Min Error',
-                'Total Operate Time', 'Leader-Follower X', 'Leader-Follower Y', 'Leader-Follower Yaw'
+                'Leader MAE', 'Leader RMSE', 'Leader Max Error', 'Leader Min Error',
+                'Follower MAE', 'Follower RMSE', 'Follower Max Error', 'Follower Min Error',
+                'Total Operate Time'
             ])
-
-            leader_errors = self.calculate_errors(self.leader_x_positions, self.leader_y_positions, self.path_x_positions, self.path_y_positions, self.leader_times)
-            follower_errors = {'dist': [], 'mae': 0, 'rmse': 0, 'max_error': 0, 'min_error': 0}
-            follower_leader_errors = {'dist': [], 'mae': 0, 'rmse': 0, 'max_error': 0, 'min_error': 0}
-
-            if self.follower_x_positions:
-                follower_errors = self.calculate_errors(self.follower_x_positions, self.follower_y_positions, self.path_x_positions, self.path_y_positions, self.follower_times)
-                follower_leader_errors = self.calculate_leader_follower_error()
-
+            
+            # Calculate errors and total operate time
+            leader_errors = self.calculate_errors(self.leader_x_positions, self.leader_y_positions, self.path_x_positions, self.path_y_positions)
+            follower_errors = self.calculate_errors(self.follower_x_positions, self.follower_y_positions, self.path_x_positions, self.path_y_positions)
             total_operate_time = self.calculate_total_operate_time()
-            max_len = max(len(self.leader_velocities), len(self.follower_velocities), len(self.leader_encoder), len(self.follower_encoder), len(self.leader_follower_x_positions))
 
-            for i in range(max_len):
-                leader_time, leader_linear_x, leader_angular_z = self.leader_velocities[i] if i < len(self.leader_velocities) else ('', '', '')
-                follower_time, follower_linear_x, follower_linear_y, follower_angular_z = self.follower_velocities[i] if i < len(self.follower_velocities) else ('', '', '', '')
-                _, leader_left_vel, leader_right_vel, leader_steering_angle = self.leader_encoder[i] if i < len(self.leader_encoder) else ('', '', '', '')
-                _, follower_motor1_vel, follower_motor2_vel, follower_motor3_vel, follower_motor4_vel = self.follower_encoder[i] if i < len(self.follower_encoder) else ('', '', '', '', '')
-                leader_follower_x = self.leader_follower_x_positions[i] if i < len(self.leader_follower_x_positions) else ''
-                leader_follower_y = self.leader_follower_y_positions[i] if i < len(self.leader_follower_y_positions) else ''
-                leader_follower_yaw = self.leader_follower_yaws[i] if i < len(self.leader_follower_yaws) else ''
-
-                leader_dist, follower_dist, follower_leader_dist = '', '', ''
-                if i < len(leader_errors['dist']):
-                    leader_dist = leader_errors['dist'][i][1]
-                if i < len(follower_errors['dist']):
-                    follower_dist = follower_errors['dist'][i][1]
-                if i < len(follower_leader_errors['dist']):
-                    follower_leader_dist = follower_leader_errors['dist'][i]
-
-                csvwriter.writerow([
-                    leader_time, leader_linear_x, leader_angular_z, leader_left_vel, leader_right_vel, leader_steering_angle,
-                    follower_linear_x, follower_linear_y, follower_angular_z, follower_motor1_vel, follower_motor2_vel, follower_motor3_vel, follower_motor4_vel,
-                    leader_dist, leader_errors['mae'] if i == 0 else '', leader_errors['rmse'] if i == 0 else '', leader_errors['max_error'] if i == 0 else '', leader_errors['min_error'] if i == 0 else '',
-                    follower_dist, follower_errors['mae'] if i == 0 else '', follower_errors['rmse'] if i == 0 else '', follower_errors['max_error'] if i == 0 else '', follower_errors['min_error'] if i == 0 else '',
-                    follower_leader_dist, follower_leader_errors['mae'] if i == 0 else '', follower_leader_errors['rmse'] if i == 0 else '', follower_leader_errors['max_error'] if i == 0 else '', follower_leader_errors['min_error'] if i == 0 else '',
-                    total_operate_time if i == 0 else '', leader_follower_x, leader_follower_y, leader_follower_yaw
-                ])
-
+            for i in range(len(self.leader_velocities)):
+                if i < len(self.follower_velocities) and i < len(self.leader_encoder) and i < len(self.follower_encoder):
+                    leader_time, leader_linear_x, leader_angular_z = self.leader_velocities[i]
+                    follower_time, follower_linear_x, follower_linear_y, follower_angular_z = self.follower_velocities[i]
+                    _, leader_left_vel, leader_right_vel, leader_steering_angle = self.leader_encoder[i]
+                    _, follower_motor1_vel, follower_motor2_vel, follower_motor3_vel, follower_motor4_vel = self.follower_encoder[i]
+                    csvwriter.writerow([
+                        leader_time, leader_linear_x, leader_angular_z, leader_left_vel, leader_right_vel, leader_steering_angle,
+                        follower_linear_x, follower_linear_y, follower_angular_z, follower_motor1_vel, follower_motor2_vel, follower_motor3_vel, follower_motor4_vel,
+                        leader_errors['mae'], leader_errors['rmse'], leader_errors['max_error'], leader_errors['min_error'],
+                        follower_errors['mae'], follower_errors['rmse'], follower_errors['max_error'], follower_errors['min_error'],
+                        total_operate_time if i == 0 else ''  # Write total operate time only once
+                    ])
+                    
         self.get_logger().info(f"Saved velocities and errors to CSV file: {unique_filename}")
-
 
 
 
@@ -421,8 +368,9 @@ class TrajectoryPlotter(Node):
         return yaw
     
     def shutdown_callback(self):
-        self.plot_trajectory()
         self.save_velocities_to_csv()
+        self.plot_trajectory()
+        
         self.get_logger().info("Saved velocities to CSV and generated plot.")
         # rclpy.shutdown()
 

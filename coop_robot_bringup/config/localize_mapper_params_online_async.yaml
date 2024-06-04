@@ -19,9 +19,10 @@ slam_toolbox:
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
-    map_file_name: cb5_lift #cb5_redock meme  momo cb5_lift
+    map_file_name: workshop_wide2 #cb5_redock meme  momo cb5_lift  cb5_real workshop_real 
     # map_start_pose: [1.8, -1.5, -3.14] #[1.8, -1.5, -3.14] front | [-0.1, -1.5, 0.0]  back 
-    map_start_at_dock: True
+    map_start_pose: [0.0,5.5,0.0]
+    # map_start_at_dock: True
 
     debug_logging: false
     throttle_scans: 1
@@ -32,7 +33,7 @@ slam_toolbox:
     minimum_time_interval: 0.5
     transform_timeout: 0.2
     tf_buffer_duration: 30.
-    stack_size_to_use: 50000000 #// program needs a larger stack size to serialize large maps
+    stack_size_to_use: 500000000000 #// program needs a larger stack size to serialize large maps
     enable_interactive_mode: true
 
     # General Parameters

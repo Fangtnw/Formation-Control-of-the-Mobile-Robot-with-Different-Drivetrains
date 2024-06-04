@@ -9,9 +9,10 @@ import numpy as np
 import math
 import tf_transformations
 
-max_vx = 0.25
-max_vy = 0.4
+max_vx = 0.35
+max_vy = 0.35
 max_rz= 0.5
+PALLET_ALLOWANCE = 0.25
 
 class FormationController(Node):
     def __init__(self,follower_type):
@@ -34,13 +35,13 @@ class FormationController(Node):
         self.previous_ty = 0
         self.kp_x = 1
         self.ki_x = 0.0  # Initialize for integral term
-        self.kp_y = 1  # New gain for y-direction
+        self.kp_y = 0.2  # New gain for y-direction
         self.ki_y = 0.0  # Initialize for integral term
         self.kp_yaw = 1
         self.ki_yaw = 0  # Initialize for integral term
 
-        self.kl_x = 5
-        self.kl_yw = 5
+        self.kl_x = 1  #8.75
+        self.kl_yw = 20    #38
         self.kl_yaw = 0
 
         # Variables to store integral errors for PI control
@@ -51,18 +52,18 @@ class FormationController(Node):
         self.follower_type = follower_type
 
         self.publisher = self.create_publisher(Twist, 'cmd_vel_follower', 10)
-        self.publisher_cmd_vel = self.create_publisher(Twist, 'cmd_vel_xdxd', 10)
+        self.publisher_cmd_vel = self.create_publisher(Twist, 'cmd_vel', 10)
         #subscribe for leader Twist command
         self.subscription = self.create_subscription(
             Twist,
-            'cmd_vel',
+            'cmd_vel_pure',
             self.cmd_vel_callback,
             10
         )
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
 
-        self.timer = self.create_timer(0.01, self.control_callback)
+        self.timer = self.create_timer(0.1, self.control_callback)
 
     def cmd_vel_callback(self, msg):
         self.leader_x = msg.linear.x 
@@ -85,16 +86,17 @@ class FormationController(Node):
             roll = euler[0]
             pitch = euler[1]
             yaw = euler[2]
+            leader_cmd_msg = Twist()
 
             self.get_logger().info(
                 f"Translation: x:{tx:.2f}, y:{ty:.2f}, z:{tz:.2f} , "
                 f"Rotation: roll:{roll:.2f}, pitch:{pitch:.2f}, yaw:{yaw:.4f}" 
             )
 
-            if tx > 1.6:
-                self.leader_x = 0.0
-                self.leader_w = 0.0
-                self.get_logger().warn("waiting for follower")
+            # if tx > 1.65:
+            #     self.leader_x = 0.0
+            #     self.leader_w = 0.0
+            #     self.get_logger().warn("waiting for follower")
 
             #mecanum_follower case
             if self.follower_type == 'mecanum':
@@ -149,33 +151,48 @@ class FormationController(Node):
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
 
             elif self.follower_type == 'aruco':
-                error_x = (tx - 1.3)
+                error_x = (tx - 1.45)
                 self.integral_error_x += error_x  # Accumulate error for integral term
-                
                 # linear_vel_x = self.kp_x * error_x + self.ki_x * self.integral_error_x
                 error_y = ty
                 self.integral_error_y += error_y  # Accumulate error for integral term
+                error_yaw = yaw 
+                self.integral_error_yaw += error_yaw
                 # linear_vel_y = self.kp_y * error_y + self.ki_y * self.integral_error_y
                 
                 if self.leader_w != 0 and self.leader_x > 0:
-                    linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)
-                    linear_vel_y = (self.kp_y * error_y) + (-self.leader_w * self.kl_yw)
-                if self.leader_w != 0 and self.leader_x < 0 :
-                    linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) - abs(self.leader_w * self.kl_yw)
-                    linear_vel_y = (self.kp_y * error_y) + (-self.leader_w * self.kl_yw)
+                    # linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) - abs(self.leader_w * self.kl_yw)
+                    linear_vel_x = (self.kp_x * error_x) + (self.ki_x * self.integral_error_x) + (-self.leader_x * self.kl_x) - abs(self.leader_w * self.kl_yw)
+                    linear_vel_y = (self.kp_y * error_y) + (self.ki_y * self.integral_error_y) + (-self.leader_w * self.kl_yw)
+                elif self.leader_w != 0 and self.leader_x < 0 :
+                    # linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)
+                    linear_vel_x = (self.kp_x * error_x) + (self.ki_x * self.integral_error_x)  + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)
+                    linear_vel_y = (self.kp_y * error_y) + (self.ki_y * self.integral_error_y) + (-self.leader_w * self.kl_yw)
                 else:
-                    linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * 1) 
-                    linear_vel_y = (self.kp_y * error_y) + (-self.leader_w * self.kl_yw)
+                    linear_vel_x = (self.kp_x * error_x) + (self.ki_x * self.integral_error_x) + (-self.leader_x * self.kl_x) 
+                    linear_vel_y = (self.kp_y * error_y) + (self.ki_y * self.integral_error_y) + (-self.leader_w * self.kl_yw)
 
-                if abs(error_x) < 0.8 and abs(error_y) < 0.5:
-                    error_yaw = yaw 
-                    self.integral_error_yaw += error_yaw  # Accumulate error for integral term
-                    # angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
-                    angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  + (self.leader_w * self.kl_yaw) 
-                    # angular_vel = 0.0
+                if abs(error_x) > PALLET_ALLOWANCE:
+                    leader_cmd_msg.linear.x = 0.0
+                    leader_cmd_msg.angular.z = 0.0
+                    self.get_logger().warn("waiting for follower")
                 else:
-                    angular_vel = 0.0  # Prioritize x, y if they are large
+                    leader_cmd_msg.linear.x = self.leader_x
+                    leader_cmd_msg.angular.z = self.leader_w      
+
+                # if linear_vel_x <= 0.02 and linear_vel_y <= 0.02:
+                #     linear_vel_x = 0.0
+                #     linear_vel_y = 0.0
+
+                # if abs(error_x) < 0.2 and abs(error_y) < 0.2:
+                #       # Accumulate error for integral term
+                #     # angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  # Apply direction factor for yaw
+                #     angular_vel = ((self.kp_yaw * error_yaw ) + (self.ki_yaw * self.integral_error_yaw))  + (self.leader_w * self.kl_yaw) 
+                #     # angular_vel = 0.0
+                # else:
+                angular_vel = 0.0  # Prioritize x, y if they are large
                 # cmd_msg.linear.y = linear_vel_y
+                
                 linear_vel_x = max(min(linear_vel_x, max_vx), -max_vx)
                 linear_vel_y = max(min(linear_vel_y, max_vy), -max_vy)
                 angular_vel = max(min(angular_vel, max_rz), -max_rz)
@@ -184,9 +201,7 @@ class FormationController(Node):
                 self.get_logger().error(f"Invalid follower type '{self.follower_type}'")
                 exit()
 
-            cmd_msg.linear.x = linear_vel_x
-            cmd_msg.linear.y = linear_vel_y
-            cmd_msg.angular.z = angular_vel
+
 
             # self.get_logger().info(
             #     f"Follower_command: x:{linear_vel_x:.2f}, z:{angular_vel:.2f} "
@@ -194,11 +209,16 @@ class FormationController(Node):
             
             self.previous_ty = ty 
             self.previous_yaw = yaw 
+            if abs(linear_vel_x) <= 0.05 and abs(linear_vel_y) <= 0.05:
+                cmd_msg.linear.x = 0.0
+                cmd_msg.linear.y = 0.0
+                cmd_msg.angular.z = 0.0
+            else:
+                cmd_msg.linear.x = linear_vel_x
+                cmd_msg.linear.y = linear_vel_y
+                cmd_msg.angular.z = angular_vel
+            
             self.publisher.publish(cmd_msg)
-
-            leader_cmd_msg = Twist()
-            leader_cmd_msg.linear.x = self.leader_x
-            leader_cmd_msg.angular.z = self.leader_w
             self.publisher_cmd_vel.publish(leader_cmd_msg)
 
         except Exception as e:

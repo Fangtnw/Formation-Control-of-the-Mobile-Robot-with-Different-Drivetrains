@@ -13,8 +13,8 @@ import math
 
 WHEEL_DISTANCE = 0.5
 LENGTH = 0.5
-IMU_WEIGHT = 0.25  # Relative weight for IMU
-ODOMETRY_WEIGHT = 0.75 # Relative weight for odometry
+IMU_WEIGHT = 0.75  # Relative weight for IMU  0.25
+ODOMETRY_WEIGHT = 0.25 # Relative weight for odometry 0.75
 TIME_STEP = 0.01  # Time step for the update rate
 
 class OdometryNode(Node):
