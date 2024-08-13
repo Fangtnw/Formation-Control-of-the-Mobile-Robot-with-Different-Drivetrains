@@ -165,7 +165,7 @@ class FormationController(Node):
                     linear_vel_x = (self.kp_x * error_x) + (self.ki_x * self.integral_error_x) + (-self.leader_x * self.kl_x) - abs(self.leader_w * self.kl_yw)
                     linear_vel_y = (self.kp_y * error_y) + (self.ki_y * self.integral_error_y) + (-self.leader_w * self.kl_yw)
                 elif self.leader_w != 0 and self.leader_x < 0 :
-                    # linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)
+                    # linear_vel_x = (self.kp_x * error_x) + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)``
                     linear_vel_x = (self.kp_x * error_x) + (self.ki_x * self.integral_error_x)  + (-self.leader_x * self.kl_x) + abs(self.leader_w * self.kl_yw)
                     linear_vel_y = (self.kp_y * error_y) + (self.ki_y * self.integral_error_y) + (-self.leader_w * self.kl_yw)
                 else:

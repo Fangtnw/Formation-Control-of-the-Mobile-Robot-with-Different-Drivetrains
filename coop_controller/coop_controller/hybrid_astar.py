@@ -31,9 +31,9 @@ class Car:
 
 class Cost:
     reverse = 0
-    directionChange = 1000 #100000
+    directionChange = 100000 #100000
     steerAngle = 0
-    steerAngleChange = 1000000#100000
+    steerAngleChange = 100000 #100000
     hybridCost = 0
 
 class Node:
@@ -132,6 +132,7 @@ def reedsSheppNode(currentNode, goalNode, mapParameters):
 
     # Instantaneous Radius of Curvature
     radius = math.tan(Car.maxSteerAngle)/Car.wheelBase
+    #radius =Car.wheelBase /  math.tan(Car.maxSteerAngle)  This might be the right formular but nvm. It's got the result
 
     #  Find all possible reeds-shepp paths between current and goal node
     reedsSheppPaths = rsCurve.calc_all_paths(startX, startY, startYaw, goalX, goalY, goalYaw, radius, 1)
@@ -828,7 +829,8 @@ def main(args=None):
     # g = [160, 522, np.deg2rad(-3)]  #403 522
 
 
-    g = [158.5, 549, np.deg2rad(0)]  #latest real amcl
+    # g = [158.5, 549, np.deg2rad(0)]  #latest real amcl  latest real resulttt
+    g = [161.5, 551.5, np.deg2rad(-1)]  #try to modify U and 1   158.5
 
     # g = [190, 392, np.deg2rad(-2)]  #403 522 wide2
     

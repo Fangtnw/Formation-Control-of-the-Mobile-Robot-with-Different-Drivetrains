@@ -217,7 +217,7 @@ def generate_launch_description():
     # ld.add_action(diff_odom_compute)
 
     # ld.add_action(ack_to_mec_tf)
-    # ld.add_action(ack_odom_compute)
+    ld.add_action(ack_odom_compute)
     # ld.add_action(ekf_odom)
     ld.add_action(camera_to_mec_footprint)
     ld.add_action(aruco_from_base_footprint)
@@ -231,7 +231,7 @@ def generate_launch_description():
     ld.add_action(rviz)
 
     # ld.add_action(slam_toolbox)
-    ld.add_action(nav2)
+    # ld.add_action(nav2)
     
     # ld.add_action(slam_toolbox)
     # ld.add_action(nav2_sim)
